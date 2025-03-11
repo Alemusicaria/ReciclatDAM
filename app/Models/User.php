@@ -11,7 +11,7 @@ class User extends Authenticatable
     protected $table = 'users';
 
     protected $fillable = [
-        'nom', 'cognoms', 'data_naieixement', 'telefon', 'ubicacio', 'punts_totals', 'punts_actuals', 'punts_gastats', 'email', 'password'
+        'nom', 'cognoms', 'data_naieixement', 'telefon', 'ubicacio', 'punts_totals', 'punts_actuals', 'punts_gastats', 'email', 'password', 'rol_id'
     ];
 
     protected $hidden = [
@@ -30,5 +30,10 @@ class User extends Authenticatable
     public function sessions()
     {
         return $this->hasMany(Session::class);
+    }
+
+    public function rol()
+    {
+        return $this->belongsTo(Rol::class);
     }
 }

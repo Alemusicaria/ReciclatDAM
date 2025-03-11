@@ -24,10 +24,10 @@ class Kernel extends HttpKernel
      */
     protected $middlewareGroups = [
         'web' => [
-            // Other middleware
+            // otros middlewares
             \App\Http\Middleware\SetLocale::class,
         ],
-
+    
         'api' => [
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,

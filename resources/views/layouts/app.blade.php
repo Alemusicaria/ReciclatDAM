@@ -33,12 +33,12 @@
             <button id="theme-toggle" class="btn btn-secondary btn-sm">Toggle Theme</button>
             <div class="dropdown ml-2">
                 <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="languageDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Language
+                    {{ __('Language') }}
                 </button>
                 <div class="dropdown-menu" aria-labelledby="languageDropdown">
-                    <a class="dropdown-item" href="#" data-lang="ca">Català</a>
-                    <a class="dropdown-item" href="#" data-lang="en">English</a>
-                    <a class="dropdown-item" href="#" data-lang="es">Español</a>
+                    <a class="dropdown-item" href="/set-locale/ca" data-lang="ca">{{ __('Català') }}</a>
+                    <a class="dropdown-item" href="/set-locale/en" data-lang="en">{{ __('English') }}</a>
+                    <a class="dropdown-item" href="/set-locale/es" data-lang="es">{{ __('Español') }}</a>
                 </div>
             </div>
         </div>

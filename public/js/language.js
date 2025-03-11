@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
     const languageDropdownItems = document.querySelectorAll('.dropdown-item[data-lang]');
     languageDropdownItems.forEach(item => {
-        item.addEventListener('click', function () {
+        item.addEventListener('click', function (event) {
+            event.preventDefault();
             const newLanguage = this.getAttribute('data-lang');
             localStorage.setItem('language', newLanguage);
 
@@ -12,8 +13,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 },
                 body: JSON.stringify({ locale: newLanguage })
-            }).then(() => {
-                location.reload(); // Reload to apply the new language
+            }).then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                }
             });
         });
     });

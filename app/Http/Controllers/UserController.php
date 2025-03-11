@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Rol;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 
@@ -9,13 +10,14 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::all();
+        $users = User::with('rol')->get();
         return view('users.index', compact('users'));
     }
 
     public function create()
     {
-        return view('users.create');
+        $rols = Rol::all();
+        return view('users.create', compact('rols'));
     }
 
     public function store(Request $request)
@@ -31,6 +33,7 @@ class UserController extends Controller
             'punts_gastats' => 'required|integer',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'rol_id' => 'required|integer|exists:rols,id',
         ]);
 
         $user = User::create([
@@ -44,6 +47,7 @@ class UserController extends Controller
             'punts_gastats' => $request->punts_gastats,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'rol_id' => $request->rol_id,
         ]);
         return redirect()->route('users.index');
     }
@@ -55,7 +59,8 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        return view('users.edit', compact('user'));
+        $rols = Rol::all();
+        return view('users.edit', compact('user', 'rols'));
     }
 
     public function update(Request $request, User $user)
@@ -71,6 +76,7 @@ class UserController extends Controller
             'punts_gastats' => 'required|integer',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'required',
+            'rol_id' => 'required|integer|exists:rols,id',
         ]);
 
         $user->update($request->all());

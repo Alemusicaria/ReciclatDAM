@@ -11,9 +11,9 @@ use App\Http\Controllers\PasswordResetTokenController;
 use App\Http\Controllers\PremiController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\UserController;
-
-
-
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\App;
 
 Route::get('/', function () {
     return view('dashboard');
@@ -26,8 +26,6 @@ Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('regi
 Route::post('/register', [AuthController::class, 'register']);
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-
 
 Route::resource('caches', CacheController::class);
 Route::resource('cache-locks', CacheLockController::class);
@@ -42,13 +40,15 @@ Route::post('/set-locale', function (Illuminate\Http\Request $request) {
     $locale = $request->input('locale');
     if (in_array($locale, config('app.available_locales'))) {
         Session::put('locale', $locale);
+        App::setLocale($locale);
     }
     return response()->json(['status' => 'success']);
 });
 
-Route::get('set-locale/{locale}', function ($locale) {
+Route::get('/set-locale/{locale}', function ($locale) {
     if (in_array($locale, config('app.available_locales'))) {
         session(['locale' => $locale]);
+        App::setLocale(session('locale'));
     }
     return redirect()->back();
 });
