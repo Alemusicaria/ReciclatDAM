@@ -1,7 +1,6 @@
 <?php
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DashboardController;
 
 use App\Http\Controllers\CacheController;
 use App\Http\Controllers\CacheLockController;
@@ -11,9 +10,7 @@ use App\Http\Controllers\PasswordResetTokenController;
 use App\Http\Controllers\PremiController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\UserController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\App;
+
 
 Route::localizedGroup(function () {
     Route::get('/', function () {
