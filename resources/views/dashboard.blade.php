@@ -3,10 +3,9 @@
 @section('content')
     <div class="dashboard-container">
         <div class="header text-center mb-4">
-            <h1>@lang('messages.welcome')</h1>
-            <p>@lang('messages.partner')</p>
+            <h1>{{ __('messages.welcome') }}</h1>
+            <p>{{ __('messages.welcome') }}</p>
         </div>
-        <h1>{{ session('locale') }}</h1>
         <h1>{{ app()->getLocale() }}</h1>
         <div id="introCarousel" class="carousel slide mb-4" data-ride="carousel">
             <div class="carousel-inner">

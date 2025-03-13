@@ -14,20 +14,20 @@
 </head>
 <body class="light">
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-        <a class="navbar-brand" href="/">Reciclat DAM</a>
+        <a class="navbar-brand" href="{{ url(app()->getLocale()) }}">Reciclat DAM</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('premis.index') }}">Premis</a>
+                    <a class="nav-link" href="{{ route('premis.index', app()->getLocale()) }}">Premis</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('codis.index') }}">Codis</a>
+                    <a class="nav-link" href="{{ route('codis.index', app()->getLocale()) }}">Codis</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('users.index') }}">Users</a>
+                    <a class="nav-link" href="{{ route('users.index', app()->getLocale()) }}">Users</a>
                 </li>
             </ul>
             <button id="theme-toggle" class="btn btn-secondary btn-sm">Toggle Theme</button>
@@ -36,9 +36,9 @@
                     {{ __('Language') }}
                 </button>
                 <div class="dropdown-menu" aria-labelledby="languageDropdown">
-                    <a class="dropdown-item" href="/set-locale/ca" data-lang="ca">{{ __('Català') }}</a>
-                    <a class="dropdown-item" href="/set-locale/en" data-lang="en">{{ __('English') }}</a>
-                    <a class="dropdown-item" href="/set-locale/es" data-lang="es">{{ __('Español') }}</a>
+                    <a class="dropdown-item" id="lang-ca" href="{{ url('/ca') }}" data-lang="ca">{{ __('Català') }}</a>
+                    <a class="dropdown-item" id="lang-en" href="{{ url('/en') }}" data-lang="en">{{ __('English') }}</a>
+                    <a class="dropdown-item" id="lang-es" href="{{ url('/es') }}" data-lang="es">{{ __('Español') }}</a>
                 </div>
             </div>
         </div>
@@ -46,5 +46,16 @@
     <div class="container mt-5 pt-5">
         @yield('content')
     </div>
+    <script>
+        document.getElementById('lang-ca').addEventListener('click', function() {
+            window.location.href = '{{ url('/ca') }}';
+        });
+        document.getElementById('lang-en').addEventListener('click', function() {
+            window.location.href = '{{ url('/en') }}';
+        });
+        document.getElementById('lang-es').addEventListener('click', function() {
+            window.location.href = '{{ url('/es') }}';
+        });
+    </script>
 </body>
 </html>

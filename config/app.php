@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\ServiceProvider;
+
 return [
 
     /*
@@ -78,18 +80,28 @@ return [
     |
     */
 
-    'locale' => 'ca',
+    'locale' => 'en',
 
-    'fallback_locale' => 'ca',
+    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
+
+    'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
     'available_locales' => [
-        'ca',
         'en',
         'es',
+        'ca',
     ],
 
-    'faker_locale' => 'ca_ES',
-
+    /*
+    |--------------------------------------------------------------------------
+    | Encryption Key
+    |--------------------------------------------------------------------------
+    |
+    | This key is utilized by Laravel's encryption services and should be set
+    | to a random, 32 character string to ensure that all encrypted values
+    | are secure. You should do this prior to deploying the application.
+    |
+    */
 
     'cipher' => 'AES-256-CBC',
 
@@ -119,4 +131,9 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'providers' => ServiceProvider::defaultProviders()->merge([
+        // otros proveedores de servicios
+    ])->replace([
+        Illuminate\Translation\TranslationServiceProvider::class => LaravelLang\JsonFallback\TranslationServiceProvider::class,
+    ])->toArray(),
 ];
