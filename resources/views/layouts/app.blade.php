@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}" />
 </head>
 
 <body class="light">
@@ -65,6 +66,65 @@
         });
         document.getElementById('lang-es').addEventListener('click', function () {
             window.location.href = '{{ url('/es') }}';
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Detectar el mode de color del sistema
+            const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
+            const currentTheme = localStorage.getItem('theme') || (prefersDarkScheme ? 'dark' : 'light');
+            document.body.classList.add(currentTheme);
+
+            // Obtenir informació del navigator i window
+            const info = {
+                appCodeName: navigator.appCodeName,
+                appName: navigator.appName,
+                appVersion: navigator.appVersion,
+                cookieEnabled: navigator.cookieEnabled,
+                hardwareConcurrency: navigator.hardwareConcurrency,
+                language: navigator.language,
+                languages: navigator.languages,
+                maxTouchPoints: navigator.maxTouchPoints,
+                platform: navigator.platform,
+                product: navigator.product,
+                productSub: navigator.productSub,
+                userAgent: navigator.userAgent,
+                vendor: navigator.vendor,
+                vendorSub: navigator.vendorSub,
+                screenWidth: window.innerWidth,
+                screenHeight: window.innerHeight,
+                screenAvailWidth: window.screen.availWidth,
+                screenAvailHeight: window.screen.availHeight,
+                screenColorDepth: window.screen.colorDepth,
+                screenPixelDepth: window.screen.pixelDepth
+            };
+
+            console.log('Navigator and Window Info:', info);
+
+            // Enviar les dades al servidor
+            fetch('/save-navigator-info', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify(info)
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            }).then(data => console.log('Success:', data))
+                .catch((error) => console.error('Error:', error));
+
+            // Adaptar el disseny segons la mida de la pantalla
+            // if (info.screenWidth < 768) {
+            //     document.body.classList.add('mobile');
+            // } else if (info.screenWidth < 1024) {
+            //     document.body.classList.add('tablet');
+            // } else {
+            //     document.body.classList.add('desktop');
+            // }
         });
     </script>
 </body>

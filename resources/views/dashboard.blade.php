@@ -5,6 +5,22 @@
         <div class="header text-center mb-4">
             <h1>{{ __('messages.welcome') }}</h1>
             <p>{{ __('messages.welcome') }}</p>
+            @auth
+                @if(Auth::user()->foto_perfil)
+                    <img src="{{ asset('storage/' . Auth::user()->foto_perfil) }}" alt="Profile Photo" class="rounded-circle"
+                        style="width: 150px; height: 150px;">
+                @else
+                    <img src="{{ asset('images/default-profile.png') }}" alt="Default Profile Photo" class="rounded-circle"
+                        style="width: 150px; height: 150px;">
+                @endif
+                <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                    @csrf
+                    <button type="submit" class="btn btn-primary">Logout</button>
+                </form>
+            @else
+                <p>Please log in to see your profile photo.</p>
+                <a href="{{ route('login') }}" class="btn btn-primary">Login</a>
+            @endauth
         </div>
         <div id="introCarousel" class="carousel slide mb-4" data-ride="carousel">
             <div class="carousel-inner">

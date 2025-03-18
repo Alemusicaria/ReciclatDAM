@@ -3,6 +3,11 @@
 @section('content')
 <div class="container">
     <h1>User: {{ $user->nom }} {{ $user->cognoms }}</h1>
+    @if($user->foto_perfil)
+        <img src="{{ asset('storage/' . $user->foto_perfil) }}" alt="Profile Photo" class="img-thumbnail" style="width: 150px; height: 150px;">
+    @else
+        <img src="{{ asset('images/default-profile.png') }}" alt="Default Profile Photo" class="img-thumbnail" style="width: 150px; height: 150px;">
+    @endif
     <p>Data Naixement: {{ $user->data_naieixement }}</p>
     <p>Telefon: {{ $user->telefon }}</p>
     <p>Ubicacio: {{ $user->ubicacio }}</p>

@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <h1>Edit User</h1>
-    <form action="{{ route('users.update', $user->id) }}" method="POST">
+    <form action="{{ route('users.update', $user->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
         <input type="text" name="nom" placeholder="Nom" value="{{ $user->nom }}">
@@ -16,6 +16,11 @@
         <input type="number" name="punts_gastats" placeholder="Punts Gastats" value="{{ $user->punts_gastats }}">
         <input type="email" name="email" placeholder="Email" value="{{ $user->email }}">
         <input type="password" name="password" placeholder="Password">
+        <input type="password" name="password_confirmation" placeholder="Confirm Password">
+        <input type="file" name="foto_perfil">
+        @if($user->foto_perfil)
+            <img src="{{ asset('storage/' . $user->foto_perfil) }}" alt="Profile Photo" class="img-thumbnail" style="width: 150px; height: 150px;">
+        @endif
         <button type="submit" class="btn btn-primary">Update</button>
     </form>
 </div>

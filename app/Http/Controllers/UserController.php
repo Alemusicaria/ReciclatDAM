@@ -5,6 +5,7 @@ use App\Models\User;
 use App\Models\Rol;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -28,27 +29,23 @@ class UserController extends Controller
             'data_naieixement' => 'nullable|date',
             'telefon' => 'nullable|string|max:15',
             'ubicacio' => 'nullable|string',
-            'punts_totals' => 'required|integer',
-            'punts_actuals' => 'required|integer',
-            'punts_gastats' => 'required|integer',
+            'punts_totals' => 'nullable|integer',
+            'punts_actuals' => 'nullable|integer',
+            'punts_gastats' => 'nullable|integer',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'rol_id' => 'required|integer|exists:rols,id',
+            'rol_id' => 'nullable|integer|exists:rols,id',
+            'foto_perfil' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        $user = User::create([
-            'nom' => $request->nom,
-            'cognoms' => $request->cognoms,
-            'data_naieixement' => $request->data_naieixement,
-            'telefon' => $request->telefon,
-            'ubicacio' => $request->ubicacio,
-            'punts_totals' => $request->punts_totals,
-            'punts_actuals' => $request->punts_actuals,
-            'punts_gastats' => $request->punts_gastats,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'rol_id' => $request->rol_id,
-        ]);
+        $user = new User($request->all());
+        if ($request->hasFile('foto_perfil')) {
+            $path = $request->file('foto_perfil')->store('profile_photos', 'public');
+            $user->foto_perfil = $path;
+        }
+        $user->password = Hash::make($request->password);
+        $user->save();
+
         return redirect()->route('users.index');
     }
 
@@ -75,16 +72,33 @@ class UserController extends Controller
             'punts_actuals' => 'required|integer',
             'punts_gastats' => 'required|integer',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'password' => 'required',
+            'password' => 'nullable',
             'rol_id' => 'required|integer|exists:rols,id',
+            'foto_perfil' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        $user->update($request->all());
+        if ($request->hasFile('foto_perfil')) {
+            if ($user->foto_perfil) {
+                Storage::disk('public')->delete($user->foto_perfil);
+            }
+            $path = $request->file('foto_perfil')->store('profile_photos', 'public');
+            $user->foto_perfil = $path;
+        }
+
+        $user->update($request->except('password'));
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+            $user->save();
+        }
+
         return redirect()->route('users.index');
     }
 
     public function destroy(User $user)
     {
+        if ($user->foto_perfil) {
+            Storage::disk('public')->delete($user->foto_perfil);
+        }
         $user->delete();
         return redirect()->route('users.index');
     }
