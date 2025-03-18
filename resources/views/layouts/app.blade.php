@@ -32,6 +32,32 @@
                     <a class="nav-link" href="{{ route('users.index', app()->getLocale()) }}">Users</a>
                 </li>
             </ul>
+            <ul class="navbar-nav ml-auto">
+                @auth
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @if(Auth::user()->foto_perfil)
+                                <img src="{{ asset('storage/' . Auth::user()->foto_perfil) }}" alt="Profile Photo" class="rounded-circle" style="width: 30px; height: 30px; margin-right: 10px;">
+                            @else
+                                <img src="{{ asset('images/default-profile.png') }}" alt="Default Profile Photo" class="rounded-circle" style="width: 30px; height: 30px; margin-right: 10px;">
+                            @endif
+                            <span>{{ Auth::user()->nom }} ({{ Auth::user()->punts_actuals }} pts)</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{{ route('users.show', Auth::user()->id) }}">Perfil</a>
+                            <div class="dropdown-divider"></div>
+                            <form action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="dropdown-item">Logout</button>
+                            </form>
+                        </div>
+                    </li>
+                @else
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-primary text-white" href="{{ route('login') }}">Login</a>
+                    </li>
+                @endauth
+            </ul>
         </div>
     </nav>
     <div class="container mt-5 pt-5">
@@ -115,16 +141,7 @@
                 }
                 return response.json();
             }).then(data => console.log('Success:', data))
-                .catch((error) => console.error('Error:', error));
-
-            // Adaptar el disseny segons la mida de la pantalla
-            // if (info.screenWidth < 768) {
-            //     document.body.classList.add('mobile');
-            // } else if (info.screenWidth < 1024) {
-            //     document.body.classList.add('tablet');
-            // } else {
-            //     document.body.classList.add('desktop');
-            // }
+                .catch((error) => console.error('Error:', error));          
         });
     </script>
 </body>
