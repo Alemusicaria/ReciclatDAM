@@ -2,7 +2,7 @@
 return [
     'welcome' => 'Bienvenido al Tablero de Reciclat DAM',
     'partner' => 'Tu socio en soluciones sostenibles de reciclaje',
-    'language' => 'Idioma',
+    'language' => 'ES',
     'catalan' => 'Catalán',
     'english' => 'Inglés',
     'spanish' => 'Español',

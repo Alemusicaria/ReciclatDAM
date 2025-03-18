@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reciclat DAM</title>
+    <title>Reciclat DAM - {{ __('messages.language') }}</title>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
@@ -14,7 +14,7 @@
 </head>
 
 <body class="light">
-    <nav class="navbar navbar-expand-lg fixed-top light">
+    <nav class="navbar navbar-expand-lg fixed-top">
         <a class="navbar-brand" href="{{ url(app()->getLocale()) }}">Reciclat DAM</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -22,15 +22,19 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('premis.index', app()->getLocale()) }}">Premis</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('codis.index', app()->getLocale()) }}">Codis</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('users.index', app()->getLocale()) }}">Users</a>
-                </li>
+                
+                @can('admin')
+                    <li class="nav-item dropdown"></li>
+                        <a class="nav-link dropdown-toggle" href="#" id="crudDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            CRUD
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="crudDropdown"></div>
+                            <a class="dropdown-item" href="{{ route('premis.index', app()->getLocale()) }}">Premis</a>
+                            <a class="dropdown-item" href="{{ route('codis.index', app()->getLocale()) }}">Codis</a>
+                            <a class="dropdown-item" href="{{ route('users.index', app()->getLocale()) }}">Users</a>
+                        </div>
+                    </li>
+                @endcan
             </ul>
             <ul class="navbar-nav ml-auto">
                 @auth
@@ -48,19 +52,19 @@
                             <div class="dropdown-divider"></div>
                             <form action="{{ route('logout') }}" method="POST">
                                 @csrf
-                                <button type="submit" class="dropdown-item">Logout</button>
+                                <button type="submit" class="dropdown-item">Tanca sessió</button>
                             </form>
                         </div>
                     </li>
                 @else
                     <li class="nav-item">
-                        <a class="nav-link btn btn-primary text-white" href="{{ route('login') }}">Login</a>
+                        <a class="nav-link btn btn-primary text-white" href="{{ route('login') }}">Iniciar sessió</a>
                     </li>
                 @endauth
             </ul>
         </div>
     </nav>
-    <div class="container mt-5 pt-5">
+    <div class="container-fluid h-100">
         @yield('content')
     </div>
     <div class="fixed-bottom-right">
@@ -141,7 +145,16 @@
                 }
                 return response.json();
             }).then(data => console.log('Success:', data))
-                .catch((error) => console.error('Error:', error));          
+                .catch((error) => console.error('Error:', error));
+
+            // Adaptar el disseny segons la mida de la pantalla
+            // if (info.screenWidth < 768) {
+            //     document.body.classList.add('mobile');
+            // } else if (info.screenWidth < 1024) {
+            //     document.body.classList.add('tablet');
+            // } else {
+            //     document.body.classList.add('desktop');
+            // }
         });
     </script>
 </body>
