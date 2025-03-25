@@ -22,28 +22,40 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mr-auto">
-                
                 @can('admin')
-                    <li class="nav-item dropdown"></li>
-                        <a class="nav-link dropdown-toggle" href="#" id="crudDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="crudDropdown" role="button" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
                             CRUD
                         </a>
-                        <div class="dropdown-menu" aria-labelledby="crudDropdown"></div>
+                        <div class="dropdown-menu" aria-labelledby="crudDropdown">
                             <a class="dropdown-item" href="{{ route('premis.index', app()->getLocale()) }}">Premis</a>
                             <a class="dropdown-item" href="{{ route('codis.index', app()->getLocale()) }}">Codis</a>
                             <a class="dropdown-item" href="{{ route('users.index', app()->getLocale()) }}">Users</a>
                         </div>
                     </li>
                 @endcan
+
             </ul>
             <ul class="navbar-nav ml-auto">
                 @auth
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown"
+                            role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             @if(Auth::user()->foto_perfil)
-                                <img src="{{ asset('storage/' . Auth::user()->foto_perfil) }}" alt="Profile Photo" class="rounded-circle" style="width: 30px; height: 30px; margin-right: 10px;">
+                                @if(str_starts_with(Auth::user()->foto_perfil, 'https://'))
+                                    <img src="{{ Auth::user()->foto_perfil }}" alt="Profile Photo" class="rounded-circle"
+                                        style="width: 30px; height: 30px; margin-right: 10px;">
+                                @elseif(file_exists(public_path('storage/' . Auth::user()->foto_perfil)))
+                                    <img src="{{ asset('storage/' . Auth::user()->foto_perfil) }}" alt="Profile Photo"
+                                        class="rounded-circle" style="width: 30px; height: 30px; margin-right: 10px;">
+                                @else
+                                    <img src="{{ asset('images/default-profile.png') }}" alt="Default Profile Photo"
+                                        class="rounded-circle" style="width: 30px; height: 30px; margin-right: 10px;">
+                                @endif
                             @else
-                                <img src="{{ asset('images/default-profile.png') }}" alt="Default Profile Photo" class="rounded-circle" style="width: 30px; height: 30px; margin-right: 10px;">
+                                <img src="{{ asset('images/default-profile.png') }}" alt="Default Profile Photo"
+                                    class="rounded-circle" style="width: 30px; height: 30px; margin-right: 10px;">
                             @endif
                             <span>{{ Auth::user()->nom }} ({{ Auth::user()->punts_actuals }} pts)</span>
                         </a>
@@ -84,7 +96,7 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <script src="{{ asset('js/theme.js') }}" defer></script>
     <script src="{{ asset('js/language.js') }}" defer></script>
     <script>

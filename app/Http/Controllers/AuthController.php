@@ -45,25 +45,22 @@ class AuthController extends Controller
             'data_naieixement' => 'nullable|date',
             'telefon' => 'nullable|string|max:15',
             'ubicacio' => 'nullable|string',
-            'punts_totals' => 'required|integer',
-            'punts_actuals' => 'required|integer',
-            'punts_gastats' => 'required|integer',
+            'punts_totals' => 'nullable|integer',
+            'punts_actuals' => 'nullable|integer',
+            'punts_gastats' => 'nullable|integer',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'rol_id' => 'nullable|integer|exists:rols,id',
+            'foto_perfil' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        $user = User::create([
-            'nom' => $request->nom,
-            'cognoms' => $request->cognoms,
-            'data_naieixement' => $request->data_naieixement,
-            'telefon' => $request->telefon,
-            'ubicacio' => $request->ubicacio,
-            'punts_totals' => $request->punts_totals,
-            'punts_actuals' => $request->punts_actuals,
-            'punts_gastats' => $request->punts_gastats,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        $user = new User($request->all());
+        if ($request->hasFile('foto_perfil')) {
+            $path = $request->file('foto_perfil')->store('profile_photos', 'public');
+            $user->foto_perfil = $path;
+        }
+        $user->password = Hash::make($request->password);
+        $user->save();
 
         Auth::login($user);
 

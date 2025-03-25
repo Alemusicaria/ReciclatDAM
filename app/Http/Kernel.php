@@ -26,6 +26,7 @@ class Kernel extends HttpKernel
         'web' => [
             // otros middlewares
             \App\Http\Middleware\SetLocale::class,
+            \App\Http\Middleware\CheckSocialLogin::class,
         ],
     
         'api' => [

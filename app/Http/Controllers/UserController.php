@@ -63,35 +63,23 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $request->validate([
-            'nom' => 'required',
-            'cognoms' => 'required',
+            'nom' => 'required|string|max:255',
+            'cognoms' => 'required|string|max:255',
             'data_naieixement' => 'nullable|date',
-            'telefon' => 'nullable',
-            'ubicacio' => 'nullable',
-            'punts_totals' => 'required|integer',
-            'punts_actuals' => 'required|integer',
-            'punts_gastats' => 'required|integer',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'password' => 'nullable',
-            'rol_id' => 'required|integer|exists:rols,id',
+            'telefon' => 'nullable|string|max:15',
+            'ubicacio' => 'nullable|string',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'foto_perfil' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         if ($request->hasFile('foto_perfil')) {
-            if ($user->foto_perfil) {
-                Storage::disk('public')->delete($user->foto_perfil);
-            }
             $path = $request->file('foto_perfil')->store('profile_photos', 'public');
             $user->foto_perfil = $path;
         }
 
-        $user->update($request->except('password'));
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
-            $user->save();
-        }
+        $user->update($request->all());
 
-        return redirect()->route('users.index');
+        return redirect()->route('users.show', $user->id);
     }
 
     public function destroy(User $user)

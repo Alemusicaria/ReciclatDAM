@@ -13,17 +13,28 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\NavigatorInfoController;
 use App\Http\Controllers\Auth\SocialiteController;
 
+Route::get('auth/{provider}', [SocialiteController::class, 'redirectToProvider']);
+Route::get('auth/{provider}/callback', [SocialiteController::class, 'handleProviderCallback']);
+
+Route::get('set-password', [SocialiteController::class, 'showSetPasswordForm'])->name('set-password');
+Route::post('set-password', [SocialiteController::class, 'setPassword']);
+
 Route::get('login/{provider}', [SocialiteController::class, 'redirectToProvider']);
 Route::get('login/{provider}/callback', [SocialiteController::class, 'handleProviderCallback']);
 Route::post('/save-navigator-info', [NavigatorInfoController::class, 'store']);
 
-
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::post('/clear-session', function () {
+    session()->forget('social_user');
+    session()->forget('social_login');
+    return response()->json(['status' => 'success']);
+})->name('clear-session');
 
 Route::localizedGroup(function () {
     Route::get('/', function () {
         return view('dashboard');
-    });
+    })->name('dashboard');
 
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
