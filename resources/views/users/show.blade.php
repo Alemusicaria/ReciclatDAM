@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mt-5 pt-5">
+<div class="mt-5 pt-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card mb-4 shadow-sm">
@@ -12,10 +12,10 @@
                     <div class="d-flex align-items-center mb-3">
                         @if(Auth::user()->foto_perfil)
                             @if(str_starts_with(Auth::user()->foto_perfil, 'https://'))
-                                <img src="{{ Auth::user()->foto_perfil }}" alt="Profile Photo" class="rounded-circle"
+                                <img src="{{ Auth::user()->foto_perfil }}" alt="Foto {{ Auth::user()->nom }}" class="rounded-circle"
                                     style="width: 100px; height: 100px; margin-right: 20px;">
                             @elseif(file_exists(public_path('storage/' . Auth::user()->foto_perfil)))
-                                <img src="{{ asset('storage/' . Auth::user()->foto_perfil) }}" alt="Profile Photo"
+                                <img src="{{ asset('storage/' . Auth::user()->foto_perfil) }}" alt="Foto {{ Auth::user()->nom }}"
                                     class="rounded-circle" style="width: 100px; height: 100px; margin-right: 20px;">
                             @else
                                 <img src="{{ asset('images/default-profile.png') }}" alt="Default Profile Photo"
@@ -78,5 +78,19 @@
     .btn-primary:hover {
         background-color: var(--bs-primary-hover);
         border-color: var(--bs-primary-hover);
+    }
+
+    body.light {
+        --bs-card-bg: #ffffff;
+        --bs-card-color: #000000;
+        --bs-primary: #007bff;
+        --bs-primary-hover: #0056b3;
+    }
+
+    body.dark {
+        --bs-card-bg: #343a40;
+        --bs-card-color: #ffffff;
+        --bs-primary: #17a2b8;
+        --bs-primary-hover: #117a8b;
     }
 </style>
