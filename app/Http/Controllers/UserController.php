@@ -63,24 +63,34 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $request->validate([
-            'nom' => 'required|string|max:255',
-            'cognoms' => 'required|string|max:255',
+            'nom' => 'nullable|string|max:255',
+            'cognoms' => 'nullable|string|max:255',
+            'email' => 'nullable|string|email|max:255|unique:users,email,' . $user->id,
             'data_naieixement' => 'nullable|date',
             'telefon' => 'nullable|string|max:15',
-            'ubicacio' => 'nullable|string',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'foto_perfil' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'ubicacio' => 'nullable|string|max:255',
+            'foto_perfil' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validació per a la foto de perfil
         ]);
 
+        // Actualitzar camps de l'usuari
+        $user->update($request->only(['nom', 'cognoms', 'email', 'data_naieixement', 'telefon', 'ubicacio']));
+
+        // Si s'ha pujat una nova foto de perfil
         if ($request->hasFile('foto_perfil')) {
+            // Esborra la foto de perfil antiga si existeix
+            if ($user->foto_perfil) {
+                Storage::disk('public')->delete($user->foto_perfil);
+            }
+
+            // Desa la nova foto de perfil
             $path = $request->file('foto_perfil')->store('profile_photos', 'public');
             $user->foto_perfil = $path;
+            $user->save();
         }
 
-        $user->update($request->all());
-
-        return redirect()->route('users.show', $user->id);
+        return redirect()->route('users.show', $user->id)->with('success', 'Perfil actualitzat correctament.');
     }
+
 
     public function destroy(User $user)
     {

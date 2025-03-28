@@ -31,6 +31,9 @@ Route::post('/clear-session', function () {
     return response()->json(['status' => 'success']);
 })->name('clear-session');
 
+Route::post('/users/{user}', [UserController::class, 'update'])->name('users.update');
+Route::post('/users/{user}/photo', [UserController::class, 'updatePhoto'])->name('users.update.photo');
+
 Route::localizedGroup(function () {
     Route::get('/', function () {
         return view('dashboard');

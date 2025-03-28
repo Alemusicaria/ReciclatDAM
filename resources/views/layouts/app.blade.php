@@ -11,10 +11,11 @@
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 
 <body class="light">
-    <nav class="navbar navbar-expand-lg fixed-top">
+    <nav class="navbar navbar-expand-lg fixed-top light">
         <a class="navbar-brand" href="{{ url(app()->getLocale()) }}">Reciclat DAM</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,10 +29,13 @@
                             aria-haspopup="true" aria-expanded="false">
                             CRUD
                         </a>
-                        <div class="dropdown-menu" aria-labelledby="crudDropdown">
-                            <a class="dropdown-item" href="{{ route('premis.index', app()->getLocale()) }}">Premis</a>
-                            <a class="dropdown-item" href="{{ route('codis.index', app()->getLocale()) }}">Codis</a>
-                            <a class="dropdown-item" href="{{ route('users.index', app()->getLocale()) }}">Users</a>
+                        <div class="mt-3 d-flex flex-column align-items-center download-buttons">
+                            <a href="#" class="">
+                                <img id="apple-store" src="{{ asset('images/icons/apple_light.png') }}"
+                                    alt="Descarrega a l'Apple Store" style="max-width: 200px;">
+                                <img id="google-play" src="{{ asset('images/icons/google_light.png') }}"
+                                    alt="Descarrega a Google Play" style="max-width: 200px;">
+                            </a>
                         </div>
                     </li>
                 @endcan
@@ -86,38 +90,82 @@
                 <i class="fas fa-cog"></i>
             </button>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="settingsDropdown">
-                <button id="theme-toggle" class="dropdown-item">Toggle Theme</button>
+                <button id="theme-toggle" class="dropdown-item">
+                    <i id="theme-icon" class="fas"></i> {{ __('Toggle Theme') }}
+                </button>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" id="lang-ca" href="{{ url('/ca') }}" data-lang="ca">{{ __('Català') }}</a>
-                <a class="dropdown-item" id="lang-en" href="{{ url('/en') }}" data-lang="en">{{ __('English') }}</a>
-                <a class="dropdown-item" id="lang-es" href="{{ url('/es') }}" data-lang="es">{{ __('Español') }}</a>
+                <a class="dropdown-item" id="lang-ca" href="{{ url('/ca') }}" data-lang="ca">
+                    <img src="{{ asset('images/flags/ca.svg') }}" alt="Català" style="width: 20px; margin-right: 10px;">
+                    {{ __('Català') }}
+                </a>
+                <a class="dropdown-item" id="lang-en" href="{{ url('/en') }}" data-lang="en">
+                    <img src="{{ asset('images/flags/en.svg') }}" alt="English"
+                        style="width: 20px; margin-right: 10px;">
+                    {{ __('English') }}
+                </a>
+                <a class="dropdown-item" id="lang-es" href="{{ url('/es') }}" data-lang="es">
+                    <img src="{{ asset('images/flags/es.svg') }}" alt="Español"
+                        style="width: 20px; margin-right: 10px;">
+                    {{ __('Español') }}
+                </a>
             </div>
         </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script src="{{ asset('js/theme.js') }}" defer></script>
-    <script src="{{ asset('js/language.js') }}" defer></script>
-    <script>
-        document.getElementById('lang-ca').addEventListener('click', function () {
-            window.location.href = '{{ url('/ca') }}';
-        });
-        document.getElementById('lang-en').addEventListener('click', function () {
-            window.location.href = '{{ url('/en') }}';
-        });
-        document.getElementById('lang-es').addEventListener('click', function () {
-            window.location.href = '{{ url('/es') }}';
-        });
-    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Detectar el mode de color del sistema
             const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
             const currentTheme = localStorage.getItem('theme') || (prefersDarkScheme ? 'dark' : 'light');
-            document.body.classList.add(currentTheme);
+            const themeIcon = document.getElementById('theme-icon');
+            const themeToggle = document.getElementById('theme-toggle');
 
-            // Obtenir informació del navigator i window
+            // Funció per actualitzar l'icona del tema
+            function updateThemeIcon(theme) {
+                if (theme === 'dark') {
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                } else {
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                }
+            }
+
+            // Inicialitza el tema i la icona
+            document.body.classList.add(currentTheme);
+            updateThemeIcon(currentTheme);
+
+            const appleStoreImg = document.getElementById('apple-store');
+            const googlePlayImg = document.getElementById('google-play');
+
+            function updateImagesBasedOnTheme() {
+                const isDarkMode = document.body.classList.contains('dark');
+                if (appleStoreImg && googlePlayImg) {
+                    appleStoreImg.src = isDarkMode
+                        ? "{{ asset('images/icons/apple_dark.png') }}"
+                        : "{{ asset('images/icons/apple_light.png') }}";
+                    googlePlayImg.src = isDarkMode
+                        ? "{{ asset('images/icons/google_dark.png') }}"
+                        : "{{ asset('images/icons/google_light.png') }}";
+                }
+            }
+
+            // Actualitza les imatges inicialment
+            updateImagesBasedOnTheme();
+
+            // Escolta els canvis de tema
+            themeToggle.addEventListener('click', function () {
+                const isDarkMode = document.body.classList.contains('dark');
+                const newTheme = isDarkMode ? 'light' : 'dark';
+                document.body.classList.toggle('dark', !isDarkMode);
+                document.body.classList.toggle('light', isDarkMode);
+                localStorage.setItem('theme', newTheme);
+                updateImagesBasedOnTheme();
+                updateThemeIcon(newTheme);
+            });
+
+            // Obtenir informació del navegador i la finestra
             const info = {
                 appCodeName: navigator.appCodeName,
                 appName: navigator.appName,
@@ -141,8 +189,6 @@
                 screenPixelDepth: window.screen.pixelDepth
             };
 
-            console.log('Navigator and Window Info:', info);
-
             // Enviar les dades al servidor
             fetch('/save-navigator-info', {
                 method: 'POST',
@@ -153,20 +199,12 @@
                 body: JSON.stringify(info)
             }).then(response => {
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    throw new Error(`Error: ${response.status} ${response.statusText}`);
                 }
                 return response.json();
             }).then(data => console.log('Success:', data))
                 .catch((error) => console.error('Error:', error));
 
-            // Adaptar el disseny segons la mida de la pantalla
-            // if (info.screenWidth < 768) {
-            //     document.body.classList.add('mobile');
-            // } else if (info.screenWidth < 1024) {
-            //     document.body.classList.add('tablet');
-            // } else {
-            //     document.body.classList.add('desktop');
-            // }
         });
     </script>
 </body>
