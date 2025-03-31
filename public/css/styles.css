@@ -168,6 +168,8 @@ button:hover {
     flex-direction: column;
     align-items: flex-end;
     gap: 10px;
+    z-index: 1000; 
+
 }
 
 .fixed-bottom-right .btn,
@@ -373,4 +375,41 @@ body.dark #apple-store {
 
 body.dark #google-play {
     content: url("{{ asset('images/icons/google_dark.png')}}");
+}
+/* Cards en mode clar */
+body.light #com-funciona .card {
+    background-color: #ffffff;
+    color: #333;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    height: 300px; /* Altura fija */
+    width: 250px; /* Ancho fijo */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Cards en mode fosc */
+body.dark #com-funciona .card {
+    background-color: #333;
+    color: #f3f4f6;
+    border: 1px solid #444;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    height: 300px; /* Altura fija */
+    width: 250px; /* Ancho fijo */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Imágenes dentro de los cards */
+#com-funciona .card img {
+
+    width: 80px; /* Tamaño fijo */
+    height: 80px; /* Tamaño fijo */
+    object-fit: contain; /* Mantiene las proporciones de la imagen */
+    margin-bottom: 1rem;
+    margin-top: 2rem;
 }

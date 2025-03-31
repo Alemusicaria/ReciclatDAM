@@ -42,7 +42,7 @@ class AuthController extends Controller
         $request->validate([
             'nom' => 'required|string|max:255',
             'cognoms' => 'required|string|max:255',
-            'data_naieixement' => 'nullable|date',
+            'data_naixement' => 'nullable|date',
             'telefon' => 'nullable|string|max:15',
             'ubicacio' => 'nullable|string',
             'punts_totals' => 'nullable|integer',

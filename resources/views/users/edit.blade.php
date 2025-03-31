@@ -18,9 +18,9 @@
             </div>
 
             <div class="form-group">
-                <label for="data_naieixement">Data de Naixement</label>
-                <input type="date" class="form-control" id="data_naieixement" name="data_naieixement"
-                    value="{{ $user->data_naieixement }}">
+                <label for="data_naixement">Data de Naixement</label>
+                <input type="date" class="form-control" id="data_naixement" name="data_naixement"
+                    value="{{ $user->data_naixement }}">
             </div>
 
             <div class="form-group">

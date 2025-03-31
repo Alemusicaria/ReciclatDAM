@@ -96,7 +96,7 @@
                         </span>
                     </div>
                     <div class="wrap-input100 validate-input" data-validate="Data Naixement is required">
-                        <input class="input100" type="date" name="data_naieixement">
+                        <input class="input100" type="date" name="data_naixement">
                         <span class="focus-input100"></span>
                     </div>
 

@@ -4,7 +4,7 @@
     <div class="container-fluid h-100 mt-5 pt-5">
         <h1>Perfil de l'usuari: {{ $user->nom }} {{ $user->cognoms }}</h1>
         <p><strong>Email:</strong> {{ $user->email }}</p>
-        <p><strong>Data de naixement:</strong> {{ $user->data_naieixement }}</p>
+        <p><strong>Data de naixement:</strong> {{ $user->data_naixement }}</p>
         <p><strong>Telèfon:</strong> {{ $user->telefon }}</p>
         <p><strong>Ubicació:</strong> {{ $user->ubicacio }}</p>
         <p><strong>Punts Actuals:</strong> {{ $user->punts_actuals }}</p>

@@ -26,7 +26,7 @@ class UserController extends Controller
         $request->validate([
             'nom' => 'required|string|max:255',
             'cognoms' => 'required|string|max:255',
-            'data_naieixement' => 'nullable|date',
+            'data_naixement' => 'nullable|date',
             'telefon' => 'nullable|string|max:15',
             'ubicacio' => 'nullable|string',
             'punts_totals' => 'nullable|integer',
@@ -66,14 +66,14 @@ class UserController extends Controller
             'nom' => 'nullable|string|max:255',
             'cognoms' => 'nullable|string|max:255',
             'email' => 'nullable|string|email|max:255|unique:users,email,' . $user->id,
-            'data_naieixement' => 'nullable|date',
+            'data_naixement' => 'nullable|date',
             'telefon' => 'nullable|string|max:15',
             'ubicacio' => 'nullable|string|max:255',
             'foto_perfil' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validació per a la foto de perfil
         ]);
 
         // Actualitzar camps de l'usuari
-        $user->update($request->only(['nom', 'cognoms', 'email', 'data_naieixement', 'telefon', 'ubicacio']));
+        $user->update($request->only(['nom', 'cognoms', 'email', 'data_naixement', 'telefon', 'ubicacio']));
 
         // Si s'ha pujat una nova foto de perfil
         if ($request->hasFile('foto_perfil')) {

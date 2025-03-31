@@ -83,6 +83,9 @@
     <div class="container-fluid h-100">
         @yield('content')
     </div>
+
+    
+
     <div class="fixed-bottom-right">
         <div class="dropdown">
             <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="settingsDropdown"
@@ -111,9 +114,9 @@
             </div>
         </div>
     </div>
+  
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
-
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;

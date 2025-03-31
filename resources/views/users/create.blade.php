@@ -7,7 +7,7 @@
         @csrf
         <input type="text" name="nom" placeholder="Nom">
         <input type="text" name="cognoms" placeholder="Cognoms">
-        <input type="date" name="data_naieixement" placeholder="Data Naixement">
+        <input type="date" name="data_naixement" placeholder="Data Naixement">
         <input type="text" name="telefon" placeholder="Telefon">
         <textarea name="ubicacio" placeholder="Ubicacio"></textarea>
         <input type="number" name="punts_totals" placeholder="Punts Totals">
