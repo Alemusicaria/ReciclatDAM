@@ -168,7 +168,7 @@ button:hover {
     flex-direction: column;
     align-items: flex-end;
     gap: 10px;
-    z-index: 1000; 
+    z-index: 1000;
 
 }
 
@@ -348,15 +348,20 @@ body.dark .search-input:focus {
 
 /* Classe per fer les imatges més petites */
 .small-image {
-    max-width: 300px; /* Amplada màxima */
-    height: auto; /* Manté la proporció */
-    margin-top: 1rem; /* Espai superior */
+    max-width: 300px;
+    /* Amplada màxima */
+    height: auto;
+    /* Manté la proporció */
+    margin-top: 1rem;
+    /* Espai superior */
 }
 
 /* Estils per al div de botons de descàrrega */
 .download-buttons {
-    margin-top: 2rem; /* Espai superior */
-    margin-bottom: 2rem; /* Espai inferior */
+    margin-top: 2rem;
+    /* Espai superior */
+    margin-bottom: 2rem;
+    /* Espai inferior */
 }
 
 /* Imatges per al mode clar */
@@ -376,14 +381,17 @@ body.dark #apple-store {
 body.dark #google-play {
     content: url("{{ asset('images/icons/google_dark.png')}}");
 }
+
 /* Cards en mode clar */
-body.light #com-funciona .card {
+body.light #funcionament .card {
     background-color: #ffffff;
     color: #333;
     border: 1px solid #ddd;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    height: 300px; /* Altura fija */
-    width: 250px; /* Ancho fijo */
+    height: 300px;
+    /* Altura fija */
+    width: 250px;
+    /* Ancho fijo */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -391,13 +399,15 @@ body.light #com-funciona .card {
 }
 
 /* Cards en mode fosc */
-body.dark #com-funciona .card {
+body.dark #funcionament .card {
     background-color: #333;
     color: #f3f4f6;
     border: 1px solid #444;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
-    height: 300px; /* Altura fija */
-    width: 250px; /* Ancho fijo */
+    height: 300px;
+    /* Altura fija */
+    width: 250px;
+    /* Ancho fijo */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -405,11 +415,34 @@ body.dark #com-funciona .card {
 }
 
 /* Imágenes dentro de los cards */
-#com-funciona .card img {
+#funcionament .card svg {
 
-    width: 80px; /* Tamaño fijo */
-    height: 80px; /* Tamaño fijo */
-    object-fit: contain; /* Mantiene las proporciones de la imagen */
+    width: 80px;
+    /* Tamaño fijo */
+    height: 80px;
+    /* Tamaño fijo */
+    object-fit: contain;
+    /* Mantiene las proporciones de la imagen */
     margin-bottom: 1rem;
     margin-top: 2rem;
+}
+
+/* Mode clar */
+body.light .icon path {
+    fill: #000000;
+    /* Color negre per al mode clar */
+}
+
+/* Mode fosc */
+body.dark .icon path {
+    fill: #ffffff;
+    /* Color blanc per al mode fosc */
+}
+
+#sponsors svg {
+    width: 80px; /* Amplada uniforme */
+    height: 80px; /* Alçada uniforme */
+    fill: #388e3c; /* Color uniforme (blau en aquest cas) */
+    margin: 10px auto; /* Centra els SVG i afegeix espai */
+    display: block;
 }
