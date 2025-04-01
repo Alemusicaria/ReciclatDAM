@@ -1,5 +1,7 @@
 <section id="funcionament" class="text-center">
-    <div class="row justify-content-center align-items-center h-100 w-100">
+    <h2 class="mb-4">Com funciona?</h2>
+    <br>
+    <div class="row justify-content-center align-items-center w-100">
         <!-- Card 1: Descarrega l'App -->
         <div class="col-md-3">
             <div class="card mb-4 shadow-sm w-100">
@@ -33,8 +35,8 @@
                     <path d="M12,0C5.383,0,0,5.383,0,12s5.383,12,12,12,12-5.383,12-12S18.617,0,12,0Zm-1.356,10.76l3.041,.507c1.342,.223,2.315,1.373,2.315,2.733,0,1.654-1.346,3-3,3v2h-2v-2c-1.654,0-3-1.346-3-3h2c0,.552,.448,1,1,1h2c.552,0,1-.448,1-1,0-.378-.271-.698-.644-.76l-3.041-.507c-1.342-.223-2.315-1.373-2.315-2.733,0-1.654,1.346-3,3-3v-2h2v2c1.654,0,3,1.346,3,3h-2c0-.551-.448-1-1-1h-2c-.552,0-1,.449-1,1,0,.378,.271,.698,.644,.76Z" />
                 </svg>
                 <div class="card-body">
-                    <h3>Acumula Monedes</h3>
-                    <p>Guanya monedes per cada acció de reciclatge.</p>
+                    <h3>Acumula <b>ECODAMS</b></h3>
+                    <p>Guanya <b>ECODAMS</b> per cada acció de reciclatge.</p>
                 </div>
             </div>
         </div>
@@ -47,7 +49,7 @@
                 </svg>
                 <div class="card-body">
                     <h3>Reclama Premis</h3>
-                    <p>Utilitza les teves monedes per obtenir premis exclusius.</p>
+                    <p>Utilitza les teves <b>ECODAMS</b> per obtenir premis exclusius.</p>
                 </div>
             </div>
         </div>

@@ -61,7 +61,7 @@
                                 <img src="{{ asset('images/default-profile.png') }}" alt="Default Profile Photo"
                                     class="rounded-circle" style="width: 30px; height: 30px; margin-right: 10px;">
                             @endif
-                            <span>{{ Auth::user()->nom }} ({{ Auth::user()->punts_actuals }} pts)</span>
+                            <span>{{ Auth::user()->nom }} ({{ Auth::user()->punts_actuals }} ECODAMS)</span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                             <a class="dropdown-item" href="{{ route('users.show', Auth::user()->id) }}">Perfil</a>
@@ -100,16 +100,16 @@
                 <a class="dropdown-item" id="lang-ca" href="{{ url('/ca') }}" data-lang="ca">
                     <img src="{{ asset('images/flags/ca.svg') }}" alt="Català" style="width: 20px; margin-right: 10px;">
                     {{ __('Català') }}
+                </a>                
+                <a class="dropdown-item" id="lang-es" href="{{ url('/es') }}" data-lang="es">
+                    <img src="{{ asset('images/flags/es.svg') }}" alt="Español"
+                        style="width: 20px; margin-right: 10px;">
+                    {{ __('Español') }}
                 </a>
                 <a class="dropdown-item" id="lang-en" href="{{ url('/en') }}" data-lang="en">
                     <img src="{{ asset('images/flags/en.svg') }}" alt="English"
                         style="width: 20px; margin-right: 10px;">
                     {{ __('English') }}
-                </a>
-                <a class="dropdown-item" id="lang-es" href="{{ url('/es') }}" data-lang="es">
-                    <img src="{{ asset('images/flags/es.svg') }}" alt="Español"
-                        style="width: 20px; margin-right: 10px;">
-                    {{ __('Español') }}
                 </a>
             </div>
         </div>
