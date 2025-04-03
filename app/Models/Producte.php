@@ -9,7 +9,7 @@ class Producte extends Model
 {
     use HasFactory, Searchable;
 
-    protected $fillable = ['nom', 'categoria'];
+    protected $fillable = ['nom', 'categoria', 'imatge'];
 
     public function toSearchableArray()
     {
@@ -17,6 +17,7 @@ class Producte extends Model
             'id' => $this->id,
             'nom' => $this->nom,
             'categoria' => $this->categoria,
+            'imatge' => $this->imatge,
         ];
     }
 }

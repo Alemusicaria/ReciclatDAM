@@ -31,7 +31,7 @@
 
             // Cerca a Algolia
             index.search(query, {
-                hitsPerPage: 10
+                hitsPerPage: 4
             }).then(({ hits }) => {
                 // Esborra els resultats anteriors
                 $('#product-results').empty();
@@ -39,8 +39,11 @@
                 // Mostra els resultats
                 hits.forEach(hit => {
                     $('#product-results').append(`
-                        <li class="list-group-item">
-                            <strong>${hit.nom}</strong> - ${hit.categoria}
+                        <li class="list-group-item d-flex align-items-center">
+                             <img src="/${hit.imatge}" alt="${hit.nom}" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
+                            <div>
+                                <strong>${hit.nom}</strong> - ${hit.categoria}
+                            </div>
                         </li>
                     `);
                 });
