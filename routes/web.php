@@ -14,6 +14,9 @@ use App\Http\Controllers\NavigatorInfoController;
 use App\Http\Controllers\Auth\SocialiteController;
 
 
+use App\Http\Controllers\ProducteController;
+use App\Http\Controllers\ContenidorController;
+
 Route::localizedGroup(function () {
     Route::get('auth/{provider}', [SocialiteController::class, 'redirectToProvider']);
     Route::get('auth/{provider}/callback', [SocialiteController::class, 'handleProviderCallback']);
@@ -54,4 +57,10 @@ Route::localizedGroup(function () {
     Route::resource('premis', PremiController::class);
     Route::resource('sessions', SessionController::class);
     Route::resource('users', UserController::class);
+
+
+    Route::apiResource('productes', ProducteController::class);
+    Route::apiResource('contenidors', ContenidorController::class);
+
+
 });
