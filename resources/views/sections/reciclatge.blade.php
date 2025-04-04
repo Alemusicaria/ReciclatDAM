@@ -56,6 +56,15 @@
     </div>
 </section>
 
+<!-- Modal per mostrar informació del producte -->
+<div id="product-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3 id="product-title"></h3>
+        <p id="product-description"></p>
+    </div>
+</div>
+
 <!-- Estils personalitzats -->
 <style>
     .category-card {
@@ -181,9 +190,10 @@
                 hits.forEach(hit => {
                     $('#product-results').append(`
                         <li class="list-group-item d-flex align-items-center">
-                             <img src="/${hit.imatge}" alt="${hit.nom}" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
+                            <img src="/${hit.imatge}" alt="${hit.nom}" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
                             <div>
-                                <strong>${hit.nom}</strong> - ${hit.categoria}
+                                <strong>${hit.nom}</strong><br>
+                                <span style="color: gray;">${hit.categoria}</span>
                             </div>
                         </li>
                     `);
