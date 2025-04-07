@@ -56,4 +56,11 @@ class PremiController extends Controller
         $premi->delete();
         return redirect()->route('premis.index');
     }
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+        $premis = Premi::search($query)->get();
+
+        return view('premis.search', compact('premis', 'query'));
+    }
 }
