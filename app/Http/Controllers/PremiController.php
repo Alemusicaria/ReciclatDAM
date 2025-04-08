@@ -23,9 +23,30 @@ class PremiController extends Controller
             'nom' => 'required',
             'descripcio' => 'required',
             'punts_requerits' => 'required|integer',
+            'imatge' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        Premi::create($request->all());
+        $data = $request->all();
+
+        // Gestionar la pujada de la imatge
+        if ($request->hasFile('imatge')) {
+            $file = $request->file('imatge');
+            $baseFilename = str_replace(' ', '_', strtolower($request->nom)); // Nom del premi com a base
+            $extension = $file->getClientOriginalExtension();
+            $filename = $baseFilename . '.' . $extension;
+
+            // Comprovar si ja existeix una imatge amb el mateix nom
+            $counter = 1;
+            while (file_exists(public_path('images/Premis/' . $filename))) {
+                $filename = $baseFilename . '_' . $counter . '.' . $extension;
+                $counter++;
+            }
+
+            $file->move(public_path('images/Premis'), $filename);
+            $data['imatge'] = 'images/Premis/' . $filename;
+        }
+
+        Premi::create($data);
         return redirect()->route('premis.index');
     }
 
@@ -45,9 +66,35 @@ class PremiController extends Controller
             'nom' => 'required',
             'descripcio' => 'required',
             'punts_requerits' => 'required|integer',
+            'imatge' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $premi->update($request->all());
+        $data = $request->all();
+
+        // Gestionar la pujada de la imatge
+        if ($request->hasFile('imatge')) {
+            // Esborrar la imatge antiga si existeix
+            if ($premi->imatge && file_exists(public_path($premi->imatge))) {
+                unlink(public_path($premi->imatge));
+            }
+
+            $file = $request->file('imatge');
+            $baseFilename = str_replace(' ', '_', strtolower($request->nom)); // Nom del premi com a base
+            $extension = $file->getClientOriginalExtension();
+            $filename = $baseFilename . '.' . $extension;
+
+            // Comprovar si ja existeix una imatge amb el mateix nom
+            $counter = 1;
+            while (file_exists(public_path('images/Premis/' . $filename))) {
+                $filename = $baseFilename . '_' . $counter . '.' . $extension;
+                $counter++;
+            }
+
+            $file->move(public_path('images/Premis'), $filename);
+            $data['imatge'] = 'images/Premis/' . $filename;
+        }
+
+        $premi->update($data);
         return redirect()->route('premis.index');
     }
 
