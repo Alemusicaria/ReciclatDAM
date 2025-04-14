@@ -1,38 +1,45 @@
-<section id="premis" class="text-center mt-5">
+<section id="premis" class="text-center py-5">
     <div class="container">
-        <div class="row">
-            <!-- Card 1: Explicació i llista de premis -->
+        <h2 class="section-title mb-4">Premis i Reconeixements</h2>
+        <div class="row g-4">
+            <!-- Card 1: Advanced Awards Gallery -->
             <div class="col-md-6">
-                <div class="card shadow-sm">
+                <div class="card shadow h-100">
                     <div class="card-body">
-                        <h3 class="card-title">Premis Disponibles</h3>
-                        <p class="card-text">Descobreix els premis disponibles i selecciona el que més t'agradi per veure'n més detalls.</p>
-                        <div class="position-relative">
-                            <div id="award-list-container" class="overflow-hidden" style="width: 100%; position: relative;">
-                                <div id="award-list" class="d-flex flex-column gap-3" style="transition: transform 0.3s ease; width: max-content;">
-                                    <!-- Aquí es generaran les files amb premis -->
-                                </div>
+                        <h3 class="card-title">Col·lecció de Premis</h3>
+                        <p class="card-text text-muted mb-4">Navega per la nostra col·lecció de premis i reconeixements.</p>
+                        
+                        <!-- Professional Gallery -->
+                        <div id="awards-gallery" class="awards-gallery">
+                            <div class="gallery-inner">
+                                <!-- Awards will be generated here -->
                             </div>
-                            <div class="d-flex justify-content-between mt-3">
-                                <button id="prev-award" class="btn-nav btn-sm">&larr;</button>
-                                <button id="next-award" class="btn-nav btn-sm">&rarr;</button>
+                            
+                            <!-- Just indicators, no arrows -->
+                            <div class="gallery-indicators-container mt-4">
+                                <div class="gallery-indicators">
+                                    <!-- Indicators will be generated here -->
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Card 2: Detall del premi seleccionat -->
+            <!-- Card 2: Award Detail -->
             <div class="col-md-6">
-                <div class="card shadow-sm">
-                    <div class="card-body">
+                <div class="card shadow h-100">
+                    <div class="card-body d-flex flex-column">
                         <h3 class="card-title">Detall del Premi</h3>
-                        <div id="selected-award" class="text-center">
-                            <img id="selected-award-image" src="" alt="Premi seleccionat" class="img-fluid mb-3 selected-award-image">
+                        <div id="selected-award" class="text-center flex-grow-1 d-flex flex-column justify-content-center">
+                            <div class="award-image-container mb-4">
+                                <img id="selected-award-image" src="" alt="Premi seleccionat" class="img-fluid selected-award-image">
+                            </div>
+                            <h4 id="selected-award-name" class="mb-3"></h4>
                             <p id="selected-award-description" class="card-text"></p>
-                            <div class="d-flex justify-content-between mt-3">
-                                <button id="prev-selected-award" class="btn-nav btn-sm">&larr;</button>
-                                <button id="next-selected-award" class="btn-nav btn-sm">&rarr;</button>
+                            <div class="d-flex justify-content-between mt-auto pt-3">
+                                <button id="prev-selected-award" class="btn btn-outline-primary">&larr; Anterior</button>
+                                <button id="next-selected-award" class="btn btn-outline-primary">Següent &rarr;</button>
                             </div>
                         </div>
                     </div>
@@ -43,154 +50,400 @@
 </section>
 
 <style>
-    #award-list-container {
-        height: 300px; /* Ajusta l'alçada per mostrar 2 files */
+    /* Section styling */
+    #premis {
+        background-color: #f8f9fa;
     }
-
-    #award-list .award-row {
-        display: flex;
-        justify-content: center;
-        gap: 15px; /* Espai entre les targetes */
+    
+    .section-title {
+        font-weight: 700;
+        margin-bottom: 2rem;
+        position: relative;
+        display: inline-block;
+        color: #212529;
     }
-
-    #award-list .award-card {
-        width: 150px; /* Amplada més gran */
-        height: 150px; /* Alçada més gran */
-        border: 2px solid transparent;
-        border-radius: 8px;
+    
+    .section-title:after {
+        content: '';
+        display: block;
+        width: 50px;
+        height: 3px;
+        background: #007bff;
+        margin: 12px auto 0;
+    }
+    
+    /* Card styling */
+    .card {
+        border: none;
+        border-radius: 12px;
         overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card-title {
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #212529;
+    }
+    
+    /* Gallery styling */
+    .awards-gallery {
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+    
+    .gallery-inner {
+        display: flex;
+        transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    
+    .gallery-page {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-gap: 15px;
+        flex: 0 0 100%;
+        padding: 0;
+    }
+    
+    .award-card {
+        position: relative;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         cursor: pointer;
         transition: all 0.3s ease;
+        height: 160px;
+        background-color: #fff;
     }
-
-    #award-list .award-card img {
+    
+    .award-card img {
         width: 100%;
         height: 100%;
         object-fit: cover;
+        transition: transform 0.5s ease;
     }
-
-    #award-list .award-card.selected {
-        border-color: #007bff;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    #selected-award img {
-        width: 300px; /* Amplada fixa més gran per a les imatges del Card 2 */
-        height: 300px; /* Alçada fixa més gran per a les imatges del Card 2 */
-        object-fit: cover; /* Manté la proporció de la imatge */
-        border-radius: 8px;
-    }
-
-    .btn-nav {
-        background-color: #6c757d;
-        border: none;
+    
+    .award-card .award-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
         color: white;
-        padding: 4px 8px; /* Botons més petits */
-        font-size: 12px; /* Text més petit */
-        border-radius: 4px;
-        transition: background-color 0.3s ease;
+        padding: 15px 10px 10px;
+        font-size: 14px;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+    }
+    
+    .award-card:hover img {
+        transform: scale(1.08);
+    }
+    
+    .award-card:hover .award-overlay {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .award-card.selected {
+        box-shadow: 0 0 0 3px #007bff, 0 4px 10px rgba(0,0,0,0.2);
+    }
+    
+    .award-card.selected img {
+        transform: scale(1.05);
+    }
+    
+    .award-card.selected .award-overlay {
+        opacity: 1;
+        transform: translateY(0);
+        background: linear-gradient(0deg, rgba(0,123,255,0.8) 0%, rgba(0,123,255,0) 100%);
+    }
+    
+    /* Indicators styling */
+    .gallery-indicators-container {
+        display: flex;
+        justify-content: center;
+    }
+    
+    .gallery-indicators {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+    }
+    
+    .gallery-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #dee2e6;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+    
+    .gallery-indicator:hover {
+        background-color: #adb5bd;
+    }
+    
+    .gallery-indicator.active {
+        background-color: #007bff;
+        transform: scale(1.2);
+    }
+    
+    /* Selected award styling */
+    .award-image-container {
+        max-width: 300px;
+        margin: 0 auto;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    #selected-award-image {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    #selected-award-image:hover {
+        transform: scale(1.03);
+    }
+    
+    #selected-award-name {
+        font-weight: 600;
+        color: #212529;
+    }
+    
+    #selected-award-description {
+        color: #6c757d;
+        line-height: 1.6;
+    }
+    
+    /* Buttons */
+    .btn-outline-primary {
+        border-width: 2px;
+        font-weight: 500;
+        padding: 8px 20px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,123,255,0.2);
+    }
+    .premi {
+        transition: all 0.5s ease;
+        border: 5px solid transparent;
+        border-radius: 15px;
+        cursor: pointer;
     }
 
-    .btn-nav:hover {
-        background-color: #5a6268;
+    .premi.selected {
+        border-color: blue;
+    }
+
+    .premi img {
+        width: 150px; /* Tamaño reducido */
+        height: auto;
     }
 </style>
 
 <script>
-    $(document).ready(function () {
-        // Inicialitza el client d'Algolia
+    $(document).ready(function() {
+        // Initialize Algolia client
         const client = algoliasearch("4JU9PG98CF", "d37ffd358dca40447584fb2ffdc28e03");
-        const index = client.initIndex('premis'); // Nom de l'índex a Algolia
-
-        const awardList = $('#award-list');
+        const index = client.initIndex('premis');
+        
+        // DOM elements
+        const galleryInner = $('.gallery-inner');
+        const galleryIndicators = $('.gallery-indicators');
         const selectedAwardImage = $('#selected-award-image');
+        const selectedAwardName = $('#selected-award-name');
         const selectedAwardDescription = $('#selected-award-description');
-        let currentAwardIndex = 0;
+        
+        // Variables
         let awards = [];
-        const itemsPerPage = 4; // Mostra 4 premis (2 a dalt i 2 a baix)
-
-        // Cerca els premis a Algolia
+        let currentAwardIndex = 0;
+        let currentPage = 0;
+        const awardsPerPage = 4; // 2x2 grid
+        
+        // Fetch awards from Algolia
         function fetchAwards(query = '') {
+            // Show loading state
+            galleryInner.html('<div class="text-center w-100 py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
+            
             index.search(query, { hitsPerPage: 100 }).then(({ hits }) => {
                 awards = hits;
-                renderAwards();
+                
                 if (awards.length > 0) {
+                    renderGallery();
                     updateSelectedAward(0);
                 } else {
+                    galleryInner.html('<p class="text-center w-100 py-4">No s\'han trobat premis.</p>');
                     selectedAwardImage.attr('src', '');
-                    selectedAwardDescription.text('No s\'han trobat premis.');
+                    selectedAwardName.text('No hi ha premis disponibles');
+                    selectedAwardDescription.text('No s\'ha trobat cap premi per mostrar.');
                 }
             }).catch(err => {
-                console.error(err);
+                console.error('Error fetching awards:', err);
+                galleryInner.html('<p class="text-center w-100 py-4 text-danger">Error carregant els premis.</p>');
             });
         }
-
-        // Renderitza les files amb premis
-        function renderAwards() {
-            awardList.empty();
-            const start = Math.floor(currentAwardIndex / itemsPerPage) * itemsPerPage;
-            const end = start + itemsPerPage;
-            const visibleAwards = awards.slice(start, end);
-
-            // Divideix els premis en 2 files
-            const row1 = visibleAwards.slice(0, 2);
-            const row2 = visibleAwards.slice(2, 4);
-
-            const row1Element = $('<div class="award-row"></div>');
-            row1.forEach((award, index) => {
-                const awardCard = $(`
-                    <div class="award-card ${start + index === currentAwardIndex ? 'selected' : ''}">
-                        <img src="${award.imatge}" alt="${award.nom}">
-                    </div>
-                `);
-                awardCard.on('click', () => updateSelectedAward(start + index));
-                row1Element.append(awardCard);
-            });
-
-            const row2Element = $('<div class="award-row"></div>');
-            row2.forEach((award, index) => {
-                const awardCard = $(`
-                    <div class="award-card ${start + index + 2 === currentAwardIndex ? 'selected' : ''}">
-                        <img src="${award.imatge}" alt="${award.nom}">
-                    </div>
-                `);
-                awardCard.on('click', () => updateSelectedAward(start + index + 2));
-                row2Element.append(awardCard);
-            });
-
-            awardList.append(row1Element);
-            awardList.append(row2Element);
+        
+        // Render gallery
+        function renderGallery() {
+            galleryInner.empty();
+            galleryIndicators.empty();
+            
+            const totalPages = Math.ceil(awards.length / awardsPerPage);
+            
+            // Create gallery pages
+            for (let i = 0; i < totalPages; i++) {
+                const pageStart = i * awardsPerPage;
+                const pageEnd = Math.min(pageStart + awardsPerPage, awards.length);
+                const pageAwards = awards.slice(pageStart, pageEnd);
+                
+                const page = $('<div class="gallery-page"></div>');
+                
+                pageAwards.forEach((award, index) => {
+                    const globalIndex = pageStart + index;
+                    const awardCard = $(`
+                        <div class="award-card ${globalIndex === currentAwardIndex ? 'selected' : ''}" data-index="${globalIndex}">
+                            <img src="${award.imatge}" alt="${award.nom}">
+                            <div class="award-overlay">
+                                <div class="award-name">${award.nom}</div>
+                            </div>
+                        </div>
+                    `);
+                    
+                    awardCard.on('click', function() {
+                        updateSelectedAward(globalIndex);
+                    });
+                    
+                    page.append(awardCard);
+                });
+                
+                // Fill empty slots if needed
+                for (let j = pageAwards.length; j < awardsPerPage; j++) {
+                    page.append('<div class="award-card empty" style="visibility: hidden;"></div>');
+                }
+                
+                galleryInner.append(page);
+                
+                // Add indicator
+                const indicator = $(`<div class="gallery-indicator ${i === currentPage ? 'active' : ''}" data-page="${i}"></div>`);
+                indicator.on('click', function() {
+                    goToPage(i);
+                });
+                galleryIndicators.append(indicator);
+            }
+            
+            // Update gallery position
+            updateGalleryPosition();
         }
-
-        // Actualitza el detall del premi seleccionat
+        
+        // Update gallery position
+        function updateGalleryPosition() {
+            galleryInner.css('transform', `translateX(-${currentPage * 100}%)`);
+            $('.gallery-indicator').removeClass('active');
+            $(`.gallery-indicator[data-page="${currentPage}"]`).addClass('active');
+        }
+        
+        // Go to specific page
+        function goToPage(page) {
+            currentPage = page;
+            updateGalleryPosition();
+        }
+        
+        // Update selected award
         function updateSelectedAward(index) {
+            if (index < 0 || index >= awards.length) return;
+            
             currentAwardIndex = index;
             const award = awards[currentAwardIndex];
-            selectedAwardImage.attr('src', award.imatge);
-            selectedAwardDescription.text(award.descripcio);
-            renderAwards();
+            
+            // Animate transition
+            $('#selected-award').fadeOut(200, function() {
+                selectedAwardImage.attr('src', award.imatge);
+                selectedAwardName.text(award.nom);
+                selectedAwardDescription.text(award.descripcio);
+                $(this).fadeIn(200);
+            });
+            
+            // Navigate to correct page in gallery
+            const targetPage = Math.floor(currentAwardIndex / awardsPerPage);
+            if (targetPage !== currentPage) {
+                goToPage(targetPage);
+            }
+            
+            // Update selected state in gallery
+            $('.award-card').removeClass('selected');
+            $(`.award-card[data-index="${currentAwardIndex}"]`).addClass('selected');
         }
-
-        // Navegació amb les fletxes
-        $('#prev-award').on('click', function () {
+        
+        // Navigate to previous award
+        function prevAward() {
             if (currentAwardIndex > 0) {
-                currentAwardIndex--;
+                updateSelectedAward(currentAwardIndex - 1);
             } else {
-                currentAwardIndex = awards.length - 1; // Torna a l'últim premi
+                updateSelectedAward(awards.length - 1); // Loop to last
             }
-            updateSelectedAward(currentAwardIndex);
-        });
-
-        $('#next-award').on('click', function () {
+        }
+        
+        // Navigate to next award
+        function nextAward() {
             if (currentAwardIndex < awards.length - 1) {
-                currentAwardIndex++;
+                updateSelectedAward(currentAwardIndex + 1);
             } else {
-                currentAwardIndex = 0; // Torna al primer premi
+                updateSelectedAward(0); // Loop to first
             }
-            updateSelectedAward(currentAwardIndex);
+        }
+        
+        // Event handlers for indicators
+        $(document).on('click', '.gallery-indicator', function() {
+            const page = $(this).data('page');
+            goToPage(page);
         });
-
-        // Inicialitza la cerca
+        
+        // Event handlers for navigation buttons
+        $('#prev-selected-award').on('click', prevAward);
+        $('#next-selected-award').on('click', nextAward);
+        
+        // Handle keyboard navigation
+        $(document).keydown(function(e) {
+            if (e.keyCode === 37) { // Left arrow
+                prevAward();
+            } else if (e.keyCode === 39) { // Right arrow
+                nextAward();
+            }
+        });
+        
+        // Auto-rotate gallery (optional)
+        let autoRotateInterval;
+        
+        function startAutoRotate() {
+            stopAutoRotate();
+            autoRotateInterval = setInterval(function() {
+                const nextPage = (currentPage + 1) % Math.ceil(awards.length / awardsPerPage);
+                goToPage(nextPage);
+            }, 5000);
+        }
+        
+        function stopAutoRotate() {
+            if (autoRotateInterval) {
+                clearInterval(autoRotateInterval);
+            }
+        }
+        
+        // Stop auto-rotate on user interaction
+        $('.gallery-inner, .gallery-indicators').on('mouseenter', stopAutoRotate);
+        $('.gallery-inner, .gallery-indicators').on('mouseleave', startAutoRotate);
+        
+        // Initialize
         fetchAwards();
+        startAutoRotate();
     });
 </script>
