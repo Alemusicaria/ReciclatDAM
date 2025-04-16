@@ -38,8 +38,8 @@
                             <h4 id="selected-award-name" class="mb-3"></h4>
                             <p id="selected-award-description" class="card-text"></p>
                             <div class="d-flex justify-content-between mt-auto pt-3">
-                                <button id="prev-selected-award" class="btn btn-outline-primary">&larr; Anterior</button>
-                                <button id="next-selected-award" class="btn btn-outline-primary">Següent &rarr;</button>
+                                <button id="prev-selected-award" class="btn btn-outline-primary">&larr;</button>
+                                <button id="next-selected-award" class="btn btn-outline-primary">&rarr;</button>
                             </div>
                         </div>
                     </div>

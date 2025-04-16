@@ -14,7 +14,7 @@ use App\Http\Controllers\NavigatorInfoController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\ProducteController;
 use App\Http\Controllers\ContenidorController;
-
+use App\Http\Controllers\OpinionsController;
 
 Route::localizedGroup(function () {
     Route::get('auth/{provider}', [SocialiteController::class, 'redirectToProvider']);
@@ -62,4 +62,8 @@ Route::localizedGroup(function () {
     Route::apiResource('contenidors', ContenidorController::class);
 
     Route::get('/premis/search', [PremiController::class, 'search'])->name('premis.search');
+
+    Route::resource('opinions', OpinionsController::class);
+    Route::get('opinions/search', [OpinionsController::class, 'search'])->name('opinions.search');
+    
 });
