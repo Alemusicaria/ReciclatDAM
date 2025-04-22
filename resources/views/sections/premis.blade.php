@@ -50,11 +50,6 @@
 </section>
 
 <style>
-    /* Section styling */
-    #premis {
-        background-color: #f8f9fa;
-    }
-    
     .section-title {
         font-weight: 700;
         margin-bottom: 2rem;

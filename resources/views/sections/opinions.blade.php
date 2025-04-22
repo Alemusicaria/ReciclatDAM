@@ -1,14 +1,14 @@
 <section id="opinions" class="text-center py-5">
-    <div class="container">
+    <div class="w-100">
         <h2 class="section-title mb-4">Opinions</h2>
         <div class="d-flex justify-content-center align-items-center">
             <!-- Fletxa esquerra -->
-            <button id="prev-opinion" class="btn btn-outline-primary btn-sm mx-2 boto boto-sm">
-                &larr;
+            <button id="prev-opinion" class="opinion-arrow mx-3">
+                <i class="fas fa-chevron-left"></i>
             </button>
 
             <!-- Carrusel d'opinions -->
-            <div id="opinion-carousel" class="opinion-card text-center p-3 shadow-sm">
+            <div id="opinion-carousel " class="opinion-card text-center p-3 shadow-sm container" style="width: 40%;">
                 <p id="opinion-text" class="mb-2">"Carregant opinions..."</p>
                 <div id="opinion-stars" class="mb-2">
                     <!-- Estrelles es generaran aquí -->
@@ -17,26 +17,34 @@
             </div>
 
             <!-- Fletxa dreta -->
-            <button id="next-opinion" class="btn btn-outline-primary btn-sm mx-2 boto boto-sm">
-                &rarr;
+            <button id="next-opinion" class="opinion-arrow mx-3">
+                <i class="fas fa-chevron-right"></i>
             </button>
         </div>
     </div>
 </section>
 
 <style>
-    #opinions {
-        background-color: #f8f9fa;
-    }
-
     .section-title {
         font-weight: 700;
         margin-bottom: 2rem;
         color: #212529;
+        position: relative;
+        display: inline-block;
+    }
+
+    .section-title:after {
+        content: '';
+        display: block;
+        width: 50px;
+        height: 3px;
+        background-color: #2e7d32;
+        /* Verd */
+        margin: 12px auto 0;
     }
 
     #opinion-carousel {
-        width: 100%;
+        width: 40%;
         max-width: 400px;
         background-color: #fff;
         border-radius: 12px;
@@ -44,21 +52,46 @@
         transition: transform 0.3s ease, opacity 0.3s ease;
     }
 
-    .boto {
-        font-size: 12px;
+    .opinion-arrow {
         width: 40px;
-        padding: 4px 8px;
+        height: 40px;
+        background-color: #2e7d32;
+        /* Blau professional */
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        /* Forma rodona */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        /* Ombra */
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
     }
 
-    .boto-sm {
-        font-size: 12px;
-        padding: 4px 8px;
+    .opinion-arrow:hover {
+        background-color: #215924;
+        /* Blau més fosc al passar el ratolí */
+        transform: scale(1.1);
+        /* Augment lleuger al passar el ratolí */
+    }
+
+    .opinion-arrow:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
+        /* Resaltat al fer focus */
+    }
+
+    .opinion-arrow i {
+        font-size: 16px;
+        /* Mida de la icona */
     }
 
     .star {
         font-size: 20px;
         color: #ffc107;
-        /* Color groc per a les estrelles plenes */
+        /* Color groc per a les estrelles */
     }
 
     .star.empty {
