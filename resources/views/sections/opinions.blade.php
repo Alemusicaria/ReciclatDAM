@@ -121,7 +121,7 @@
         // Obté les opinions d'Algolia
         function fetchOpinions() {
             index.search('', { hitsPerPage: 100 }).then(({ hits }) => {
-                opinions = hits;
+                opinions = hits.filter(opinion => opinion.estrelles >= 3.5 && opinion.estrelles <= 5);
 
                 if (opinions.length > 0) {
                     updateOpinion(0); // Mostra la primera opinió
