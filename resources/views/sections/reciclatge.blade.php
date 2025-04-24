@@ -17,7 +17,7 @@
         <div class="row row-16 justify-content-center">
             @php
                 $categories = [
-                    ['slug' => 'paper', 'nom' => 'Paper i Cartró', 'color' => '#2859bc'], // Blau
+                    ['slug' => 'Paper', 'nom' => 'Paper i Cartró', 'color' => '#2859bc'], // Blau
                     ['slug' => 'envasos', 'nom' => 'Envàs lleuger', 'color' => '#fddd19'], // Groc
                     ['slug' => 'organica', 'nom' => 'Fracció Orgànica', 'color' => '#9e6831'], // Marro
                     ['slug' => 'vidre', 'nom' => 'Envàs vidre', 'color' => '#3fd055'], // Verd
@@ -35,7 +35,7 @@
                 <div class="col-6 col-md-2">
                     <div class="card text-center category-card"
                         style="height: 200px; background-size: cover; background-position: center; background-image: url('{{ asset("images/Reciclatge/{$categoria['slug']}/{$categoria['slug']}_portada.png") }}');"
-                        data-color="{{ $categoria['color'] }}">
+                        data-color="{{ $categoria['color'] }}" data-category="{{ $categoria['slug'] }}">
                         <!-- Superposició -->
                         <div class="overlay"></div>
                         <div class="card-body d-flex justify-content-center align-items-center">
@@ -68,12 +68,12 @@
     </div>
 </section>
 
-<!-- Modal per mostrar informació del producte -->
+<!-- Modal per mostrar productes de la fracció -->
 <div id="product-modal" class="modal" style="display: none;">
     <div class="modal-content">
         <span class="close">&times;</span>
         <h3 id="product-title"></h3>
-        <p id="product-description"></p>
+        <div id="product-list" class="mt-3"></div>
     </div>
 </div>
 
@@ -262,6 +262,35 @@
     #clear-search:hover {
         color: black;
     }
+
+
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 10;
+    }
+
+    .modal-content {
+        background-color: #fff;
+        margin: 10% auto;
+        padding: 20px;
+        max-width: 500px;
+        border-radius: 8px;
+        position: relative;
+    }
+
+    .close {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
 </style>
 
 <!-- Inclou les llibreries d'Algolia i jQuery -->
@@ -335,6 +364,71 @@
             }).catch(err => {
                 console.error(err);
             });
+        });
+
+
+
+        // Obre el modal amb els productes d'una categoria
+        $('.category-card').on('click', function () {
+            const categoria = $(this).data('category');
+            const color = $(this).data('color');
+
+            index.search('', {
+                filters: `categoria:"${categoria}"`
+            }).then(({ hits }) => {
+                $('#product-title').text(`Productes de la fracció: ${categoria}`);
+                const productList = $('#product-list');
+                productList.empty();
+
+                if (hits.length === 0) {
+                    productList.append('<p>No s\'han trobat productes en aquesta fracció.</p>');
+                } else {
+                    hits.forEach(hit => {
+                        productList.append(`
+                        <div class="d-flex align-items-center mb-2">
+                            <img src="/${hit.imatge}" alt="${hit.nom}" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
+                            <strong>${hit.nom}</strong>
+                        </div>
+                    `);
+                    });
+                }
+
+                $('#product-modal').fadeIn();
+            });
+        });
+
+        // Obre el modal quan es fa clic a un resultat de cerca
+        $(document).on('click', '#product-results .list-group-item', function () {
+            const productName = $(this).find('strong').text();
+
+            index.search(productName).then(({ hits }) => {
+                if (hits.length > 0) {
+                    const hit = hits[0];
+                    $('#product-title').text(hit.nom);
+                    $('#product-list').html(`
+        <div class="d-flex align-items-center mb-2">
+            <img src="/${hit.imatge}" alt="${hit.nom}" style="width: 70px; height: 70px; object-fit: cover; margin-right: 15px;">
+                <div>
+                    <strong>${hit.nom}</strong><br>
+                        <span style="color: gray;">Fracció: ${hit.categoria}</span>
+                </div>
+        </div>
+                    `);
+                    $('#product-modal').fadeIn();
+                }
+            });
+        });
+
+        // Tanca el modal
+        $('.close').on('click', function () {
+            $('#product-modal').fadeOut();
+        });
+
+        // També tanquem el modal si es fa clic fora del contingut
+        $('#product-modal').on('click', function (e) {
+            if (e.target === this) {
+                $(this).fadeOut();
+            }
         });
     });
 </script>
