@@ -28,6 +28,70 @@
                     ['slug' => 'Especial', 'nom' => 'Especial', 'color' => '#2f3939'], // Gris fosc
                     ['slug' => 'RAEE', 'nom' => 'RAEE', 'color' => '#006f3f', 'tooltip' => 'Residus Aparells Elèctrics i Electrònics'] // Verd fosc
                 ];
+
+                $recyclingInfo = [
+                    'Paper' => [
+                        'descripcion' => "El paper i el cartró són materials biodegradables que provenen d'una font renovable i es poden reciclar fins a 6 vegades.",
+                        'instruccions' => "Plega les caixes de cartró per reduir el seu volum. Assegura't que el paper estigui net i sec. No barregis paper brut amb oli, menjar o altres líquids.",
+                        'beneficis' => "Reciclar una tona de paper salva 17 arbres i estalvia fins a 26.000 litres d'aigua.",
+                        'consells' => "Els papers enfilmats, parafinats o plastificats no es poden reciclar al contenidor blau. Paper de cuina i tovallons usats van al contenidor d'orgànica."
+                    ],
+                    'Envasos' => [
+                        'descripcion' => "Els envasos lleugers inclouen ampolles de plàstic, llaunes, brics, safates de porexpan i embolcalls de plàstic.",
+                        'instruccions' => "Buida completament els envasos i aixafa'ls si és possible per reduir el volum. No és necessari rentar-los, però sí eliminar restes de menjar.",
+                        'beneficis' => "Reciclar plàstic estalvia un 80% de l'energia necessària per fabricar nous productes i redueix l'abocament al medi ambient.",
+                        'consells' => "Reutilitza les bosses de plàstic o utilitza bosses de tela. Recorda que els utensilis de plàstic d'un sol ús no són envasos i van al contenidor gris."
+                    ],
+                    'Organica' => [
+
+                        'descripcion' => "La fracció orgànica inclou restes de menjar, petits residus vegetals i altres materials compostables.",
+                        'instruccions' => "Utilitza bosses compostables i assegura't que no hi hagi materials impropis com plàstics o metalls. Evita tirar líquids.",
+                        'beneficis' => "Els residus orgànics correctament separats es converteixen en compost d'alta qualitat per a l'agricultura i jardineria.",
+                        'consells' => "Els taps de suro, escuradents de fusta i tovallons de paper usats també van al contenidor marró. Evita tirar ossos grans o clofolles de marisc."
+                    ],
+                    'Vidre' => [
+                        'descripcion' => "El vidre és 100% reciclable i pot ser reutilitzat infinites vegades sense perdre qualitat.",
+                        'instruccions' => "Buida completament els envasos i treu-ne els taps i tapes. No cal rentar-los. No barregis vidre pla, ceràmica o vaixelles.",
+                        'beneficis' => "Reciclar vidre estalvia un 30% d'energia comparada amb fabricar vidre nou i redueix les emissions de CO₂.",
+                        'consells' => "Els miralls, finestres, gots, plats de vidre o ceràmica no van al contenidor verd, sinó a la deixalleria o al gris."
+                    ],
+                    'Resta' => [
+                        'descripcion' => "La fracció resta inclou tots aquells residus que no es poden reciclar o que no tenen un sistema de recollida selectiva específic.",
+                        'instruccions' => "Utilitza el contenidor gris només quan el residu no es pugui llençar a cap altre contenidor específic.",
+                        'beneficis' => "Separar correctament redueix la quantitat de residus que acaben en abocadors, allargant la seva vida útil.",
+                        'consells' => "Abans de llençar un objecte al contenidor gris, pregunta't si podria reciclar-se en algun dels altres contenidors o a la deixalleria."
+                    ],
+                    'Deixalleria' => [
+                        'descripcion' => "Les deixalleries o punts verds són instal·lacions on es recullen de forma selectiva aquells residus que no tenen un contenidor específic al carrer.",
+                        'instruccions' => "Porta els residus separats per tipus i segueix les indicacions del personal. Consulta els horaris i normes de la deixalleria del teu municipi.",
+                        'beneficis' => "L'ús de deixalleries permet recuperar materials valuosos i evita que substàncies perilloses contaminin el medi ambient.",
+                        'consells' => "Molts municipis ofereixen deixalleries mòbils que visiten regularment els barris. Alguns residus especials com pintures o dissolvents mai s'han de llençar pels desguassos."
+                    ],
+                    'Medicaments' => [
+                        'descripcion' => "Els medicaments caducats o en desús s'han de gestionar correctament per evitar riscos per a la salut i el medi ambient.",
+                        'instruccions' => "Porta els medicaments caducats, restes de medicaments i els seus envasos als punts SIGRE de les farmàcies. No els llencis mai a les escombraries o al vàter.",
+                        'beneficis' => "La correcta gestió evita la contaminació del sòl i l'aigua, prevenint riscos per a la salut pública i els ecosistemes.",
+                        'consells' => "Revisa periòdicament la farmaciola i elimina els medicaments caducats. No acumulis medicaments innecessàriament."
+                    ],
+                    'Piles' => [
+                        'descripcion' => "Les piles i acumuladors contenen metalls pesants i substàncies tòxiques que poden ser molt contaminants si no es gestionen adequadament.",
+                        'instruccions' => "Diposita-les als contenidors específics que trobaràs a botigues d'electrònica, grans superfícies o punts verds.",
+                        'beneficis' => "Reciclar piles permet recuperar metalls valuosos com zinc, manganès i ferro, evitant la contaminació del sòl i l'aigua.",
+                        'consells' => "Considera utilitzar piles recarregables, que poden substituir fins a 1.000 piles d'un sol ús al llarg de la seva vida útil."
+                    ],
+                    'Especial' => [
+                        'descripcion' => "Els residus especials són aquells que per les seves característiques poden ser perillosos per al medi ambient o requereixen un tractament específic.",
+                        'instruccions' => "Mai barregis residus especials amb altres tipus de residus. Porta'ls a la deixalleria en el seu envàs original si és possible.",
+                        'beneficis' => "La gestió adequada d'aquests residus prevé greus problemes de contaminació i protegeix la salut pública.",
+                        'consells' => "Olis de cuina, pintures, dissolvents, termòmetres, radiografies o bateries pertanyen a aquesta categoria. Consulta amb el teu ajuntament quins altres residus es consideren especials."
+                    ],
+                    'RAEE' => [
+                        'descripcion' => "Els Residus d'Aparells Elèctrics i Electrònics (RAEE) contenen materials valuosos i també components potencialment tòxics.",
+                        'instruccions' => "Porta'ls a la deixalleria, o si compres un aparell nou, la botiga està obligada a recollir el vell. No els desmuntis per la teva compte.",
+                        'beneficis' => "El 90% dels components dels RAEE es poden recuperar i reciclar, incloent metalls preciosos com or, plata, coure i terres rares.",
+                        'consells' => "Intenta reparar els aparells abans de rebutjar-los. Si funcionen però ja no els necessites, considera donar-los a organitzacions socials."
+                    ]
+                ];
             @endphp
 
             <!-- Mostra les categories -->
@@ -275,21 +339,99 @@
         z-index: 10;
     }
 
+    /* Modal más grande */
     .modal-content {
         background-color: #fff;
-        margin: 10% auto;
-        padding: 20px;
-        max-width: 500px;
+        margin: 5% auto;
+        padding: 25px;
+        max-width: 800px;
+        width: 80%;
         border-radius: 8px;
         position: relative;
+        max-height: 85vh;
+        overflow-y: auto;
     }
 
-    .close {
-        position: absolute;
-        top: 10px;
-        right: 20px;
-        font-size: 1.5rem;
+    /* Estilo para las tarjetas de productos */
+    .product-card {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
         cursor: pointer;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .product-card img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+    }
+
+    .product-card-body {
+        padding: 15px;
+        text-align: center;
+    }
+
+    /* Estilo para modal de producto */
+    .product-info-container {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .product-image {
+        flex: 0 0 200px;
+    }
+
+    .product-image img {
+        width: 100%;
+        border-radius: 8px;
+    }
+
+    .product-details {
+        flex: 1;
+    }
+
+    .recycling-tips {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 20px;
+    }
+
+    .category-banner {
+        background-color: var(--category-color);
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .category-banner svg {
+        width: 30px;
+        height: 30px;
+        fill: white;
+    }
+
+    .back-button {
+        color: #666;
+        cursor: pointer;
+        margin-bottom: 15px;
+        display: inline-block;
+    }
+
+    .back-button:hover {
+        color: #333;
+        text-decoration: underline;
     }
 </style>
 
@@ -305,10 +447,12 @@
             card.style.setProperty('--hover-color', color);
         });
     });
+
     $(document).ready(function () {
         // Inicialitza el client d'Algolia
         const client = algoliasearch("4JU9PG98CF", "d37ffd358dca40447584fb2ffdc28e03");
         const index = client.initIndex('productes'); // Nom de l'índex a Algolia
+        const recyclingInfo = @json($recyclingInfo);
         $('[data-bs-toggle="tooltip"]').tooltip();
 
         const searchInput = $('#product-search');
@@ -333,7 +477,6 @@
             productResults.hide(); // Amaga la llista de resultats
         });
 
-
         // Cerca en temps real
         searchInput.on('input', function () {
             const query = $(this).val();
@@ -348,7 +491,24 @@
             index.search(query).then(({ hits }) => {
                 // Esborra els resultats anteriors
                 productResults.empty();
-
+                productResults.append(`
+                    <div class="category-banner" style="background-color: ${color}">
+                        <svg class="category-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
+                            <path d="M17,4V2a2,2,0,0,0-2-2H9A2,2,0,0,0,7,2V4H2V6H4V21a3,3,0,0,0,3,3H17a3,3,0,0,0,3-3V6h2V4ZM11,17H9V11h2Zm4,0H13V11h2ZM15,4H9V2h6Z" />
+                        </svg>
+                        <h4 class="mb-0">${$(`[data-category="${categoria}"]`).closest('.col-6').find('.category-title').text()}</h4>
+                    </div>
+                    
+                    <div class="recycling-tips mb-4">
+                        <h5>Informació de reciclatge</h5>
+                        <p><strong>Què és:</strong> ${info.descripcion}</p>
+                        <p><strong>Com reciclar-ho:</strong> ${info.instruccions}</p>
+                        <p><strong>Beneficis:</strong> ${info.beneficis}</p>
+                        <p><strong>Consells:</strong> ${info.consells}</p>
+                    </div>
+                    
+                    <h5>Productes d'aquesta fracció</h5>
+                `);
                 // Mostra els resultats
                 hits.forEach(hit => {
                     productResults.append(`
@@ -366,36 +526,94 @@
             });
         });
 
-
-
         // Obre el modal amb els productes d'una categoria
         $('.category-card').on('click', function () {
-            const categoria = $(this).data('category');
+            const categoria = $(this).data('category'); // No cal convertir a minúscules aquí
             const color = $(this).data('color');
+            const info = recyclingInfo[categoria];
 
+            console.log("Filtering for category:", categoria);
+
+            // Consulta els productes de la categoria
             index.search('', {
-                filters: `categoria:"${categoria}"`
+                filters: `categoria:"${categoria}"`, // Filtre exacte
+                hitsPerPage: 100
             }).then(({ hits }) => {
-                $('#product-title').text(`Productes de la fracció: ${categoria}`);
-                const productList = $('#product-list');
-                productList.empty();
+                console.log(`Found ${hits.length} products for ${categoria}`);
 
                 if (hits.length === 0) {
-                    productList.append('<p>No s\'han trobat productes en aquesta fracció.</p>');
-                } else {
-                    hits.forEach(hit => {
-                        productList.append(`
-                        <div class="d-flex align-items-center mb-2">
-                            <img src="/${hit.imatge}" alt="${hit.nom}" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
-                            <strong>${hit.nom}</strong>
-                        </div>
-                    `);
-                    });
-                }
+                    // Si no hi ha resultats, fem una cerca sense filtres i filtrem manualment
+                    index.search('', {
+                        hitsPerPage: 1000 // Obtenim tots els resultats
+                    }).then(({ hits: allHits }) => {
+                        const matchingProducts = allHits.filter(product =>
+                            product.categoria.toLowerCase() === categoria.toLowerCase()
+                        );
 
+                        console.log(`Found ${matchingProducts.length} products with case-insensitive match`);
+                        showProducts(matchingProducts, categoria, color, info);
+                    });
+                } else {
+                    showProducts(hits, categoria, color, info);
+                }
+            }).catch(err => {
+                console.error("Error al buscar productes:", err);
+                $('#product-title').text(`Error cercant productes de ${categoria}`);
+                $('#product-list').html(`<p>Hi ha hagut un error en cercar els productes. Detalls: ${err.message}</p>`);
                 $('#product-modal').fadeIn();
             });
         });
+
+        // Funció per mostrar els productes
+        function showProducts(products, categoria, color, info) {
+            $('#product-title').text(`Productes de la fracció: ${categoria}`);
+            const productList = $('#product-list');
+            productList.empty();
+
+            // Afegeix el banner amb informació de la categoria
+            productList.append(`
+                <div class="category-banner" style="background-color: ${color}">
+                    <svg class="category-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
+                        <path d="M17,4V2a2,2,0,0,0-2-2H9A2,2,0,0,0,7,2V4H2V6H4V21a3,3,0,0,0,3,3H17a3,3,0,0,0,3-3V6h2V4ZM11,17H9V11h2Zm4,0H13V11h2ZM15,4H9V2h6Z" />
+                    </svg>
+                    <h4 class="mb-0">${categoria}</h4>
+                </div>
+                
+                <div class="recycling-tips mb-4">
+                    <h5>Informació de reciclatge</h5>
+                    <p><strong>Què és:</strong> ${info.descripcion}</p>
+                    <p><strong>Com reciclar-ho:</strong> ${info.instruccions}</p>
+                    <p><strong>Beneficis:</strong> ${info.beneficis}</p>
+                    <p><strong>Consells:</strong> ${info.consells}</p>
+                </div>
+                
+                <h5>Productes d'aquesta fracció</h5>
+            `);
+
+            if (products.length === 0) {
+                productList.append('<p>No s\'han trobat productes en aquesta fracció.</p>');
+            } else {
+                // Crea una fila per a les targetes
+                let row = $('<div class="row g-3"></div>');
+                productList.append(row);
+
+                products.forEach(product => {
+                    row.append(`
+                        <div class="col-6 col-md-3 mb-3">
+                            <div class="product-card" data-product-id="${product.id}" data-product-name="${product.nom}" data-product-category="${product.categoria}" data-product-image="${product.imatge}">
+                                <img src="/${product.imatge}" alt="${product.nom}" class="card-img-top">
+                                <div class="product-card-body">
+                                    <h6>${product.nom}</h6>
+                                    <p class="text-muted">${product.categoria}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+                });
+            }
+
+            $('#product-modal').fadeIn();
+        }
 
         // Obre el modal quan es fa clic a un resultat de cerca
         $(document).on('click', '#product-results .list-group-item', function () {
@@ -406,13 +624,13 @@
                     const hit = hits[0];
                     $('#product-title').text(hit.nom);
                     $('#product-list').html(`
-        <div class="d-flex align-items-center mb-2">
-            <img src="/${hit.imatge}" alt="${hit.nom}" style="width: 70px; height: 70px; object-fit: cover; margin-right: 15px;">
-                <div>
-                    <strong>${hit.nom}</strong><br>
-                        <span style="color: gray;">Fracció: ${hit.categoria}</span>
-                </div>
-        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <img src="/${hit.imatge}" alt="${hit.nom}" style="width: 70px; height: 70px; object-fit: cover; margin-right: 15px;">
+                            <div>
+                                <strong>${hit.nom}</strong><br>
+                                <span style="color: gray;">Fracció: ${hit.categoria}</span>
+                            </div>
+                        </div>
                     `);
                     $('#product-modal').fadeIn();
                 }
