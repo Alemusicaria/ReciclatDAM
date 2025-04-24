@@ -37,9 +37,9 @@
                         </div>
                         <h4 id="selected-award-name" class="mb-3"></h4>
                         <p id="selected-award-description" class="card-text"></p>
-                        <div class="d-flex justify-content-between mt-auto pt-3">
-                            <button id="prev-selected-award" class="btn btn-outline-primary">&larr;</button>
-                            <button id="next-selected-award" class="btn btn-outline-primary">&rarr;</button>
+                        <div class="d-flex justify-content-center mt-auto pt-3">
+                            <button id="prev-selected-award" class="btn">&larr;</button>
+                            <button id="next-selected-award" class="btn">&rarr;</button>
                         </div>
                     </div>
                 </div>
@@ -99,7 +99,7 @@
         padding: 0;
     }
 
-        .award-card {
+    .award-card {
         position: relative;
         border-radius: 10px;
         overflow: hidden;
@@ -108,31 +108,36 @@
         transition: all 0.3s ease;
         height: 160px;
         background-color: #fff;
-        border: 3px solid transparent; /* Contorn inicial transparent */
+        border: 3px solid transparent;
+        /* Contorn inicial transparent */
     }
-    
+
     .award-card img {
         width: 100%;
         height: 100%;
         object-fit: cover;
         transition: transform 0.5s ease;
     }
-    
+
     .award-card:hover img {
         transform: scale(1.08);
     }
-    
+
     .award-card:hover {
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Augmenta l'ombra al passar el ratolí */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        /* Augmenta l'ombra al passar el ratolí */
     }
-    
+
     .award-card.selected {
-        border: 5px solid #2e7d32; /* Contorn verd clar */
-        box-shadow: 0 0 10px rgba(46, 125, 50, 0.5); /* Ombra verda */
+        border: 5px solid #2e7d32;
+        /* Contorn verd clar */
+        box-shadow: 0 0 10px rgba(46, 125, 50, 0.5);
+        /* Ombra verda */
     }
-    
+
     .award-card.selected img {
-        transform: scale(1.05); /* Lleuger augment de la imatge */
+        transform: scale(1.05);
+        /* Lleuger augment de la imatge */
     }
 
     .award-card:hover .award-overlay {
@@ -219,6 +224,11 @@
         box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
     }
 
+    .btn:focus {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
     .premi {
         transition: all 0.5s ease;
         border: 5px solid transparent;
@@ -240,6 +250,8 @@
     #next-selected-award {
         color: #2e7d32;
         border-color: #2e7d32;
+        width: 10rem;
+        margin: 0 30px;
     }
 
     #prev-selected-award:hover,
@@ -247,6 +259,12 @@
         background-color: #2e7d32;
         color: white;
         border-color: #2e7d32;
+    }
+
+    button#prev-selected-award:focus,
+    button#next-selected-award:focus {
+        outline: 0 !important;
+        box-shadow: 0 0 0 0.2rem rgba(46, 125, 50, 0.5) !important;
     }
 </style>
 
@@ -426,8 +444,7 @@
         function startAutoRotate() {
             stopAutoRotate();
             autoRotateInterval = setInterval(function () {
-                const nextPage = (currentPage + 1) % Math.ceil(awards.length / awardsPerPage);
-                goToPage(nextPage);
+                nextAward();
             }, 5000);
         }
 

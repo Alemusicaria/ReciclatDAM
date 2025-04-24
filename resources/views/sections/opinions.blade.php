@@ -79,8 +79,7 @@
 
     .opinion-arrow:focus {
         outline: none;
-        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
-        /* Resaltat al fer focus */
+        box-shadow: 0 0 0 0.2rem rgba(46, 125, 50, 0.5) !important;
     }
 
     .opinion-arrow i {
