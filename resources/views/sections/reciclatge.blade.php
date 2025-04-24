@@ -18,15 +18,15 @@
             @php
                 $categories = [
                     ['slug' => 'Paper', 'nom' => 'Paper i Cartró', 'color' => '#2859bc'], // Blau
-                    ['slug' => 'envasos', 'nom' => 'Envàs lleuger', 'color' => '#fddd19'], // Groc
-                    ['slug' => 'organica', 'nom' => 'Fracció Orgànica', 'color' => '#9e6831'], // Marro
-                    ['slug' => 'vidre', 'nom' => 'Envàs vidre', 'color' => '#3fd055'], // Verd
-                    ['slug' => 'resta', 'nom' => 'Fracció Resta', 'color' => '#6d7878'], // Gris
-                    ['slug' => 'deixalleria', 'nom' => 'Deixalleria / Punt verd', 'color' => '#d62c2d'], // Vermell
-                    ['slug' => 'medicaments', 'nom' => 'Medicaments', 'color' => '#b7e53b'], // Verd clar
-                    ['slug' => 'piles', 'nom' => 'Piles i Acumuladors', 'color' => '#fca614'], // Taronja
-                    ['slug' => 'especial', 'nom' => 'Especial', 'color' => '#2f3939'], // Gris fosc
-                    ['slug' => 'raee', 'nom' => 'RAEE', 'color' => '#006f3f', 'tooltip' => 'Residus Aparells Elèctrics i Electrònics'] // Verd fosc
+                    ['slug' => 'Envasos', 'nom' => 'Envàs lleuger', 'color' => '#fddd19'], // Groc
+                    ['slug' => 'Organica', 'nom' => 'Fracció Orgànica', 'color' => '#9e6831'], // Marro
+                    ['slug' => 'Vidre', 'nom' => 'Envàs vidre', 'color' => '#3fd055'], // Verd
+                    ['slug' => 'Resta', 'nom' => 'Fracció Resta', 'color' => '#6d7878'], // Gris
+                    ['slug' => 'Deixalleria', 'nom' => 'Deixalleria / Punt verd', 'color' => '#d62c2d'], // Vermell
+                    ['slug' => 'Medicaments', 'nom' => 'Medicaments', 'color' => '#b7e53b'], // Verd clar
+                    ['slug' => 'Piles', 'nom' => 'Piles i Acumuladors', 'color' => '#fca614'], // Taronja
+                    ['slug' => 'Especial', 'nom' => 'Especial', 'color' => '#2f3939'], // Gris fosc
+                    ['slug' => 'RAEE', 'nom' => 'RAEE', 'color' => '#006f3f', 'tooltip' => 'Residus Aparells Elèctrics i Electrònics'] // Verd fosc
                 ];
             @endphp
 
@@ -40,7 +40,7 @@
                         <div class="overlay"></div>
                         <div class="card-body d-flex justify-content-center align-items-center">
                             <div class="icon-background">
-                                @if ($categoria['slug'] === 'raee')
+                                @if ($categoria['slug'] === 'RAEE')
                                     <svg class="category-icon" xmlns="http://www.w3.org/2000/svg" width="27.963" height="29.131"
                                         viewBox="0 0 27.963 29.131" fill="{{ $categoria['color'] }}">
                                         <path id="Union_4" data-name="Union 4"
