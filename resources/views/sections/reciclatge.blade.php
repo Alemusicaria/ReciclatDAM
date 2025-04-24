@@ -479,50 +479,46 @@
 
         // Cerca en temps real
         searchInput.on('input', function () {
-            const query = $(this).val();
+            const query = $(this).val().trim(); // Elimina espais innecessaris
 
             // Si el camp està buit, esborra els resultats
             if (!query) {
                 productResults.empty();
+                productResults.hide(); // Amaga la llista de resultats
                 return;
             }
 
-            // Cerca a Algolia sense límit de resultats
-            index.search(query).then(({ hits }) => {
+            // Cerca a Algolia
+            index.search(query, {
+                hitsPerPage: 10 // Limita el nombre de resultats
+            }).then(({ hits }) => {
                 // Esborra els resultats anteriors
                 productResults.empty();
-                productResults.append(`
-                    <div class="category-banner" style="background-color: ${color}">
-                        <svg class="category-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
-                            <path d="M17,4V2a2,2,0,0,0-2-2H9A2,2,0,0,0,7,2V4H2V6H4V21a3,3,0,0,0,3,3H17a3,3,0,0,0,3-3V6h2V4ZM11,17H9V11h2Zm4,0H13V11h2ZM15,4H9V2h6Z" />
-                        </svg>
-                        <h4 class="mb-0">${$(`[data-category="${categoria}"]`).closest('.col-6').find('.category-title').text()}</h4>
-                    </div>
-                    
-                    <div class="recycling-tips mb-4">
-                        <h5>Informació de reciclatge</h5>
-                        <p><strong>Què és:</strong> ${info.descripcion}</p>
-                        <p><strong>Com reciclar-ho:</strong> ${info.instruccions}</p>
-                        <p><strong>Beneficis:</strong> ${info.beneficis}</p>
-                        <p><strong>Consells:</strong> ${info.consells}</p>
-                    </div>
-                    
-                    <h5>Productes d'aquesta fracció</h5>
-                `);
-                // Mostra els resultats
-                hits.forEach(hit => {
-                    productResults.append(`
-                        <li class="list-group-item d-flex align-items-center">
-                            <img src="/${hit.imatge}" alt="${hit.nom}" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
-                            <div>
-                                <strong>${hit.nom}</strong><br>
-                                <span style="color: gray;">${hit.categoria}</span>
-                            </div>
-                        </li>
-                    `);
-                });
+
+                if (hits.length === 0) {
+                    // Si no hi ha resultats, mostra un missatge
+                    productResults.append('<li class="list-group-item">No s\'han trobat productes.</li>');
+                } else {
+                    // Mostra els resultats
+                    hits.forEach(hit => {
+                        productResults.append(`
+                            <li class="list-group-item d-flex align-items-center">
+                                <img src="/${hit.imatge}" alt="${hit.nom}" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
+                                <div>
+                                    <strong>${hit.nom}</strong><br>
+                                    <span style="color: gray;">${hit.categoria}</span>
+                                </div>
+                            </li>
+                        `);
+                    });
+                }
+
+                productResults.show(); // Mostra la llista de resultats
             }).catch(err => {
-                console.error(err);
+                console.error("Error en la cerca:", err);
+                productResults.empty();
+                productResults.append('<li class="list-group-item text-danger">Error en la cerca. Torna-ho a intentar.</li>');
+                productResults.show();
             });
         });
 
