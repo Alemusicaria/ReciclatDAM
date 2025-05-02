@@ -130,6 +130,24 @@
             @endforeach
         </div>
     </div>
+    <!-- Modal per mostrar productes de la fracció -->
+    <div id="fraction-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 id="fraction-title"></h3>
+            <div id="fraction-list" class="mt-3"></div>
+        </div>
+    </div>
+
+    <!-- Modal per mostrar detalls d'un producte -->
+    <div id="product-detail-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 id="product-detail-title"></h3>
+            <div id="product-detail-content" class="mt-3"></div>
+        </div>
+    </div>
+
 </section>
 
 <!-- Modal per mostrar productes de la fracció -->
@@ -140,7 +158,49 @@
         <div id="product-list" class="mt-3"></div>
     </div>
 </div>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<section id="mapa" class="mapa-section mt-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Mapa Interactiu de Punts de Recollida</h2>
+        <div id="map" style="height: 500px; width: 100%;"></div>
+    </div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/algoliasearch@4"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Inicialitza el mapa centrat a Catalunya
+        const map = L.map('map').setView([41.3851, 2.1734], 8); // Coordenades inicials (Barcelona)
 
+        // Afegeix el tile layer d'OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Inicialitza el client d'Algolia
+        const client = algoliasearch("4JU9PG98CF", "d37ffd358dca40447584fb2ffdc28e03");
+        const index = client.initIndex('punts_de_recollida');
+
+        // Cerca els punts de recollida a Algolia
+        index.search('').then(({ hits }) => {
+            hits.forEach(punt => {
+                // Afegeix un marcador per a cada punt de recollida
+                const marker = L.marker([punt.latitud, punt.longitud]).addTo(map);
+
+                // Popup amb informació del punt de recollida
+                marker.bindPopup(`
+                    <strong>${punt.nom}</strong><br>
+                    <strong>Ciutat:</strong> ${punt.ciutat}<br>
+                    <strong>Adreça:</strong> ${punt.adreça}<br>
+                    <strong>Fracció:</strong> ${punt.fracció}<br>
+                    <strong>Disponibilitat:</strong> ${punt.disponible ? 'Disponible' : 'No disponible'}
+                `);
+            });
+        }).catch(err => {
+            console.error('Error carregant els punts de recollida:', err);
+        });
+    });
+</script>
 <!-- Estils personalitzats -->
 <style>
     .category-card {
@@ -342,13 +402,13 @@
     /* Modal más grande */
     .modal-content {
         background-color: #fff;
-        margin: 5% auto;
+        margin: 7% auto auto auto;
         padding: 25px;
         max-width: 800px;
         width: 80%;
         border-radius: 8px;
         position: relative;
-        max-height: 85vh;
+        max-height: 80vh;
         overflow-y: auto;
     }
 
@@ -458,6 +518,8 @@
         const searchInput = $('#product-search');
         const clearButton = $('#clear-search');
         const productResults = $('#product-results');
+        // Variable per emmagatzemar el contingut original de la llista de productes
+        let originalProductListContent = '';
 
         // Mostra o amaga el botó de la creu i la llista de resultats
         searchInput.on('input', function () {
@@ -502,14 +564,14 @@
                     // Mostra els resultats
                     hits.forEach(hit => {
                         productResults.append(`
-                            <li class="list-group-item d-flex align-items-center">
-                                <img src="/${hit.imatge}" alt="${hit.nom}" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
-                                <div>
-                                    <strong>${hit.nom}</strong><br>
-                                    <span style="color: gray;">${hit.categoria}</span>
-                                </div>
-                            </li>
-                        `);
+                    <li class="list-group-item d-flex align-items-center product-result" data-product-id="${hit.id}" data-product-name="${hit.nom}" data-product-category="${hit.categoria}" data-product-image="${hit.imatge}">
+                        <img src="/${hit.imatge}" alt="${hit.nom}" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
+                        <div>
+                            <strong>${hit.nom}</strong><br>
+                            <span style="color: gray;">${hit.categoria}</span>
+                        </div>
+                    </li>
+                `);
                     });
                 }
 
@@ -590,12 +652,12 @@
                 productList.append('<p>No s\'han trobat productes en aquesta fracció.</p>');
             } else {
                 // Crea una fila per a les targetes
-                let row = $('<div class="row g-3"></div>');
+                let row = $('<div class="row g-3" id="product-row"></div>');
                 productList.append(row);
 
                 products.forEach(product => {
                     row.append(`
-                        <div class="col-6 col-md-3 mb-3">
+                        <div class="col-6 col-md-3 mb-3 product-row-item">
                             <div class="product-card" data-product-id="${product.id}" data-product-name="${product.nom}" data-product-category="${product.categoria}" data-product-image="${product.imatge}">
                                 <img src="/${product.imatge}" alt="${product.nom}" class="card-img-top">
                                 <div class="product-card-body">
@@ -633,14 +695,61 @@
             });
         });
 
+
+
+        // Obre el modal quan es fa clic a un producte de la llista de productes de la categoria
+        $(document).on('click', '#product-row .product-row-item', function () {
+            const productName = $(this).find('h6').text(); // Obté el nom del producte
+            const productCategory = $(this).find('.text-muted').text(); // Obté la categoria del producte
+            const productImage = $(this).find('img').attr('src'); // Obté la imatge del producte
+
+            // Guarda el contingut original de la llista de productes si encara no està guardat
+            if (!originalProductListContent) {
+                originalProductListContent = $('#product-list').html();
+            }
+
+            // Actualitza el títol del modal amb el nom del producte
+            $('#product-title').text(productName);
+
+            // Mostra la informació detallada del producte
+            $('#product-list').html(`
+                <div class="product-info-container">
+                    <div class="product-image">
+                        <img src="${productImage}" alt="${productName}" style="width: 100%; border-radius: 8px;">
+                    </div>
+                    <div class="product-details mt-3">
+                        <h4>${productName}</h4>
+                        <p><strong>Fracció:</strong> ${productCategory}</p>
+                    </div>
+                </div>
+                <button class="btn btn-primary mt-3 back-button">&larr; Tornar a la llista</button>
+            `);
+
+            // Handler per tornar a la llista de productes
+            $('.back-button').on('click', function () {
+                // Restaura el contingut original de la llista de productes
+                $('#product-title').text(`Productes de la fracció: ${productCategory}`);
+                $('#product-list').html(originalProductListContent);
+
+                // Esborra la variable temporal per evitar conflictes
+                originalProductListContent = '';
+            });
+
+            // Mostra el modal
+            $('#product-modal').fadeIn();
+        });
+
+
         // Tanca el modal
         $('.close').on('click', function () {
+            originalProductListContent = '';
             $('#product-modal').fadeOut();
         });
 
         // També tanquem el modal si es fa clic fora del contingut
         $('#product-modal').on('click', function (e) {
             if (e.target === this) {
+                originalProductListContent = '';
                 $(this).fadeOut();
             }
         });

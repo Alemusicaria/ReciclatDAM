@@ -13,8 +13,10 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\NavigatorInfoController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\ProducteController;
-use App\Http\Controllers\ContenidorController;
 use App\Http\Controllers\OpinionsController;
+use App\Http\Controllers\PuntDeRecollidaController;
+use App\Http\Controllers\TipusAlertaController;
+use App\Http\Controllers\AlertaPuntDeRecollidaController;
 
 Route::localizedGroup(function () {
     Route::get('auth/{provider}', [SocialiteController::class, 'redirectToProvider']);
@@ -59,11 +61,13 @@ Route::localizedGroup(function () {
     Route::resource('productes', ProducteController::class);
 
     Route::apiResource('productes', ProducteController::class);
-    Route::apiResource('contenidors', ContenidorController::class);
 
     Route::get('/premis/search', [PremiController::class, 'search'])->name('premis.search');
 
     Route::resource('opinions', OpinionsController::class);
     Route::get('opinions/search', [OpinionsController::class, 'search'])->name('opinions.search');
-    
+
+    Route::resource('punts_de_recollida', PuntDeRecollidaController::class);
+    Route::resource('tipus_alertes', TipusAlertaController::class);
+    Route::resource('alertes_punts_de_recollida', AlertaPuntDeRecollidaController::class);
 });

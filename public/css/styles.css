@@ -363,23 +363,6 @@ body.dark .search-input:focus {
     /* Espai inferior */
 }
 
-/* Imatges per al mode clar */
-body.light #apple-store {
-    content: url("{{ asset('images/icons/apple_light.png')}}");
-}
-
-body.light #google-play {
-    content: url("{{ asset('images/icons/google_light.png')}}");
-}
-
-/* Imatges per al mode fosc */
-body.dark #apple-store {
-    content: url("{{ asset('images/icons/apple_dark.png')}}");
-}
-
-body.dark #google-play {
-    content: url("{{ asset('images/icons/google_dark.png')}}");
-}
 
 /* Cards en mode clar */
 body.light #funcionament .card {
