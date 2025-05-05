@@ -166,19 +166,23 @@
     <div class="container">
         <h2 class="text-center mb-4">Mapa Interactiu de Punts de Recollida</h2>
         <div class="d-flex justify-content-center mb-3">
-            <button class="btn btn-primary mx-2 filter-button" data-fraccio="Paper">Paper</button>
-            <button class="btn btn-warning mx-2 filter-button" data-fraccio="Envasos">Envasos</button>
-            <button class="btn btn-success mx-2 filter-button" data-fraccio="Orgànica">Orgànica</button>
-            <button class="btn btn-info mx-2 filter-button" data-fraccio="Vidre">Vidre</button>
-            <button class="btn btn-secondary mx-2 filter-button" data-fraccio="Resta">Resta</button>
-            <button class="btn btn-danger mx-2 filter-button" data-fraccio="Deixalleria">Deixalleria</button>
-            <button class="btn btn-light mx-2 filter-button" data-fraccio="Medicaments">Medicaments</button>
-            <button class="btn btn-dark mx-2 filter-button" data-fraccio="Piles">Piles</button>
-            <button class="btn btn-secondary mx-2 filter-button" data-fraccio="Especial">Especial</button>
-            <button class="btn btn-success mx-2 filter-button" data-fraccio="RAEE">RAEE</button>
+            @foreach ($categories as $categoria)
+
+                @if ($categoria['slug'] === 'Organica')
+                    <button class="btn btn-primary mx-2 filter-button" data-fraccio="{{ $categoria['slug'] }}"
+                        style="background-color: {{ $categoria['color'] }};">
+                        Orgànica
+                    </button>
+
+                @else
+                    <button class="btn btn-primary mx-2 filter-button" data-fraccio="{{ $categoria['slug'] }}"
+                        style="background-color: {{ $categoria['color'] }};">
+                        {{ $categoria['slug'] }}
+                    </button>
+                @endif
+            @endforeach
             <button class="btn btn-outline-secondary mx-2 clear-filter-button">Esborra Filtre</button>
         </div>
-
         <div id="map" style="height: 500px; width: 100%;"></div>
     </div>
 </section>
@@ -498,170 +502,170 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize category cards
-    const cards = document.querySelectorAll('.category-card');
-    cards.forEach(card => {
-        const color = card.getAttribute('data-color');
-        card.style.setProperty('--hover-color', color);
-    });
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize category cards
+        const cards = document.querySelectorAll('.category-card');
+        cards.forEach(card => {
+            const color = card.getAttribute('data-color');
+            card.style.setProperty('--hover-color', color);
+        });
 
-    // Initialize tooltips
-    $('[data-bs-toggle="tooltip"]').tooltip();
+        // Initialize tooltips
+        $('[data-bs-toggle="tooltip"]').tooltip();
 
-    // Initialize Algolia client
-    const client = algoliasearch("4JU9PG98CF", "d37ffd358dca40447584fb2ffdc28e03");
-    const productIndex = client.initIndex('productes');
-    const puntsIndex = client.initIndex('punts_de_recollida');
-    
-    // Get recycling info from PHP
-    const recyclingInfo = JSON.parse(document.getElementById('recycling-info-data').textContent);
-    console.log("Recycling info loaded:", recyclingInfo);
+        // Initialize Algolia client
+        const client = algoliasearch("4JU9PG98CF", "d37ffd358dca40447584fb2ffdc28e03");
+        const productIndex = client.initIndex('productes');
+        const puntsIndex = client.initIndex('punts_de_recollida');
 
-    // Search elements
-    const searchInput = $('#product-search');
-    const clearButton = $('#clear-search');
-    const productResults = $('#product-results');
-    let originalProductListContent = '';
+        // Get recycling info from PHP
+        const recyclingInfo = JSON.parse(document.getElementById('recycling-info-data').textContent);
+        console.log("Recycling info loaded:", recyclingInfo);
 
-    // MAP FUNCTIONALITY
-    // Initialize map centered on Catalonia
-    const map = L.map('map');
-    const catalunyaBounds = [
-        [40.5, 0.15], // Southwest (approximately)
-        [42.85, 3.35] // Northeast (approximately)
-    ];
-    
-    // Adjust the map to show all of Catalonia
-    map.fitBounds(catalunyaBounds);
+        // Search elements
+        const searchInput = $('#product-search');
+        const clearButton = $('#clear-search');
+        const productResults = $('#product-results');
+        let originalProductListContent = '';
 
-    // Add OpenStreetMap tile layer
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+        // MAP FUNCTIONALITY
+        // Initialize map centered on Catalonia
+        const map = L.map('map');
+        const catalunyaBounds = [
+            [40.5, 0.15], // Southwest (approximately)
+            [42.85, 3.35] // Northeast (approximately)
+        ];
 
-    // Variable to store markers
-    let markers = [];
-    let noResultsControl = null; // Control for visual message
+        // Adjust the map to show all of Catalonia
+        map.fitBounds(catalunyaBounds);
 
-    // Function to normalize fractions (remove accents and convert to lowercase)
-    function normalizeFraccio(fraccio) {
-        return fraccio.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    }
+        // Add OpenStreetMap tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
 
-    // Function to load collection points on the map
-    function loadPuntsDeRecollida(fraccio = '') {
-        // Delete previous markers
-        markers.forEach(marker => map.removeLayer(marker));
-        markers = [];
+        // Variable to store markers
+        let markers = [];
+        let noResultsControl = null; // Control for visual message
 
-        // If there's already a "Not found" message, delete it
-        if (noResultsControl) {
-            map.removeControl(noResultsControl);
-            noResultsControl = null;
+        // Function to normalize fractions (remove accents and convert to lowercase)
+        function normalizeFraccio(fraccio) {
+            return fraccio.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase();
         }
 
-        console.log('Filtering by fraction:', fraccio);
+        // Function to load collection points on the map
+        function loadPuntsDeRecollida(fraccio = '') {
+            // Delete previous markers
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
 
-        puntsIndex.search('', {
-            hitsPerPage: 100
-        }).then(({ hits }) => {
-            console.log('Collection point data:', hits);
-
-            if (fraccio) {
-                const fraccioNormalitzada = normalizeFraccio(fraccio);
-                hits = hits.filter(punt => normalizeFraccio(punt.fraccio) === fraccioNormalitzada);
+            // If there's already a "Not found" message, delete it
+            if (noResultsControl) {
+                map.removeControl(noResultsControl);
+                noResultsControl = null;
             }
 
-            if (hits.length === 0) {
-                console.warn('No s\'han trobat punts de recollida per a la fracció:', fraccio);
+            console.log('Filtering by fraction:', fraccio);
 
-                // Add visual message
-                noResultsControl = L.control({ position: 'topright' });
-                noResultsControl.onAdd = function(map) {
-                    let div = L.DomUtil.create('div', 'alert alert-warning');
-                    div.innerHTML = `No s\'han trobat punts per a <strong>${fraccio}</strong>`;
-                    return div;
-                };
-                noResultsControl.addTo(map);
-            } else {
-                hits.forEach(punt => {
-                    const marker = L.marker([punt.latitud, punt.longitud]).addTo(map);
-                    marker.bindPopup(`
+            puntsIndex.search('', {
+                hitsPerPage: 100
+            }).then(({ hits }) => {
+                console.log('Collection point data:', hits);
+
+                if (fraccio) {
+                    const fraccioNormalitzada = normalizeFraccio(fraccio);
+                    hits = hits.filter(punt => normalizeFraccio(punt.fraccio) === fraccioNormalitzada);
+                }
+
+                if (hits.length === 0) {
+                    console.warn('No s\'han trobat punts de recollida per a la fracció:', fraccio);
+
+                    // Add visual message
+                    noResultsControl = L.control({ position: 'topright' });
+                    noResultsControl.onAdd = function (map) {
+                        let div = L.DomUtil.create('div', 'alert alert-warning');
+                        div.innerHTML = `No s\'han trobat punts per a <strong>${fraccio}</strong>`;
+                        return div;
+                    };
+                    noResultsControl.addTo(map);
+                } else {
+                    hits.forEach(punt => {
+                        const marker = L.marker([punt.latitud, punt.longitud]).addTo(map);
+                        marker.bindPopup(`
                         <strong>${punt.nom}</strong><br>
-                        <strong>City:</strong> ${punt.ciutat}<br>
-                        <strong>Address:</strong> ${punt.adreca}<br>
-                        <strong>Fraction:</strong> ${punt.fraccio}<br>
-                        <strong>Availability:</strong> ${punt.disponible ? 'Available' : 'Not available'}
+                        <strong>Ciutat:</strong> ${punt.ciutat}<br>
+                        <strong>Adreça:</strong> ${punt.adreca}<br>
+                        <strong>Fracció:</strong> ${punt.fraccio}<br>
+                        <strong>Disponible:</strong> ${punt.disponible ? 'Disponible' : 'No disponible'}
                     `);
-                    markers.push(marker);
-                });
-            }
-        }).catch(err => {
-            console.error('Error loading collection points:', err);
-        });
-    }
+                        markers.push(marker);
+                    });
+                }
+            }).catch(err => {
+                console.error('Error loading collection points:', err);
+            });
+        }
 
-    // Initially load all collection points
-    loadPuntsDeRecollida();
-
-    // Handle clicks on filter buttons
-    document.querySelectorAll('.filter-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const fraccio = this.getAttribute('data-fraccio');
-            loadPuntsDeRecollida(fraccio);
-        });
-    });
-
-    // Handle click on clear filter button
-    document.querySelector('.clear-filter-button').addEventListener('click', function() {
+        // Initially load all collection points
         loadPuntsDeRecollida();
-    });
 
-    // SEARCH FUNCTIONALITY
-    // Show or hide the cross button and results list
-    searchInput.on('input', function() {
-        if ($(this).val().trim() !== '') {
-            clearButton.show();
-            productResults.show();
-        } else {
+        // Handle clicks on filter buttons
+        document.querySelectorAll('.filter-button').forEach(button => {
+            button.addEventListener('click', function () {
+                const fraccio = this.getAttribute('data-fraccio');
+                loadPuntsDeRecollida(fraccio);
+            });
+        });
+
+        // Handle click on clear filter button
+        document.querySelector('.clear-filter-button').addEventListener('click', function () {
+            loadPuntsDeRecollida();
+        });
+
+        // SEARCH FUNCTIONALITY
+        // Show or hide the cross button and results list
+        searchInput.on('input', function () {
+            if ($(this).val().trim() !== '') {
+                clearButton.show();
+                productResults.show();
+            } else {
+                clearButton.hide();
+                productResults.hide();
+            }
+        });
+
+        // Clear the search field text
+        clearButton.on('click', function () {
+            searchInput.val('');
             clearButton.hide();
             productResults.hide();
-        }
-    });
+        });
 
-    // Clear the search field text
-    clearButton.on('click', function() {
-        searchInput.val('');
-        clearButton.hide();
-        productResults.hide();
-    });
+        // Real-time search
+        searchInput.on('input', function () {
+            const query = $(this).val().trim();
 
-    // Real-time search
-    searchInput.on('input', function() {
-        const query = $(this).val().trim();
+            // If the field is empty, clear the results
+            if (!query) {
+                productResults.empty();
+                productResults.hide();
+                return;
+            }
 
-        // If the field is empty, clear the results
-        if (!query) {
-            productResults.empty();
-            productResults.hide();
-            return;
-        }
+            // Search Algolia
+            productIndex.search(query, {
+                hitsPerPage: 10
+            }).then(({ hits }) => {
+                // Clear previous results
+                productResults.empty();
 
-        // Search Algolia
-        productIndex.search(query, {
-            hitsPerPage: 10
-        }).then(({ hits }) => {
-            // Clear previous results
-            productResults.empty();
-
-            if (hits.length === 0) {
-                // If there are no results, show a message
-                productResults.append('<li class="list-group-item">No products found.</li>');
-            } else {
-                // Show results
-                hits.forEach(hit => {
-                    productResults.append(`
+                if (hits.length === 0) {
+                    // If there are no results, show a message
+                    productResults.append('<li class="list-group-item">No products found.</li>');
+                } else {
+                    // Show results
+                    hits.forEach(hit => {
+                        productResults.append(`
                         <li class="list-group-item d-flex align-items-center product-result" 
                             data-product-id="${hit.id}" 
                             data-product-name="${hit.nom}" 
@@ -674,54 +678,54 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                         </li>
                     `);
-                });
-            }
+                    });
+                }
 
-            productResults.show();
-        }).catch(err => {
-            console.error("Error in search:", err);
-            productResults.empty();
-            productResults.append('<li class="list-group-item text-danger">Search error. Please try again.</li>');
-            productResults.show();
+                productResults.show();
+            }).catch(err => {
+                console.error("Error in search:", err);
+                productResults.empty();
+                productResults.append('<li class="list-group-item text-danger">Search error. Please try again.</li>');
+                productResults.show();
+            });
         });
-    });
 
-    // CATEGORY MODAL FUNCTIONALITY
-    // Open modal with products for a category
-    $('.category-card').on('click', function() {
-        const categoria = $(this).data('category');
-        const color = $(this).data('color');
-        const info = recyclingInfo[categoria];
+        // CATEGORY MODAL FUNCTIONALITY
+        // Open modal with products for a category
+        $('.category-card').on('click', function () {
+            const categoria = $(this).data('category');
+            const color = $(this).data('color');
+            const info = recyclingInfo[categoria];
 
-        console.log("Filtering for category:", categoria);
+            console.log("Filtering for category:", categoria);
 
-        // Query products for the category
-        productIndex.search('', {
-            hitsPerPage: 1000
-        }).then(({ hits }) => {
-            const categoriaNormalitzada = normalizeFraccio(categoria);
-            const matchingProducts = hits.filter(product =>
-                normalizeFraccio(product.categoria) === categoriaNormalitzada
-            );
+            // Query products for the category
+            productIndex.search('', {
+                hitsPerPage: 1000
+            }).then(({ hits }) => {
+                const categoriaNormalitzada = normalizeFraccio(categoria);
+                const matchingProducts = hits.filter(product =>
+                    normalizeFraccio(product.categoria) === categoriaNormalitzada
+                );
 
-            console.log(`Found ${matchingProducts.length} products with case-insensitive match`);
-            showProducts(matchingProducts, categoria, color, info);
-        }).catch(err => {
-            console.error("Error searching for products:", err);
-            $('#product-title').text(`Error searching for products in ${categoria}`);
-            $('#product-list').html(`<p>There was an error searching for products. Details: ${err.message}</p>`);
-            $('#product-modal').fadeIn();
+                console.log(`Found ${matchingProducts.length} products with case-insensitive match`);
+                showProducts(matchingProducts, categoria, color, info);
+            }).catch(err => {
+                console.error("Error searching for products:", err);
+                $('#product-title').text(`Error searching for products in ${categoria}`);
+                $('#product-list').html(`<p>There was an error searching for products. Details: ${err.message}</p>`);
+                $('#product-modal').fadeIn();
+            });
         });
-    });
 
-    // Function to show products
-    function showProducts(products, categoria, color, info) {
-        $('#product-title').text(`Products in the ${categoria} fraction`);
-        const productList = $('#product-list');
-        productList.empty();
+        // Function to show products
+        function showProducts(products, categoria, color, info) {
+            $('#product-title').text(`Products in the ${categoria} fraction`);
+            const productList = $('#product-list');
+            productList.empty();
 
-        // Add banner with category information
-        productList.append(`
+            // Add banner with category information
+            productList.append(`
             <div class="category-banner" style="background-color: ${color}">
                 <svg class="category-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
                     <path d="M17,4V2a2,2,0,0,0-2-2H9A2,2,0,0,0,7,2V4H2V6H4V21a3,3,0,0,0,3,3H17a3,3,0,0,0,3-3V6h2V4ZM11,17H9V11h2Zm4,0H13V11h2ZM15,4H9V2h6Z" />
@@ -740,15 +744,15 @@ document.addEventListener('DOMContentLoaded', function() {
             <h5>Products in this fraction</h5>
         `);
 
-        if (products.length === 0) {
-            productList.append('<p>No products found in this fraction.</p>');
-        } else {
-            // Create a row for the cards
-            let row = $('<div class="row g-3" id="product-row"></div>');
-            productList.append(row);
+            if (products.length === 0) {
+                productList.append('<p>No products found in this fraction.</p>');
+            } else {
+                // Create a row for the cards
+                let row = $('<div class="row g-3" id="product-row"></div>');
+                productList.append(row);
 
-            products.forEach(product => {
-                row.append(`
+                products.forEach(product => {
+                    row.append(`
                     <div class="col-6 col-md-3 mb-3 product-row-item">
                         <div class="product-card" 
                             data-product-id="${product.id}" 
@@ -763,24 +767,24 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     </div>
                 `);
-            });
+                });
+            }
+
+            $('#product-modal').fadeIn();
         }
 
-        $('#product-modal').fadeIn();
-    }
+        // PRODUCT DETAILS MODAL FUNCTIONALITY
+        // Function to show a modal with product information and map
+        function showProductModal(productName, productCategory, productImage) {
+            // Get recycling text for the fraction
+            const info = recyclingInfo[productCategory] || {};
+            const recyclingText = info.instruccions || 'No information available for this fraction.';
 
-    // PRODUCT DETAILS MODAL FUNCTIONALITY
-    // Function to show a modal with product information and map
-    function showProductModal(productName, productCategory, productImage) {
-        // Get recycling text for the fraction
-        const info = recyclingInfo[productCategory] || {};
-        const recyclingText = info.instruccions || 'No information available for this fraction.';
+            // Update the modal title with the product name
+            $('#product-title').text(productName).css('text-align', 'center');
 
-        // Update the modal title with the product name
-        $('#product-title').text(productName).css('text-align', 'center');
-
-        // Show detailed product information
-        $('#product-list').html(`
+            // Show detailed product information
+            $('#product-list').html(`
             <div class="product-info-container">
                 <div class="product-image" style="text-align: center;">
                     <img src="${productImage}" alt="${productName}" style="width: 150px; height: 150px; object-fit: cover; border-radius: 8px;">
@@ -795,125 +799,125 @@ document.addEventListener('DOMContentLoaded', function() {
             <button class="btn btn-primary mt-3 back-button">&larr; Back to list</button>
         `);
 
-        // Initialize map centered on Catalonia
-        const productMap = L.map('product-map');
-        productMap.fitBounds(catalunyaBounds);
+            // Initialize map centered on Catalonia
+            const productMap = L.map('product-map');
+            productMap.fitBounds(catalunyaBounds);
 
-        // Add OpenStreetMap tile layer
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(productMap);
+            // Add OpenStreetMap tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(productMap);
 
-        let markersCategory = [];
-        let productNoResultsControl = null;
+            let markersCategory = [];
+            let productNoResultsControl = null;
 
-        // Clear previous markers
-        markersCategory.forEach(marker => productMap.removeLayer(marker));
-        markersCategory = [];
+            // Clear previous markers
+            markersCategory.forEach(marker => productMap.removeLayer(marker));
+            markersCategory = [];
 
-        // If there's already a "Not found" message, delete it
-        if (productNoResultsControl) {
-            productMap.removeControl(productNoResultsControl);
-            productNoResultsControl = null;
-        }
-
-        console.log('Filtering by product category:', productCategory);
-
-        // Search for collection points in Algolia filtering by fraction
-        puntsIndex.search('', {
-            hitsPerPage: 100
-        }).then(({ hits: puntsDeRecollida }) => {
-            console.log('Collection point data:', puntsDeRecollida);
-
-            if (productCategory) {
-                const productCategoryNormalitzada = normalizeFraccio(productCategory);
-                puntsDeRecollida = puntsDeRecollida.filter(punt => 
-                    normalizeFraccio(punt.fraccio) === productCategoryNormalitzada
-                );
+            // If there's already a "Not found" message, delete it
+            if (productNoResultsControl) {
+                productMap.removeControl(productNoResultsControl);
+                productNoResultsControl = null;
             }
 
-            if (puntsDeRecollida.length === 0) {
-                console.warn('No s\'han trobat punts de recollida per a la fracció:', productCategory);
+            console.log('Filtering by product category:', productCategory);
 
-                // Add visual message
-                productNoResultsControl = L.control({ position: 'topright' });
-                productNoResultsControl.onAdd = function(map) {
-                    let div = L.DomUtil.create('div', 'alert alert-warning');
-                    div.innerHTML = `No s\'han trobat punts per a <strong>${productCategory}</strong>`;
-                    return div;
-                };
-                productNoResultsControl.addTo(productMap);
-            } else {
-                puntsDeRecollida.forEach(punt => {
-                    const marker = L.marker([punt.latitud, punt.longitud]).addTo(productMap);
-                    marker.bindPopup(`
+            // Search for collection points in Algolia filtering by fraction
+            puntsIndex.search('', {
+                hitsPerPage: 100
+            }).then(({ hits: puntsDeRecollida }) => {
+                console.log('Collection point data:', puntsDeRecollida);
+
+                if (productCategory) {
+                    const productCategoryNormalitzada = normalizeFraccio(productCategory);
+                    puntsDeRecollida = puntsDeRecollida.filter(punt =>
+                        normalizeFraccio(punt.fraccio) === productCategoryNormalitzada
+                    );
+                }
+
+                if (puntsDeRecollida.length === 0) {
+                    console.warn('No s\'han trobat punts de recollida per a la fracció:', productCategory);
+
+                    // Add visual message
+                    productNoResultsControl = L.control({ position: 'topright' });
+                    productNoResultsControl.onAdd = function (map) {
+                        let div = L.DomUtil.create('div', 'alert alert-warning');
+                        div.innerHTML = `No s\'han trobat punts per a <strong>${productCategory}</strong>`;
+                        return div;
+                    };
+                    productNoResultsControl.addTo(productMap);
+                } else {
+                    puntsDeRecollida.forEach(punt => {
+                        const marker = L.marker([punt.latitud, punt.longitud]).addTo(productMap);
+                        marker.bindPopup(`
                         <strong>${punt.nom}</strong><br>
                         ${punt.ciutat}, ${punt.adreca}
                     `);
-                    markersCategory.push(marker);
-                });
-            }
-        }).catch(err => {
-            console.error('Error loading collection points:', err);
-        });
+                        markersCategory.push(marker);
+                    });
+                }
+            }).catch(err => {
+                console.error('Error loading collection points:', err);
+            });
 
-        // Show the modal and force map redraw
-        $('#product-modal').fadeIn(() => {
-            productMap.invalidateSize();
-        });
-    }
+            // Show the modal and force map redraw
+            $('#product-modal').fadeIn(() => {
+                productMap.invalidateSize();
+            });
+        }
 
-    // Open modal when clicking on a search result
-    $(document).on('click', '#product-results .list-group-item', function() {
-        const productName = $(this).data('product-name');
-        const productCategory = $(this).data('product-category');
-        const productImage = $(this).data('product-image');
-        
-        showProductModal(productName, productCategory, `/${productImage}`);
-        
-        // Clear search after selection
-        searchInput.val('');
-        clearButton.hide();
-        productResults.hide();
-    });
-
-    // Open modal when clicking on a product in the category product list
-    $(document).on('click', '#product-row .product-card', function() {
-        const productName = $(this).data('product-name');
-        const productCategory = $(this).data('product-category');
-        const productImage = $(this).data('product-image');
-        
-        showProductModal(productName, productCategory, `/${productImage}`);
-    });
-
-    // Handle back button in product detail view
-    $(document).on('click', '.back-button', function() {
-        // Go back to the previous view in the modal
-        const productId = $(this).data('product-id');
-        if (productId) {
-            // If we have a product ID, go back to that product's category
+        // Open modal when clicking on a search result
+        $(document).on('click', '#product-results .list-group-item', function () {
+            const productName = $(this).data('product-name');
             const productCategory = $(this).data('product-category');
-            
-            // Trigger a click on the category card to show all products in that category
-            $(`.category-card[data-category="${productCategory}"]`).click();
-        } else {
-            // Otherwise just close the modal
-            $('#product-modal').fadeOut();
-        }
-    });
+            const productImage = $(this).data('product-image');
 
-    // Close modal
-    $('.close').on('click', function() {
-        originalProductListContent = '';
-        $('#product-modal').fadeOut();
-    });
+            showProductModal(productName, productCategory, `/${productImage}`);
 
-    // Also close the modal if clicking outside the content
-    $('#product-modal').on('click', function(e) {
-        if (e.target === this) {
+            // Clear search after selection
+            searchInput.val('');
+            clearButton.hide();
+            productResults.hide();
+        });
+
+        // Open modal when clicking on a product in the category product list
+        $(document).on('click', '#product-row .product-card', function () {
+            const productName = $(this).data('product-name');
+            const productCategory = $(this).data('product-category');
+            const productImage = $(this).data('product-image');
+
+            showProductModal(productName, productCategory, `/${productImage}`);
+        });
+
+        // Handle back button in product detail view
+        $(document).on('click', '.back-button', function () {
+            // Go back to the previous view in the modal
+            const productId = $(this).data('product-id');
+            if (productId) {
+                // If we have a product ID, go back to that product's category
+                const productCategory = $(this).data('product-category');
+
+                // Trigger a click on the category card to show all products in that category
+                $(`.category-card[data-category="${productCategory}"]`).click();
+            } else {
+                // Otherwise just close the modal
+                $('#product-modal').fadeOut();
+            }
+        });
+
+        // Close modal
+        $('.close').on('click', function () {
             originalProductListContent = '';
-            $(this).fadeOut();
-        }
+            $('#product-modal').fadeOut();
+        });
+
+        // Also close the modal if clicking outside the content
+        $('#product-modal').on('click', function (e) {
+            if (e.target === this) {
+                originalProductListContent = '';
+                $(this).fadeOut();
+            }
+        });
     });
-});
 </script>
