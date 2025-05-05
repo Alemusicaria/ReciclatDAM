@@ -89,8 +89,8 @@
                         listItem.innerHTML = `
                             <div style="flex: 1; position: relative; z-index: 2; padding: 10px; background: rgba(255, 255, 255, 0.8); border-radius: 5px; color: black;">
                                 <strong>${hit.nom}</strong><br>
-                                <span>${hit.ciutat}, ${hit.adreça}</span><br>
-                                <small><strong>Fracció:</strong> ${hit.fracció}</small>
+                                <span>${hit.ciutat}, ${hit.adreca}</span><br>
+                                <small><strong>Fracció:</strong> ${hit.fraccio}</small>
                             </div>
                             <div style="margin-left: 10px; z-index: 1;">
                                 <img src="https://maps.googleapis.com/maps/api/staticmap?center=${hit.latitud},${hit.longitud}&zoom=15&size=150x100&scale=2&markers=color:red%7C${hit.latitud},${hit.longitud}&key=AIzaSyA_P805QMSihuKi7XQAK7KMnoPcZa8YEas" alt="Mapa estàtic" style="width: 150px; height: 100px; border-radius: 5px;">

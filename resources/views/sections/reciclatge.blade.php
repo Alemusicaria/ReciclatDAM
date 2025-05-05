@@ -158,49 +158,31 @@
         <div id="product-list" class="mt-3"></div>
     </div>
 </div>
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
 <section id="mapa" class="mapa-section mt-5">
     <div class="container">
         <h2 class="text-center mb-4">Mapa Interactiu de Punts de Recollida</h2>
+        <div class="d-flex justify-content-center mb-3">
+            <button class="btn btn-primary mx-2 filter-button" data-fraccio="Paper">Paper</button>
+            <button class="btn btn-warning mx-2 filter-button" data-fraccio="Envasos">Envasos</button>
+            <button class="btn btn-success mx-2 filter-button" data-fraccio="Orgànica">Orgànica</button>
+            <button class="btn btn-info mx-2 filter-button" data-fraccio="Vidre">Vidre</button>
+            <button class="btn btn-secondary mx-2 filter-button" data-fraccio="Resta">Resta</button>
+            <button class="btn btn-danger mx-2 filter-button" data-fraccio="Deixalleria">Deixalleria</button>
+            <button class="btn btn-light mx-2 filter-button" data-fraccio="Medicaments">Medicaments</button>
+            <button class="btn btn-dark mx-2 filter-button" data-fraccio="Piles">Piles</button>
+            <button class="btn btn-secondary mx-2 filter-button" data-fraccio="Especial">Especial</button>
+            <button class="btn btn-success mx-2 filter-button" data-fraccio="RAEE">RAEE</button>
+            <button class="btn btn-outline-secondary mx-2 clear-filter-button">Esborra Filtre</button>
+        </div>
+
         <div id="map" style="height: 500px; width: 100%;"></div>
     </div>
 </section>
-<script src="https://cdn.jsdelivr.net/npm/algoliasearch@4"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Inicialitza el mapa centrat a Catalunya
-        const map = L.map('map').setView([41.3851, 2.1734], 8); // Coordenades inicials (Barcelona)
 
-        // Afegeix el tile layer d'OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-
-        // Inicialitza el client d'Algolia
-        const client = algoliasearch("4JU9PG98CF", "d37ffd358dca40447584fb2ffdc28e03");
-        const index = client.initIndex('punts_de_recollida');
-
-        // Cerca els punts de recollida a Algolia
-        index.search('').then(({ hits }) => {
-            hits.forEach(punt => {
-                // Afegeix un marcador per a cada punt de recollida
-                const marker = L.marker([punt.latitud, punt.longitud]).addTo(map);
-
-                // Popup amb informació del punt de recollida
-                marker.bindPopup(`
-                    <strong>${punt.nom}</strong><br>
-                    <strong>Ciutat:</strong> ${punt.ciutat}<br>
-                    <strong>Adreça:</strong> ${punt.adreça}<br>
-                    <strong>Fracció:</strong> ${punt.fracció}<br>
-                    <strong>Disponibilitat:</strong> ${punt.disponible ? 'Disponible' : 'No disponible'}
-                `);
-            });
-        }).catch(err => {
-            console.error('Error carregant els punts de recollida:', err);
-        });
-    });
-</script>
 <!-- Estils personalitzats -->
 <style>
     .category-card {
@@ -493,12 +475,126 @@
         color: #333;
         text-decoration: underline;
     }
+
+    .leaflet-top.leaflet-right .alert {
+        font-size: 1.2rem;
+        padding: 10px 15px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        background-color: #fff3cd;
+        border: 1px solid #ffeeba;
+        color: #856404;
+        max-width: 250px;
+        text-align: center;
+    }
 </style>
 
 <!-- Inclou les llibreries d'Algolia i jQuery -->
 <script src="https://cdn.jsdelivr.net/npm/algoliasearch@4"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Inicialitza el mapa centrat a Catalunya
+        const map = L.map('map');
 
+        // Defineix els límits de Catalunya (coordenades aproximades)
+        const catalunyaBounds = [
+            [40.5, 0.15], // Sud-oest (aproximadament)
+            [42.85, 3.35] // Nord-est (aproximadament)
+        ];
+
+        // Ajusta el mapa perquè mostri tota Catalunya
+        map.fitBounds(catalunyaBounds);
+
+        // Afegeix el tile layer d'OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+        // Inicialitza el client d'Algolia
+        const client = algoliasearch("4JU9PG98CF", "d37ffd358dca40447584fb2ffdc28e03");
+        const index = client.initIndex('punts_de_recollida');
+
+        // Variable per emmagatzemar els marcadors
+        let markers = [];
+
+        function normalizeFraccio(fraccio) {
+            return fraccio.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        }
+
+        let noResultsControl = null; // Control per missatge visual
+
+        function loadPuntsDeRecollida(fraccio = '') {
+            // Esborra marcadors anteriors
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+
+            // Si ja hi ha missatge "No trobat", esborra'l
+            if (noResultsControl) {
+                map.removeControl(noResultsControl);
+                noResultsControl = null;
+            }
+
+            console.log('Filtrant per fracció:', fraccio);
+
+            index.search('', {
+                hitsPerPage: 100
+            }).then(({ hits }) => {
+                console.log('Dades de punts de recollida:', hits);
+
+                if (fraccio) {
+                    const fraccioNormalitzada = normalizeFraccio(fraccio);
+                    hits = hits.filter(punt => normalizeFraccio(punt.fraccio) === fraccioNormalitzada);
+                }
+
+                if (hits.length === 0) {
+                    console.warn('No s\'han trobat punts de recollida per a la fracció:', fraccio);
+
+                    // ➡️ Afegeix missatge visual
+                    noResultsControl = L.control({ position: 'topright' });
+                    noResultsControl.onAdd = function (map) {
+                        let div = L.DomUtil.create('div', 'alert alert-warning');
+                        div.innerHTML = `No s'han trobat punts per a <strong>${fraccio}</strong>`;
+                        return div;
+                    };
+                    noResultsControl.addTo(map);
+
+                } else {
+                    hits.forEach(punt => {
+                        const marker = L.marker([punt.latitud, punt.longitud]).addTo(map);
+                        marker.bindPopup(`
+                    <strong>${punt.nom}</strong><br>
+                    <strong>Ciutat:</strong> ${punt.ciutat}<br>
+                    <strong>Adreça:</strong> ${punt.adreca}<br>
+                    <strong>Fracció:</strong> ${punt.fraccio}<br>
+                    <strong>Disponibilitat:</strong> ${punt.disponible ? 'Disponible' : 'No disponible'}
+                `);
+                        markers.push(marker);
+                    });
+                }
+            }).catch(err => {
+                console.error('Error carregant els punts de recollida:', err);
+            });
+        }
+
+
+
+        // Carrega tots els punts de recollida inicialment
+        loadPuntsDeRecollida();
+
+        // Gestiona els clics als botons de filtratge
+        document.querySelectorAll('.filter-button').forEach(button => {
+            button.addEventListener('click', function () {
+                const fraccio = this.getAttribute('data-fraccio');
+                loadPuntsDeRecollida(fraccio); // Carrega els punts de recollida filtrats per fracció
+            });
+        });
+
+        // Gestiona el clic al botó d'esborrar filtre
+        document.querySelector('.clear-filter-button').addEventListener('click', function () {
+            loadPuntsDeRecollida(); // Carrega tots els punts de recollida sense filtre
+        });
+    });
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const cards = document.querySelectorAll('.category-card');
@@ -513,6 +609,7 @@
         const client = algoliasearch("4JU9PG98CF", "d37ffd358dca40447584fb2ffdc28e03");
         const index = client.initIndex('productes'); // Nom de l'índex a Algolia
         const recyclingInfo = @json($recyclingInfo);
+        console.log("Recycling info:", recyclingInfo);
         $('[data-bs-toggle="tooltip"]').tooltip();
 
         const searchInput = $('#product-search');
@@ -586,7 +683,7 @@
 
         // Obre el modal amb els productes d'una categoria
         $('.category-card').on('click', function () {
-            const categoria = $(this).data('category'); // No cal convertir a minúscules aquí
+            const categoria = $(this).data('category'); // Categoria seleccionada
             const color = $(this).data('color');
             const info = recyclingInfo[categoria];
 
@@ -673,6 +770,135 @@
             $('#product-modal').fadeIn();
         }
 
+        // Funció genèrica per mostrar el modal amb informació del producte i el mapa
+        function showProductModal(productName, productCategory, productImage) {
+            // Informació de reciclatge per fracció
+            const recyclingInfo = {
+                'Paper': 'Plega les caixes de cartró per reduir el volum. Assegura\'t que el paper estigui net i sec.',
+                'Envasos': 'Buida completament els envasos i aixafa\'ls per reduir el volum. No és necessari rentar-los.',
+                'Organica': 'Utilitza bosses compostables i assegura\'t que no hi hagi materials impropis com plàstics.',
+                'Vidre': 'Buida completament els envasos i treu-ne els taps i tapes. No cal rentar-los.',
+                'Resta': 'Els residus que no es poden reciclar van al contenidor gris.',
+                'Deixalleria': 'Porta els residus especials a la deixalleria o punt verd més proper.',
+                'Medicaments': 'Els medicaments caducats o sobrants han d\'anar al punt SIGRE de la farmàcia.',
+                'Piles': 'Diposa les piles i acumuladors als contenidors específics per a piles.',
+                'Especial': 'Residus especials com pintures o dissolvents han d\'anar a la deixalleria.',
+                'RAEE': 'Els aparells elèctrics i electrònics han de portar-se a punts de recollida específics.'
+            };
+
+            // Obté el text de reciclatge per a la fracció
+            const recyclingText = recyclingInfo[productCategory] || 'No hi ha informació disponible per aquesta fracció.';
+
+            // Actualitza el títol del modal amb el nom del producte
+            $('#product-title').text(productName).css('text-align', 'center');
+
+            // Mostra la informació detallada del producte
+            $('#product-list').html(`
+                <div class="product-info-container">
+                    <div class="product-image" style="text-align: center;">
+                        <img src="${productImage}" alt="${productName}" style="width: 150px; height: 150px; object-fit: cover; border-radius: 8px;">
+                    </div>
+                    <div class="product-details mt-3" style="text-align: center;">
+                        <h4>${productName}</h4>
+                        <p><strong>Fracció:</strong> ${productCategory}</p>
+                        <p><strong>Com reciclar-ho:</strong> ${recyclingText}</p>
+                    </div>
+                </div>
+                <div id="map" style="height: 250px; width: 100%; margin-top: 20px; border-radius: 8px;"></div>
+                <button class="btn btn-primary mt-3 back-button">&larr; Tornar a la llista</button>
+            `);
+
+            // Inicialitza el mapa centrat a Catalunya
+            const map = L.map('map');
+
+            // Defineix els límits de Catalunya (coordenades aproximades)
+            const catalunyaBounds = [
+                [40.5, 0.15], // Sud-oest (aproximadament)
+                [42.85, 3.35] // Nord-est (aproximadament)
+            ];
+
+            // Ajusta el mapa perquè mostri tota Catalunya
+            map.fitBounds(catalunyaBounds);
+
+            // Afegeix el tile layer d'OpenStreetMap
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Cerca punts de recollida a Algolia filtrant per fracció
+            const puntsIndex = client.initIndex('punts_de_recollida'); // Índex d'Algolia per a punts de recollida
+
+            let markersCategory = [];
+
+
+            function normalizeFraccio(productCategory) {
+                return productCategory.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase();
+            }
+
+            let noResultsControl = null; // Control per missatge visual
+
+            function loadPuntsDeRecollida() {
+
+                // Esborra marcadors anteriors
+                markersCategory.forEach(marker => map.removeLayer(marker));
+                markersCategory = [];
+
+                // Si ja hi ha missatge "No trobat", esborra'l
+                if (noResultsControl) {
+                    map.removeControl(noResultsControl);
+                    noResultsControl = null;
+                }
+
+                console.log('Filtrant per fracció:', productCategory);
+
+                puntsIndex.search('', {
+                    hitsPerPage: 100
+                }).then(({ hits: puntsDeRecollida }) => {
+                    console.log('Dades de punts de recollida:', puntsDeRecollida);
+
+                    if (productCategory) {
+                        const productCategoryNormalitzada = normalizeFraccio(productCategory);
+                        puntsDeRecollida = puntsDeRecollida.filter(punt => normalizeFraccio(punt.fraccio) === productCategoryNormalitzada);
+                    }
+
+                    if (puntsDeRecollida.length === 0) {
+                        console.warn('No s\'han trobat punts de recollida per a la fracció:', productCategory);
+
+                        // ➡️ Afegeix missatge visual
+                        noResultsControl = L.control({ position: 'topright' });
+                        noResultsControl.onAdd = function (map) {
+                            let div = L.DomUtil.create('div', 'alert alert-warning');
+                            div.innerHTML = `No s'han trobat punts per a <strong>${productCategory}</strong>`;
+                            return div;
+                        };
+                        noResultsControl.addTo(map);
+
+                    } else {
+                        puntsDeRecollida.forEach(punt => {
+                            const marker = L.marker([punt.latitud, punt.longitud]).addTo(map);
+                            marker.bindPopup(`
+                                <strong>${punt.nom}</strong><br>
+                                ${punt.ciutat}, ${punt.adreca}
+                            `);
+                            markersCategory.push(marker);
+                        });
+                    }
+                }).catch(err => {
+                    console.error('Error carregant els punts de recollida:', err);
+                });
+            }
+
+            // Carrega tots els punts de recollida inicialment
+            loadPuntsDeRecollida();
+
+
+
+            // Mostra el modal i força el redibuix del mapa
+            $('#product-modal').fadeIn(() => {
+                map.invalidateSize(); // Força el redibuix del mapa
+            });
+        }
+
         // Obre el modal quan es fa clic a un resultat de cerca
         $(document).on('click', '#product-results .list-group-item', function () {
             const productName = $(this).find('strong').text();
@@ -680,22 +906,10 @@
             index.search(productName).then(({ hits }) => {
                 if (hits.length > 0) {
                     const hit = hits[0];
-                    $('#product-title').text(hit.nom);
-                    $('#product-list').html(`
-                        <div class="d-flex align-items-center mb-2">
-                            <img src="/${hit.imatge}" alt="${hit.nom}" style="width: 70px; height: 70px; object-fit: cover; margin-right: 15px;">
-                            <div>
-                                <strong>${hit.nom}</strong><br>
-                                <span style="color: gray;">Fracció: ${hit.categoria}</span>
-                            </div>
-                        </div>
-                    `);
-                    $('#product-modal').fadeIn();
+                    showProductModal(hit.nom, hit.categoria, `/${hit.imatge}`);
                 }
             });
         });
-
-
 
         // Obre el modal quan es fa clic a un producte de la llista de productes de la categoria
         $(document).on('click', '#product-row .product-row-item', function () {
@@ -703,42 +917,8 @@
             const productCategory = $(this).find('.text-muted').text(); // Obté la categoria del producte
             const productImage = $(this).find('img').attr('src'); // Obté la imatge del producte
 
-            // Guarda el contingut original de la llista de productes si encara no està guardat
-            if (!originalProductListContent) {
-                originalProductListContent = $('#product-list').html();
-            }
-
-            // Actualitza el títol del modal amb el nom del producte
-            $('#product-title').text(productName);
-
-            // Mostra la informació detallada del producte
-            $('#product-list').html(`
-                <div class="product-info-container">
-                    <div class="product-image">
-                        <img src="${productImage}" alt="${productName}" style="width: 100%; border-radius: 8px;">
-                    </div>
-                    <div class="product-details mt-3">
-                        <h4>${productName}</h4>
-                        <p><strong>Fracció:</strong> ${productCategory}</p>
-                    </div>
-                </div>
-                <button class="btn btn-primary mt-3 back-button">&larr; Tornar a la llista</button>
-            `);
-
-            // Handler per tornar a la llista de productes
-            $('.back-button').on('click', function () {
-                // Restaura el contingut original de la llista de productes
-                $('#product-title').text(`Productes de la fracció: ${productCategory}`);
-                $('#product-list').html(originalProductListContent);
-
-                // Esborra la variable temporal per evitar conflictes
-                originalProductListContent = '';
-            });
-
-            // Mostra el modal
-            $('#product-modal').fadeIn();
+            showProductModal(productName, productCategory, productImage);
         });
-
 
         // Tanca el modal
         $('.close').on('click', function () {
