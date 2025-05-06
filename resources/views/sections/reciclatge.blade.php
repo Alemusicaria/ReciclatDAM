@@ -4,12 +4,11 @@
 
         <!-- Cerca -->
         <div class="d-flex flex-column justify-content-center align-items-center mb-3 position-relative">
-            <div class="search">
+            <div class="search-container">
                 <input id="product-search" type="text" class="form-control" placeholder="Cerca un producte...">
                 <button id="clear-search" type="button">&times;</button>
+                <ul id="product-results" class="list-group"></ul>
             </div>
-            <!-- Resultats de cerca -->
-            <ul id="product-results" class="list-group"></ul>
         </div>
 
         <!-- Fraccions -->
@@ -491,6 +490,58 @@
         max-width: 250px;
         text-align: center;
     }
+
+    body.dark-mode .modal-content {
+        background-color: #2c2c2c;
+        /* Fons fosc */
+        color: #ffffff;
+        /* Text blanc */
+        border: 1px solid #444;
+        /* Contorn subtil */
+    }
+
+    body.dark-mode .modal-content h3,
+    body.dark-mode .modal-content h4,
+    body.dark-mode .modal-content p {
+        color: #ffffff;
+        /* Text blanc */
+    }
+
+    body.dark-mode .product-info-container {
+        background-color: #3a3a3a;
+        /* Fons més fosc per a la informació del producte */
+        border-radius: 8px;
+        padding: 15px;
+    }
+
+    body.dark-mode .recycling-tips {
+        background-color: #444;
+        /* Fons fosc per a les recomanacions */
+        color: #ddd;
+        /* Text gris clar */
+        border: 1px solid #555;
+        /* Contorn subtil */
+    }
+
+    body.dark-mode .category-banner {
+        background-color: #444;
+        /* Fons fosc per al banner */
+        color: #ffffff;
+        /* Text blanc */
+    }
+
+    body.dark-mode .btn-primary {
+        background-color: #555;
+        /* Botons primaris en mode fosc */
+        border-color: #666;
+        color: #ffffff;
+    }
+
+    body.dark-mode .btn-primary:hover {
+        background-color: #666;
+        /* Canvi de color en passar el ratolí */
+        border-color: #777;
+    }
 </style>
 <!-- Add this hidden element to store the recycling info JSON data -->
 <script type="application/json" id="recycling-info-data">
@@ -502,6 +553,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
+
     document.addEventListener('DOMContentLoaded', function () {
         // Initialize category cards
         const cards = document.querySelectorAll('.category-card');
@@ -520,7 +572,6 @@
 
         // Get recycling info from PHP
         const recyclingInfo = JSON.parse(document.getElementById('recycling-info-data').textContent);
-        console.log("Recycling info loaded:", recyclingInfo);
 
         // Search elements
         const searchInput = $('#product-search');
@@ -565,12 +616,9 @@
                 noResultsControl = null;
             }
 
-            console.log('Filtering by fraction:', fraccio);
-
             puntsIndex.search('', {
                 hitsPerPage: 100
             }).then(({ hits }) => {
-                console.log('Collection point data:', hits);
 
                 if (fraccio) {
                     const fraccioNormalitzada = normalizeFraccio(fraccio);
@@ -627,10 +675,10 @@
         searchInput.on('input', function () {
             if ($(this).val().trim() !== '') {
                 clearButton.show();
-                productResults.show();
+                showResults();
             } else {
                 clearButton.hide();
-                productResults.hide();
+                hideResults();
             }
         });
 
@@ -638,7 +686,7 @@
         clearButton.on('click', function () {
             searchInput.val('');
             clearButton.hide();
-            productResults.hide();
+            hideResults();
         });
 
         // Real-time search
@@ -648,9 +696,12 @@
             // If the field is empty, clear the results
             if (!query) {
                 productResults.empty();
-                productResults.hide();
+                hideResults();
+                clearButton.hide();
                 return;
             }
+
+            clearButton.show();
 
             // Search Algolia
             productIndex.search(query, {
@@ -661,34 +712,84 @@
 
                 if (hits.length === 0) {
                     // If there are no results, show a message
-                    productResults.append('<li class="list-group-item">No products found.</li>');
+                    productResults.append('<li class="list-group-item">No s\'ha trobat cap producte.</li>');
                 } else {
                     // Show results
                     hits.forEach(hit => {
                         productResults.append(`
-                        <li class="list-group-item d-flex align-items-center product-result" 
-                            data-product-id="${hit.id}" 
-                            data-product-name="${hit.nom}" 
-                            data-product-category="${hit.categoria}" 
-                            data-product-image="${hit.imatge}">
-                            <img src="/${hit.imatge}" alt="${hit.nom}" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
-                            <div>
-                                <strong>${hit.nom}</strong><br>
-                                <span style="color: gray;">${hit.categoria}</span>
-                            </div>
-                        </li>
-                    `);
+                            <li class="list-group-item d-flex align-items-center product-result" 
+                                data-product-id="${hit.id}" 
+                                data-product-name="${hit.nom}" 
+                                data-product-category="${hit.categoria}" 
+                                data-product-image="${hit.imatge}">
+                                <div class="me-3">
+                                    <img src="/${hit.imatge}" alt="${hit.nom}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+                                </div>
+                                <div class="product-info">
+                                    <strong>${hit.nom}</strong><br>
+                                    <span>${hit.categoria}</span>
+                                </div>
+                            </li>
+                        `);
                     });
                 }
 
-                productResults.show();
+                showResults();
             }).catch(err => {
                 console.error("Error in search:", err);
                 productResults.empty();
-                productResults.append('<li class="list-group-item text-danger">Search error. Please try again.</li>');
-                productResults.show();
+                productResults.append('<li class="list-group-item text-danger">Error en la cerca. Torna-ho a intentar.</li>');
+                showResults();
             });
         });
+        // Show search results with a smooth animation
+        function showResults() {
+            productResults.slideDown(200);
+        }
+
+        // Hide search results with a smooth animation
+        function hideResults() {
+            productResults.slideUp(200);
+        }
+
+        // Add keyboard navigation for search results
+        searchInput.on('keydown', function (e) {
+            if (!productResults.is(':visible')) return;
+
+            const items = productResults.find('.list-group-item');
+            let selected = productResults.find('.selected');
+
+            // Down arrow
+            if (e.keyCode === 40) {
+                e.preventDefault();
+                if (selected.length === 0) {
+                    items.first().addClass('selected');
+                } else {
+                    selected.removeClass('selected');
+                    selected.next().addClass('selected');
+                }
+            }
+
+            // Up arrow
+            else if (e.keyCode === 38) {
+                e.preventDefault();
+                if (selected.length === 0) {
+                    items.last().addClass('selected');
+                } else {
+                    selected.removeClass('selected');
+                    selected.prev().addClass('selected');
+                }
+            }
+
+            // Enter key
+            else if (e.keyCode === 13) {
+                e.preventDefault();
+                if (selected.length > 0) {
+                    selected.click();
+                }
+            }
+        });
+
 
         // CATEGORY MODAL FUNCTIONALITY
         // Open modal with products for a category
@@ -696,8 +797,6 @@
             const categoria = $(this).data('category');
             const color = $(this).data('color');
             const info = recyclingInfo[categoria];
-
-            console.log("Filtering for category:", categoria);
 
             // Query products for the category
             productIndex.search('', {
@@ -708,7 +807,6 @@
                     normalizeFraccio(product.categoria) === categoriaNormalitzada
                 );
 
-                console.log(`Found ${matchingProducts.length} products with case-insensitive match`);
                 showProducts(matchingProducts, categoria, color, info);
             }).catch(err => {
                 console.error("Error searching for products:", err);
@@ -773,100 +871,103 @@
             $('#product-modal').fadeIn();
         }
 
-        // PRODUCT DETAILS MODAL FUNCTIONALITY
         // Function to show a modal with product information and map
         function showProductModal(productName, productCategory, productImage) {
             // Get recycling text for the fraction
             const info = recyclingInfo[productCategory] || {};
-            const recyclingText = info.instruccions || 'No information available for this fraction.';
+            const recyclingText = info.instruccions || 'No hi ha informació disponible per aquesta fracció.';
 
             // Update the modal title with the product name
-            $('#product-title').text(productName).css('text-align', 'center');
+            $('#product-title').text("Descripció del producte").css('text-align', 'center');
 
             // Show detailed product information
             $('#product-list').html(`
-            <div class="product-info-container">
-                <div class="product-image" style="text-align: center;">
-                    <img src="${productImage}" alt="${productName}" style="width: 150px; height: 150px; object-fit: cover; border-radius: 8px;">
+                <div class="product-info-container">
+                    <div class="product-image">
+                        <img src="${productImage}" alt="${productName}" class="product-img">
+                    </div>
+                    <div class="product-details">
+                        <h4>${productName}</h4>
+                        <p><strong>Fracció:</strong> ${productCategory}</p>
+                        <p><strong>Com reciclar-ho:</strong> ${recyclingText}</p>
+                    </div>
                 </div>
-                <div class="product-details mt-3" style="text-align: center;">
-                    <h4>${productName}</h4>
-                    <p><strong>Fraction:</strong> ${productCategory}</p>
-                    <p><strong>How to recycle it:</strong> ${recyclingText}</p>
-                </div>
-            </div>
-            <div id="product-map" style="height: 250px; width: 100%; margin-top: 20px; border-radius: 8px;"></div>
-            <button class="btn btn-primary mt-3 back-button">&larr; Back to list</button>
-        `);
+                <div id="product-map"></div>
+                <button class="btn btn-primary mt-3 back-button">Tancar</button>
+            `);
 
-            // Initialize map centered on Catalonia
-            const productMap = L.map('product-map');
-            productMap.fitBounds(catalunyaBounds);
+            // First show the modal
+            $('#product-modal').fadeIn(function () {
+                // Initialize map centered on Catalonia AFTER the modal is visible
+                const productMap = L.map('product-map');
 
-            // Add OpenStreetMap tile layer
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(productMap);
+                // Define Catalunya bounds
+                const catalunyaBounds = [
+                    [40.5, 0.15], // Southwest (approximately)
+                    [42.85, 3.35]  // Northeast (approximately)
+                ];
 
-            let markersCategory = [];
-            let productNoResultsControl = null;
+                // Adjust the map to show all of Catalonia
+                productMap.fitBounds(catalunyaBounds);
 
-            // Clear previous markers
-            markersCategory.forEach(marker => productMap.removeLayer(marker));
-            markersCategory = [];
+                // Set maximum zoom level to ensure we don't zoom in too much
+                productMap.setMaxZoom(9);
 
-            // If there's already a "Not found" message, delete it
-            if (productNoResultsControl) {
-                productMap.removeControl(productNoResultsControl);
-                productNoResultsControl = null;
-            }
+                // Add OpenStreetMap tile layer
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(productMap);
 
-            console.log('Filtering by product category:', productCategory);
-
-            // Search for collection points in Algolia filtering by fraction
-            puntsIndex.search('', {
-                hitsPerPage: 100
-            }).then(({ hits: puntsDeRecollida }) => {
-                console.log('Collection point data:', puntsDeRecollida);
-
-                if (productCategory) {
-                    const productCategoryNormalitzada = normalizeFraccio(productCategory);
-                    puntsDeRecollida = puntsDeRecollida.filter(punt =>
-                        normalizeFraccio(punt.fraccio) === productCategoryNormalitzada
-                    );
-                }
-
-                if (puntsDeRecollida.length === 0) {
-                    console.warn('No s\'han trobat punts de recollida per a la fracció:', productCategory);
-
-                    // Add visual message
-                    productNoResultsControl = L.control({ position: 'topright' });
-                    productNoResultsControl.onAdd = function (map) {
-                        let div = L.DomUtil.create('div', 'alert alert-warning');
-                        div.innerHTML = `No s\'han trobat punts per a <strong>${productCategory}</strong>`;
-                        return div;
-                    };
-                    productNoResultsControl.addTo(productMap);
-                } else {
-                    puntsDeRecollida.forEach(punt => {
-                        const marker = L.marker([punt.latitud, punt.longitud]).addTo(productMap);
-                        marker.bindPopup(`
-                        <strong>${punt.nom}</strong><br>
-                        ${punt.ciutat}, ${punt.adreca}
-                    `);
-                        markersCategory.push(marker);
-                    });
-                }
-            }).catch(err => {
-                console.error('Error loading collection points:', err);
-            });
-
-            // Show the modal and force map redraw
-            $('#product-modal').fadeIn(() => {
+                // Force map redraw immediately after initialization
                 productMap.invalidateSize();
+
+                // Variable to store markers and control
+                let markersCategory = [];
+                let productNoResultsControl = null;
+
+                // Search for collection points in Algolia filtering by fraction
+                puntsIndex.search('', {
+                    hitsPerPage: 100
+                }).then(({ hits: puntsDeRecollida }) => {
+                    if (productCategory) {
+                        const productCategoryNormalitzada = normalizeFraccio(productCategory);
+                        puntsDeRecollida = puntsDeRecollida.filter(punt =>
+                            normalizeFraccio(punt.fraccio) === productCategoryNormalitzada
+                        );
+                    }
+
+                    if (puntsDeRecollida.length === 0) {
+                        console.warn('No s\'han trobat punts de recollida per a la fracció:', productCategory);
+
+                        // Add visual message
+                        productNoResultsControl = L.control({ position: 'topright' });
+                        productNoResultsControl.onAdd = function (map) {
+                            let div = L.DomUtil.create('div', 'alert alert-warning');
+                            div.innerHTML = `No s\'han trobat punts per a <strong>${productCategory}</strong>`;
+                            return div;
+                        };
+                        productNoResultsControl.addTo(productMap);
+                    } else {
+                        puntsDeRecollida.forEach(punt => {
+                            const marker = L.marker([punt.latitud, punt.longitud]).addTo(productMap);
+                            marker.bindPopup(`
+                                        <strong>${punt.nom}</strong><br>
+                                        ${punt.ciutat}, ${punt.adreca}
+                                    `);
+                            markersCategory.push(marker);
+                        });
+
+                        // ELIMINA AQUESTA SECCIÓ o comenta-la per mantenir el zoom original
+                        // if (markersCategory.length > 0) {
+                        //     const markerGroup = L.featureGroup(markersCategory);
+                        //     productMap.fitBounds(markerGroup.getBounds().pad(0.2));
+                        // }
+                    }
+                }).catch(err => {
+                    console.error('Error loading collection points:', err);
+                });
             });
         }
-
         // Open modal when clicking on a search result
         $(document).on('click', '#product-results .list-group-item', function () {
             const productName = $(this).data('product-name');
@@ -878,7 +979,7 @@
             // Clear search after selection
             searchInput.val('');
             clearButton.hide();
-            productResults.hide();
+            hideResults();
         });
 
         // Open modal when clicking on a product in the category product list
@@ -917,6 +1018,50 @@
             if (e.target === this) {
                 originalProductListContent = '';
                 $(this).fadeOut();
+            }
+        });
+
+        // Afegir aquest codi després de la inicialització del cercador
+        $(document).on('click', function (event) {
+            // Comprova si el clic va ser fora del contenidor de cerca i de la llista de resultats
+            if (!$(event.target).closest('.search-container').length) {
+                hideResults();
+                clearButton.hide();
+            }
+        });
+
+        // També pots afegir un event per quan l'usuari prem la tecla Escape
+        $(document).on('keydown', function (e) {
+            if (e.key === 'Escape') {
+                hideResults();
+                clearButton.hide();
+            }
+        });
+
+        // Afegir event blur per detectar quan l'usuari surt del camp de cerca
+        // Però necessitem un timeout per permetre clics als resultats
+        searchInput.on('blur', function () {
+            setTimeout(function () {
+                if (!$('.product-result:hover').length) {
+                    hideResults();
+                    clearButton.hide();
+                }
+            }, 200);
+        });
+        // Show results again when focusing back on the search input
+        searchInput.on('focus', function () {
+            const query = $(this).val().trim();
+            if (query) {
+                // If there's text in the input, show the clear button and results
+                clearButton.show();
+
+                // Only show results if we have any
+                if (productResults.children().length > 0) {
+                    showResults();
+                } else {
+                    // If no results, trigger a search
+                    $(this).trigger('input');
+                }
             }
         });
     });

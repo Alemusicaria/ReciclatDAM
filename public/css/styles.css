@@ -131,7 +131,7 @@ button:hover {
 .navbar {
     background-color: #fff;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
+    z-index: 10000;
     padding: 10px 20px;
     border-radius: 15px;
     margin: 30px 70px 10px 70px;
@@ -427,4 +427,292 @@ body.dark .icon path {
     fill: #388e3c; /* Color uniforme (blau en aquest cas) */
     margin: 10px auto; /* Centra els SVG i afegeix espai */
     display: block;
+}
+/* Estils per als modals en mode clar */
+body.light .modal-content {
+    background-color: #ffffff;
+    color: #333;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+body.light .modal-content h3,
+body.light .modal-content h4,
+body.light .modal-content p {
+    color: #333;
+}
+
+body.light .product-info-container {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+body.light .recycling-tips {
+    background-color: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+body.light .product-details {
+    background-color: #f8f9fa !important;
+}
+
+body.light .category-banner {
+    background-color: var(--category-color);
+    color: white;
+}
+
+/* Estils per als modals en mode fosc */
+body.dark .modal-content {
+    background-color: #333;
+    color: #f3f4f6;
+    border: 1px solid #444;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+}
+
+body.dark .modal-content h3,
+body.dark .modal-content h4,
+body.dark .modal-content p {
+    color: #f3f4f6;
+}
+
+body.dark .product-info-container {
+    background-color: #444;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+body.dark .recycling-tips {
+    background-color: #444;
+    color: #f3f4f6;
+    border: 1px solid #555;
+}
+
+body.dark .product-details {
+    background-color: #444 !important;
+    color: #f3f4f6;
+}
+
+body.dark .category-banner {
+    background-color: var(--category-color);
+    color: white;
+}
+
+/* Estils per als botons en el modal */
+body.light .modal-content .btn-primary {
+    background-color: #388e3c;
+    border-color: #388e3c;
+    color: white;
+}
+
+body.dark .modal-content .btn-primary {
+    background-color: #2e7d32;
+    border-color: #2e7d32;
+    color: white;
+}
+
+body.light .modal-content .btn-primary:hover {
+    background-color: #2e7d32;
+    border-color: #2e7d32;
+}
+
+body.dark .modal-content .btn-primary:hover {
+    background-color: #388e3c;
+    border-color: #388e3c;
+}
+
+/* Estils per al fons del modal */
+body.light .modal {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+body.dark .modal {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.product-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.product-img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.product-details {
+    text-align: center;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+#product-map {
+    height: 250px;
+    width: 100%;
+    margin-top: 20px;
+    border-radius: 8px;
+}
+
+/* Estils per a la llista de cerca en mode clar */
+body.light #product-results {
+    background-color: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    width: 100%;
+    max-width: 400px;
+    margin-top: 5px;
+}
+
+body.light #product-results .list-group-item {
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    border-bottom: 1px solid #dee2e6;
+    padding: 12px 15px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+body.light #product-results .list-group-item:last-child {
+    border-bottom: none;
+}
+
+body.light #product-results .list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+body.light #product-results .list-group-item strong {
+    color: #333;
+}
+
+body.light #product-results .list-group-item span {
+    color: #6c757d;
+}
+
+/* Estils per a la llista de cerca en mode fosc */
+body.dark #product-results {
+    background-color: #333;
+    border: 1px solid #444;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    width: 100%;
+    max-width: 400px;
+    margin-top: 5px;
+}
+
+body.dark #product-results .list-group-item {
+    background-color: #333;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    border-bottom: 1px solid #444;
+    padding: 12px 15px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+body.dark #product-results .list-group-item:last-child {
+    border-bottom: none;
+}
+
+body.dark #product-results .list-group-item:hover {
+    background-color: #444;
+}
+
+body.dark #product-results .list-group-item strong {
+    color: #f3f4f6;
+}
+
+body.dark #product-results .list-group-item span {
+    color: #adb5bd !important;
+}
+
+/* Barra de desplaçament personalitzada */
+#product-results::-webkit-scrollbar {
+    width: 8px;
+}
+
+#product-results::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+body.light #product-results::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 20px;
+}
+
+body.dark #product-results::-webkit-scrollbar-thumb {
+    background-color: #555;
+    border-radius: 20px;
+}
+
+#product-results::-webkit-scrollbar-thumb:hover {
+    background: #888;
+}
+
+/* Estil per al botó d'esborrar */
+#clear-search {
+    border: none;
+    background: transparent;
+    font-size: 1.2rem;
+    line-height: 1;
+    padding: 0 10px;
+    cursor: pointer;
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+}
+
+body.light #clear-search {
+    color: #666;
+}
+
+body.dark #clear-search {
+    color: #aaa;
+}
+
+body.light #clear-search:hover {
+    color: #333;
+}
+
+body.dark #clear-search:hover {
+    color: #fff;
+}
+
+/* Estil per al camp de cerca */
+.search-container {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+#product-search {
+    width: 97%;
+}
+body.light #product-search {
+    background-color: white;
+    border: 1px solid #ced4da;
+    color: #333;
+}
+
+body.dark #product-search {
+    background-color: #333;
+    border: 1px solid #444;
+    color: #f3f4f6;
 }
