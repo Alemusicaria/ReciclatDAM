@@ -338,12 +338,24 @@
 
     #product-results .list-group-item {
         cursor: pointer;
+        text-align: left;
         /* Canvia el cursor per indicar que és clicable */
     }
 
     #product-results .list-group-item:hover {
         background-color: #f8f9fa;
         /* Canvia el fons quan es passa el ratolí */
+    }
+
+    #product-results .product-info {
+        text-align: left;
+        margin-left: 15px;
+        /* Marge entre la imatge i el text */
+    }
+
+    #product-results .me-3 {
+        margin-right: 0 !important;
+        /* Elimina el marge dret predeterminat */
     }
 
     .position-relative {

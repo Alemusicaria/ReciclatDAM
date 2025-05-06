@@ -23,6 +23,25 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#inici">Inici</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#funcionament">Com funciona</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#qui_som">Qui som</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#reciclatge">Reciclatge</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#premis">Premis</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#opinions">Opinions</a>
+                </li>
+
                 @can('admin')
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="crudDropdown" role="button" data-toggle="dropdown"
@@ -84,7 +103,7 @@
         @yield('content')
     </div>
 
-    
+
 
     <div class="fixed-bottom-right">
         <div class="dropdown">
@@ -100,7 +119,7 @@
                 <a class="dropdown-item" id="lang-ca" href="{{ url('/ca') }}" data-lang="ca">
                     <img src="{{ asset('images/flags/ca.svg') }}" alt="Català" style="width: 20px; margin-right: 10px;">
                     {{ __('Català') }}
-                </a>                
+                </a>
                 <a class="dropdown-item" id="lang-es" href="{{ url('/es') }}" data-lang="es">
                     <img src="{{ asset('images/flags/es.svg') }}" alt="Español"
                         style="width: 20px; margin-right: 10px;">
@@ -114,7 +133,7 @@
             </div>
         </div>
     </div>
-  
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -123,6 +142,8 @@
             const currentTheme = localStorage.getItem('theme') || (prefersDarkScheme ? 'dark' : 'light');
             const themeIcon = document.getElementById('theme-icon');
             const themeToggle = document.getElementById('theme-toggle');
+            const links = document.querySelectorAll('a[href^="#"]:not([href="#"])');
+
 
             // Funció per actualitzar l'icona del tema
             function updateThemeIcon(theme) {
@@ -207,7 +228,62 @@
                 return response.json();
             }).then(data => console.log('Success:', data))
                 .catch((error) => console.error('Error:', error));
+            // Afegim event listener per a cada enllaç
+            links.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
 
+                    // Obtenim el valor del hash (l'ID de la secció)
+                    const targetId = this.getAttribute('href');
+                    const targetSection = document.querySelector(targetId);
+
+                    if (targetSection) {
+                        // Calculem la posició de la secció tenint en compte l'altura del navbar
+                        const navbarHeight = document.querySelector('.navbar').offsetHeight;
+                        const targetPosition = targetSection.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
+
+                        // Animem el scroll
+                        window.scrollTo({
+                            top: targetPosition,
+                            behavior: 'smooth'
+                        });
+
+                        // Opcional: Actualitzem la URL amb el hash
+                        window.history.pushState(null, null, targetId);
+                    }
+                });
+            });
+
+            // Activa l'enllaç actual basat en la posició de scroll
+            function highlightNavLink() {
+                const sections = document.querySelectorAll('section[id]');
+                const navLinks = document.querySelectorAll('.nav-link[href^="#"]');
+
+                let currentSection = '';
+                const navbarHeight = document.querySelector('.navbar').offsetHeight;
+
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop - navbarHeight - 100; // 100px abans
+                    const sectionHeight = section.offsetHeight;
+
+                    if (window.scrollY >= sectionTop && window.scrollY < sectionTop + sectionHeight) {
+                        currentSection = '#' + section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === currentSection) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+
+            // Executem la funció quan es fa scroll
+            window.addEventListener('scroll', highlightNavLink);
+
+            // Executem la funció en carregar la pàgina
+            highlightNavLink();
         });
     </script>
 </body>

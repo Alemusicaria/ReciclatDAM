@@ -16,4 +16,6 @@
 
     @include('sections.opinions')
 
+    @include('sections.footer')
+
 @endsection
