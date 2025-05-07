@@ -421,13 +421,83 @@ body.dark .icon path {
     /* Color blanc per al mode fosc */
 }
 
+/* Estils per als SVG dels sponsors */
 #sponsors svg {
-    width: 80px; /* Amplada uniforme */
-    height: 80px; /* Alçada uniforme */
-    fill: #388e3c; /* Color uniforme (blau en aquest cas) */
-    margin: 10px auto; /* Centra els SVG i afegeix espai */
+    width: 140px;
+    /* Amplada més gran (abans 80px) */
+    height: 70px;
+    /* Alçada més gran (abans 80px) */
+    max-width: 100%;
+    /* Assegura responsivitat */
+    margin: 15px auto;
+    /* Més espai al voltant */
     display: block;
+    transition: transform 0.3s ease;
+    /* Transició suau */
 }
+
+/* Efecte hover opcional per a millor interactivitat */
+#sponsors .col-md-2:hover svg {
+    transform: scale(1.1);
+    /* Efecte d'augment en hover */
+}
+
+/* Ajustos responsiu per a diferents mides de pantalla */
+@media (min-width: 768px) and (max-width: 991px) {
+    #sponsors svg {
+        width: 120px;
+        height: 60px;
+    }
+}
+
+@media (min-width: 992px) {
+    #sponsors svg {
+        width: 160px;
+        height: 80px;
+    }
+}
+
+/* Ajustar mides específiques per als logos d'ALSA i Mercadona */
+#sponsors .col-md-2:nth-of-type(5) svg,
+/* ALSA (5é element a la primera fila) */
+#sponsors .col-4:nth-of-type(5) svg {
+    width: 120px;
+    /* Més petit */
+    height: 60px;
+}
+
+#sponsors .col-md-2:nth-of-type(6) svg,
+/* Mercadona (6é element a la segona fila) */
+#sponsors .col-4:nth-of-type(12) svg {
+    width: 180px;
+    /* Més gran */
+    height: 90px;
+}
+
+/* Ajustament del contenidor per evitar que es talli */
+#sponsors {
+    height: auto !important;
+    /* Sobreescriu l'alçada fixa */
+    padding: 50px 0;
+}
+
+/* Ajustar mides específiques per als logos d'ALSA i Mercadona amb classes */
+#sponsors .logo-alsa svg {
+    width: 100px !important;
+    /* Més petit */
+    height: 100px !important;
+
+    margin-top: 0 !important;
+}
+
+#sponsors .logo-mercadona svg {
+    width: 150px !important;
+    /* Més gran */
+    height: 150px !important;
+
+    margin-top: -30px !important;
+}
+
 /* Estils per als modals en mode clar */
 body.light .modal-content {
     background-color: #ffffff;
@@ -705,6 +775,7 @@ body.dark #clear-search:hover {
 #product-search {
     width: 97%;
 }
+
 body.light #product-search {
     background-color: white;
     border: 1px solid #ced4da;

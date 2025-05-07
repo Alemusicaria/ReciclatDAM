@@ -15,7 +15,7 @@
             <div class="col-md-2 col-4">
                 {!! file_get_contents(public_path('images/sponsors/svg/generalitat_de_catalunya.svg')) !!}
             </div>
-            <div class="col-md-2 col-4">
+            <div class="col-md-2 col-4 logo-alsa">
                 {!! file_get_contents(public_path('images/sponsors/svg/alsa.svg')) !!}
             </div>
         </div>
@@ -36,7 +36,7 @@
             <div class="col-md-2 col-4">
                 {!! file_get_contents(public_path('images/sponsors/svg/endesa.svg')) !!}
             </div>
-            <div class="col-md-2 col-4">
+            <div class="col-md-2 col-4 logo-mercadona">
                 {!! file_get_contents(public_path('images/sponsors/svg/mercadona.svg')) !!}
             </div>
         </div>
