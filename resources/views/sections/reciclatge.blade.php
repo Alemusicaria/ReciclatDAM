@@ -1,94 +1,94 @@
 <section id="reciclatge" class="mt-3">
     <div class="container" style="align-items: center;">
-        <h2 class="text-center mb-3">Cerca un producte o selecciona una fracció</h2>
+        <h2 class="text-center mb-3">{{ __('messages.recycling.title') }}</h2>
 
         <!-- Cerca -->
         <div class="d-flex flex-column justify-content-center align-items-center mb-3 position-relative">
             <div class="search-container">
-                <input id="product-search" type="text" class="form-control" placeholder="Cerca un producte...">
+                <input id="product-search" type="text" class="form-control"
+                    placeholder="{{ __('messages.recycling.search_placeholder') }}">
                 <button id="clear-search" type="button">&times;</button>
                 <ul id="product-results" class="list-group"></ul>
             </div>
         </div>
 
         <!-- Fraccions -->
-        <h3 class="text-center mb-3">Fraccions</h3>
+        <h3 class="text-center mb-3">{{ __('messages.recycling.fractions_title') }}</h3>
         <div class="row row-16 justify-content-center">
             @php
                 $categories = [
-                    ['slug' => 'Paper', 'nom' => 'Paper i Cartró', 'color' => '#2859bc'], // Blau
-                    ['slug' => 'Envasos', 'nom' => 'Envàs lleuger', 'color' => '#fddd19'], // Groc
-                    ['slug' => 'Organica', 'nom' => 'Fracció Orgànica', 'color' => '#9e6831'], // Marro
-                    ['slug' => 'Vidre', 'nom' => 'Envàs vidre', 'color' => '#3fd055'], // Verd
-                    ['slug' => 'Resta', 'nom' => 'Fracció Resta', 'color' => '#6d7878'], // Gris
-                    ['slug' => 'Deixalleria', 'nom' => 'Deixalleria / Punt verd', 'color' => '#d62c2d'], // Vermell
-                    ['slug' => 'Medicaments', 'nom' => 'Medicaments', 'color' => '#b7e53b'], // Verd clar
-                    ['slug' => 'Piles', 'nom' => 'Piles i Acumuladors', 'color' => '#fca614'], // Taronja
-                    ['slug' => 'Especial', 'nom' => 'Especial', 'color' => '#2f3939'], // Gris fosc
-                    ['slug' => 'RAEE', 'nom' => 'RAEE', 'color' => '#006f3f', 'tooltip' => 'Residus Aparells Elèctrics i Electrònics'] // Verd fosc
+                    ['slug' => 'Paper', 'nom' => __('messages.categories.paper'), 'color' => '#2859bc'], // Blau
+                    ['slug' => 'Envasos', 'nom' => __('messages.categories.packaging'), 'color' => '#fddd19'], // Groc
+                    ['slug' => 'Organica', 'nom' => __('messages.categories.organic'), 'color' => '#9e6831'], // Marro
+                    ['slug' => 'Vidre', 'nom' => __('messages.categories.glass'), 'color' => '#3fd055'], // Verd
+                    ['slug' => 'Resta', 'nom' => __('messages.categories.rest'), 'color' => '#6d7878'], // Gris
+                    ['slug' => 'Deixalleria', 'nom' => __('messages.categories.waste_collection'), 'color' => '#d62c2d'], // Vermell
+                    ['slug' => 'Medicaments', 'nom' => __('messages.categories.medication'), 'color' => '#b7e53b'], // Verd clar
+                    ['slug' => 'Piles', 'nom' => __('messages.categories.batteries'), 'color' => '#fca614'], // Taronja
+                    ['slug' => 'Especial', 'nom' => __('messages.categories.special'), 'color' => '#2f3939'], // Gris fosc
+                    ['slug' => 'RAEE', 'nom' => __('messages.categories.raee'), 'color' => '#006f3f', 'tooltip' => __('messages.categories.raee_tooltip')] // Verd fosc
                 ];
 
                 $recyclingInfo = [
                     'Paper' => [
-                        'descripcion' => "El paper i el cartró són materials biodegradables que provenen d'una font renovable i es poden reciclar fins a 6 vegades.",
-                        'instruccions' => "Plega les caixes de cartró per reduir el seu volum. Assegura't que el paper estigui net i sec. No barregis paper brut amb oli, menjar o altres líquids.",
-                        'beneficis' => "Reciclar una tona de paper salva 17 arbres i estalvia fins a 26.000 litres d'aigua.",
-                        'consells' => "Els papers enfilmats, parafinats o plastificats no es poden reciclar al contenidor blau. Paper de cuina i tovallons usats van al contenidor d'orgànica."
+                        'descripcion' => __('messages.fractions.paper.description'),
+                        'instruccions' => __('messages.fractions.paper.instructions'),
+                        'beneficis' => __('messages.fractions.paper.benefits'),
+                        'consells' => __('messages.fractions.paper.tips')
                     ],
                     'Envasos' => [
-                        'descripcion' => "Els envasos lleugers inclouen ampolles de plàstic, llaunes, brics, safates de porexpan i embolcalls de plàstic.",
-                        'instruccions' => "Buida completament els envasos i aixafa'ls si és possible per reduir el volum. No és necessari rentar-los, però sí eliminar restes de menjar.",
-                        'beneficis' => "Reciclar plàstic estalvia un 80% de l'energia necessària per fabricar nous productes i redueix l'abocament al medi ambient.",
-                        'consells' => "Reutilitza les bosses de plàstic o utilitza bosses de tela. Recorda que els utensilis de plàstic d'un sol ús no són envasos i van al contenidor gris."
+                        'descripcion' => __('messages.fractions.packaging.description'),
+                        'instruccions' => __('messages.fractions.packaging.instructions'),
+                        'beneficis' => __('messages.fractions.packaging.benefits'),
+                        'consells' => __('messages.fractions.packaging.tips')
                     ],
                     'Organica' => [
-
-                        'descripcion' => "La fracció orgànica inclou restes de menjar, petits residus vegetals i altres materials compostables.",
-                        'instruccions' => "Utilitza bosses compostables i assegura't que no hi hagi materials impropis com plàstics o metalls. Evita tirar líquids.",
-                        'beneficis' => "Els residus orgànics correctament separats es converteixen en compost d'alta qualitat per a l'agricultura i jardineria.",
-                        'consells' => "Els taps de suro, escuradents de fusta i tovallons de paper usats també van al contenidor marró. Evita tirar ossos grans o clofolles de marisc."
+                        'descripcion' => __('messages.fractions.organic.description'),
+                        'instruccions' => __('messages.fractions.organic.instructions'),
+                        'beneficis' => __('messages.fractions.organic.benefits'),
+                        'consells' => __('messages.fractions.organic.tips')
                     ],
                     'Vidre' => [
-                        'descripcion' => "El vidre és 100% reciclable i pot ser reutilitzat infinites vegades sense perdre qualitat.",
-                        'instruccions' => "Buida completament els envasos i treu-ne els taps i tapes. No cal rentar-los. No barregis vidre pla, ceràmica o vaixelles.",
-                        'beneficis' => "Reciclar vidre estalvia un 30% d'energia comparada amb fabricar vidre nou i redueix les emissions de CO₂.",
-                        'consells' => "Els miralls, finestres, gots, plats de vidre o ceràmica no van al contenidor verd, sinó a la deixalleria o al gris."
+                        'descripcion' => __('messages.fractions.glass.description'),
+                        'instruccions' => __('messages.fractions.glass.instructions'),
+                        'beneficis' => __('messages.fractions.glass.benefits'),
+                        'consells' => __('messages.fractions.glass.tips')
                     ],
                     'Resta' => [
-                        'descripcion' => "La fracció resta inclou tots aquells residus que no es poden reciclar o que no tenen un sistema de recollida selectiva específic.",
-                        'instruccions' => "Utilitza el contenidor gris només quan el residu no es pugui llençar a cap altre contenidor específic.",
-                        'beneficis' => "Separar correctament redueix la quantitat de residus que acaben en abocadors, allargant la seva vida útil.",
-                        'consells' => "Abans de llençar un objecte al contenidor gris, pregunta't si podria reciclar-se en algun dels altres contenidors o a la deixalleria."
+                        'descripcion' => __('messages.fractions.rest.description'),
+                        'instruccions' => __('messages.fractions.rest.instructions'),
+                        'beneficis' => __('messages.fractions.rest.benefits'),
+                        'consells' => __('messages.fractions.rest.tips')
                     ],
                     'Deixalleria' => [
-                        'descripcion' => "Les deixalleries o punts verds són instal·lacions on es recullen de forma selectiva aquells residus que no tenen un contenidor específic al carrer.",
-                        'instruccions' => "Porta els residus separats per tipus i segueix les indicacions del personal. Consulta els horaris i normes de la deixalleria del teu municipi.",
-                        'beneficis' => "L'ús de deixalleries permet recuperar materials valuosos i evita que substàncies perilloses contaminin el medi ambient.",
-                        'consells' => "Molts municipis ofereixen deixalleries mòbils que visiten regularment els barris. Alguns residus especials com pintures o dissolvents mai s'han de llençar pels desguassos."
+                        'descripcion' => __('messages.fractions.waste_collection.description'),
+                        'instruccions' => __('messages.fractions.waste_collection.instructions'),
+                        'beneficis' => __('messages.fractions.waste_collection.benefits'),
+                        'consells' => __('messages.fractions.waste_collection.tips')
                     ],
                     'Medicaments' => [
-                        'descripcion' => "Els medicaments caducats o en desús s'han de gestionar correctament per evitar riscos per a la salut i el medi ambient.",
-                        'instruccions' => "Porta els medicaments caducats, restes de medicaments i els seus envasos als punts SIGRE de les farmàcies. No els llencis mai a les escombraries o al vàter.",
-                        'beneficis' => "La correcta gestió evita la contaminació del sòl i l'aigua, prevenint riscos per a la salut pública i els ecosistemes.",
-                        'consells' => "Revisa periòdicament la farmaciola i elimina els medicaments caducats. No acumulis medicaments innecessàriament."
+                        'descripcion' => __('messages.fractions.medicines.description'),
+                        'instruccions' => __('messages.fractions.medicines.instructions'),
+                        'beneficis' => __('messages.fractions.medicines.benefits'),
+                        'consells' => __('messages.fractions.medicines.tips')
                     ],
                     'Piles' => [
-                        'descripcion' => "Les piles i acumuladors contenen metalls pesants i substàncies tòxiques que poden ser molt contaminants si no es gestionen adequadament.",
-                        'instruccions' => "Diposita-les als contenidors específics que trobaràs a botigues d'electrònica, grans superfícies o punts verds.",
-                        'beneficis' => "Reciclar piles permet recuperar metalls valuosos com zinc, manganès i ferro, evitant la contaminació del sòl i l'aigua.",
-                        'consells' => "Considera utilitzar piles recarregables, que poden substituir fins a 1.000 piles d'un sol ús al llarg de la seva vida útil."
+                        'descripcion' => __('messages.fractions.batteries.description'),
+                        'instruccions' => __('messages.fractions.batteries.instructions'),
+                        'beneficis' => __('messages.fractions.batteries.benefits'),
+                        'consells' => __('messages.fractions.batteries.tips')
                     ],
                     'Especial' => [
-                        'descripcion' => "Els residus especials són aquells que per les seves característiques poden ser perillosos per al medi ambient o requereixen un tractament específic.",
-                        'instruccions' => "Mai barregis residus especials amb altres tipus de residus. Porta'ls a la deixalleria en el seu envàs original si és possible.",
-                        'beneficis' => "La gestió adequada d'aquests residus prevé greus problemes de contaminació i protegeix la salut pública.",
-                        'consells' => "Olis de cuina, pintures, dissolvents, termòmetres, radiografies o bateries pertanyen a aquesta categoria. Consulta amb el teu ajuntament quins altres residus es consideren especials."
+                        'descripcion' => __('messages.fractions.special.description'),
+                        'instruccions' => __('messages.fractions.special.instructions'),
+                        'beneficis' => __('messages.fractions.special.benefits'),
+                        'consells' => __('messages.fractions.special.tips')
                     ],
                     'RAEE' => [
-                        'descripcion' => "Els Residus d'Aparells Elèctrics i Electrònics (RAEE) contenen materials valuosos i també components potencialment tòxics.",
-                        'instruccions' => "Porta'ls a la deixalleria, o si compres un aparell nou, la botiga està obligada a recollir el vell. No els desmuntis per la teva compte.",
-                        'beneficis' => "El 90% dels components dels RAEE es poden recuperar i reciclar, incloent metalls preciosos com or, plata, coure i terres rares.",
-                        'consells' => "Intenta reparar els aparells abans de rebutjar-los. Si funcionen però ja no els necessites, considera donar-los a organitzacions socials."
+                        'descripcion' => __('messages.fractions.raee.description'),
+                        'instruccions' => __('messages.fractions.raee.instructions'),
+                        'beneficis' => __('messages.fractions.raee.benefits'),
+                        'consells' => __('messages.fractions.raee.tips')
                     ]
                 ];
             @endphp
@@ -121,8 +121,9 @@
                     </div>
                     <h5 class="text-center category-title mt-2">
                         {{ $categoria['nom'] }}
-                        @if ($categoria['slug'] === 'raee')
-                            <span class="info-icon" data-bs-toggle="tooltip" title="{{ $categoria['tooltip'] }}">i</span>
+                        @if ($categoria['slug'] === 'RAEE')
+                            <span class="info-icon" data-bs-toggle="tooltip"
+                                title="{{ __('messages.fractions.raee.name') }}">i</span>
                         @endif
                     </h5>
                 </div>
@@ -158,21 +159,16 @@
     </div>
 </div>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-
 <section id="mapa" class="mapa-section mt-5">
     <div class="container">
-        <h2 class="text-center mb-4">Mapa Interactiu de Punts de Recollida</h2>
+        <h2 class="text-center mb-4">{{ __('messages.recycling.map_title') }}</h2>
         <div class="d-flex justify-content-center mb-3">
             @foreach ($categories as $categoria)
-
                 @if ($categoria['slug'] === 'Organica')
                     <button class="btn btn-primary mx-2 filter-button" data-fraccio="{{ $categoria['slug'] }}"
                         style="background-color: {{ $categoria['color'] }};">
                         Orgànica
                     </button>
-
                 @else
                     <button class="btn btn-primary mx-2 filter-button" data-fraccio="{{ $categoria['slug'] }}"
                         style="background-color: {{ $categoria['color'] }};">
@@ -180,7 +176,8 @@
                     </button>
                 @endif
             @endforeach
-            <button class="btn btn-outline-secondary mx-2 clear-filter-button">Esborra Filtre</button>
+            <button
+                class="btn btn-outline-secondary mx-2 clear-filter-button">{{ __('messages.recycling.clear_filter') }}</button>
         </div>
         <div id="map" style="height: 500px; width: 100%;"></div>
     </div>
@@ -564,8 +561,9 @@
 <script src="https://cdn.jsdelivr.net/npm/algoliasearch@4"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-<script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
 
+<script>
     document.addEventListener('DOMContentLoaded', function () {
         // Initialize category cards
         const cards = document.querySelectorAll('.category-card');
@@ -644,7 +642,7 @@
                     noResultsControl = L.control({ position: 'topright' });
                     noResultsControl.onAdd = function (map) {
                         let div = L.DomUtil.create('div', 'alert alert-warning');
-                        div.innerHTML = `No s\'han trobat punts per a <strong>${fraccio}</strong>`;
+                        div.innerHTML = `{{ __('messages.recycling.no_collection_points') }}`;
                         return div;
                     };
                     noResultsControl.addTo(map);
@@ -653,10 +651,10 @@
                         const marker = L.marker([punt.latitud, punt.longitud]).addTo(map);
                         marker.bindPopup(`
                         <strong>${punt.nom}</strong><br>
-                        <strong>Ciutat:</strong> ${punt.ciutat}<br>
-                        <strong>Adreça:</strong> ${punt.adreca}<br>
-                        <strong>Fracció:</strong> ${punt.fraccio}<br>
-                        <strong>Disponible:</strong> ${punt.disponible ? 'Disponible' : 'No disponible'}
+                        <strong>{{ __('messages.hero.city') }}:</strong> ${punt.ciutat}<br>
+                        <strong>{{ __('messages.hero.address') }}:</strong> ${punt.adreca}<br>
+                        <strong>{{ __('messages.hero.fraction') }}:</strong> ${punt.fraccio}<br>
+                        <strong>{{ __('messages.recycling.available') }}:</strong> ${punt.disponible ? '{{ __("messages.recycling.yes") }}' : '{{ __("messages.recycling.no") }}'}
                     `);
                         markers.push(marker);
                     });
@@ -724,7 +722,7 @@
 
                 if (hits.length === 0) {
                     // If there are no results, show a message
-                    productResults.append('<li class="list-group-item">No s\'ha trobat cap producte.</li>');
+                    productResults.append(`<li class="list-group-item">{{ __('messages.products.no_results') }}</li>`);
                 } else {
                     // Show results
                     hits.forEach(hit => {
@@ -734,10 +732,10 @@
                                 data-product-name="${hit.nom}" 
                                 data-product-category="${hit.categoria}" 
                                 data-product-image="${hit.imatge}">
-                                <div class="me-3">
+                                <div class="flex-shrink-0 me-3">
                                     <img src="/${hit.imatge}" alt="${hit.nom}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
                                 </div>
-                                <div class="product-info">
+                                <div class="flex-grow-1 ms-3 text-start">
                                     <strong>${hit.nom}</strong><br>
                                     <span>${hit.categoria}</span>
                                 </div>
@@ -750,10 +748,11 @@
             }).catch(err => {
                 console.error("Error in search:", err);
                 productResults.empty();
-                productResults.append('<li class="list-group-item text-danger">Error en la cerca. Torna-ho a intentar.</li>');
+                productResults.append(`<li class="list-group-item text-danger">{{ __('messages.products.error_search') }}</li>`);
                 showResults();
             });
         });
+
         // Show search results with a smooth animation
         function showResults() {
             productResults.slideDown(200);
@@ -822,15 +821,15 @@
                 showProducts(matchingProducts, categoria, color, info);
             }).catch(err => {
                 console.error("Error searching for products:", err);
-                $('#product-title').text(`Error searching for products in ${categoria}`);
-                $('#product-list').html(`<p>There was an error searching for products. Details: ${err.message}</p>`);
+                $('#product-title').text(`{{ __('messages.recycling.error_search') }} ${categoria}`);
+                $('#product-list').html(`<p>{{ __('messages.recycling.error_details') }}: ${err.message}</p>`);
                 $('#product-modal').fadeIn();
             });
         });
 
         // Function to show products
         function showProducts(products, categoria, color, info) {
-            $('#product-title').text(`Products in the ${categoria} fraction`);
+            $('#product-title').text(`{{ __('messages.recycling.products_title') }}`);
             const productList = $('#product-list');
             productList.empty();
 
@@ -844,18 +843,18 @@
             </div>
             
             <div class="recycling-tips mb-4">
-                <h5>Recycling information</h5>
-                <p><strong>What it is:</strong> ${info.descripcion}</p>
-                <p><strong>How to recycle it:</strong> ${info.instruccions}</p>
-                <p><strong>Benefits:</strong> ${info.beneficis}</p>
-                <p><strong>Tips:</strong> ${info.consells}</p>
+                <h5>{{ __('messages.recycling.recycling_info') }}</h5>
+                <p><strong>{{ __('messages.recycling.what_is') }}</strong> ${info.descripcion}</p>
+                <p><strong>{{ __('messages.recycling.how_to') }}</strong> ${info.instruccions}</p>
+                <p><strong>{{ __('messages.recycling.benefits') }}</strong> ${info.beneficis}</p>
+                <p><strong>{{ __('messages.recycling.tips') }}</strong> ${info.consells}</p>
             </div>
             
-            <h5>Products in this fraction</h5>
+            <h5>{{ __('messages.recycling.products_title') }}</h5>
         `);
 
             if (products.length === 0) {
-                productList.append('<p>No products found in this fraction.</p>');
+                productList.append(`<p>{{ __('messages.recycling.no_products') }}</p>`);
             } else {
                 // Create a row for the cards
                 let row = $('<div class="row g-3" id="product-row"></div>');
@@ -887,10 +886,10 @@
         function showProductModal(productName, productCategory, productImage) {
             // Get recycling text for the fraction
             const info = recyclingInfo[productCategory] || {};
-            const recyclingText = info.instruccions || 'No hi ha informació disponible per aquesta fracció.';
+            const recyclingText = info.instruccions || "{{ __('messages.recycling.no_info') }}";
 
             // Update the modal title with the product name
-            $('#product-title').text("Descripció del producte").css('text-align', 'center');
+            $('#product-title').text(productName).css('text-align', 'center');
 
             // Show detailed product information
             $('#product-list').html(`
@@ -900,12 +899,12 @@
                     </div>
                     <div class="product-details">
                         <h4>${productName}</h4>
-                        <p><strong>Fracció:</strong> ${productCategory}</p>
-                        <p><strong>Com reciclar-ho:</strong> ${recyclingText}</p>
+                        <p><strong>{{ __('messages.hero.fraction') }}</strong> ${productCategory}</p>
+                        <p><strong>{{ __('messages.recycling.how_to') }}</strong> ${recyclingText}</p>
                     </div>
                 </div>
                 <div id="product-map"></div>
-                <button class="btn btn-primary mt-3 back-button">Tancar</button>
+                <button class="btn btn-primary mt-3 back-button">{{ __('messages.recycling.close') }}</button>
             `);
 
             // First show the modal
@@ -955,7 +954,7 @@
                         productNoResultsControl = L.control({ position: 'topright' });
                         productNoResultsControl.onAdd = function (map) {
                             let div = L.DomUtil.create('div', 'alert alert-warning');
-                            div.innerHTML = `No s\'han trobat punts per a <strong>${productCategory}</strong>`;
+                            div.innerHTML = `{{ __('messages.recycling.no_collection_points_for') }} <strong>${productCategory}</strong>`;
                             return div;
                         };
                         productNoResultsControl.addTo(productMap);
@@ -980,6 +979,7 @@
                 });
             });
         }
+
         // Open modal when clicking on a search result
         $(document).on('click', '#product-results .list-group-item', function () {
             const productName = $(this).data('product-name');
@@ -1060,6 +1060,7 @@
                 }
             }, 200);
         });
+
         // Show results again when focusing back on the search input
         searchInput.on('focus', function () {
             const query = $(this).val().trim();

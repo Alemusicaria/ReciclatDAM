@@ -1,6 +1,6 @@
 <section id="opinions" class="text-center py-5">
     <div class="w-100">
-        <h2 class="section-title mb-4">Opinions</h2>
+        <h2 class="section-title mb-4">{{ __('messages.opinions.title') }}</h2>
         <div class="d-flex justify-content-center align-items-center">
             <!-- Fletxa esquerra -->
             <button id="prev-opinion" class="opinion-arrow mx-3">
@@ -9,7 +9,7 @@
 
             <!-- Carrusel d'opinions -->
             <div id="opinion-carousel " class="opinion-card text-center p-3 shadow-sm container" style="width: 40%;">
-                <p id="opinion-text" class="mb-2">"Carregant opinions..."</p>
+                <p id="opinion-text" class="mb-2">{{ __('messages.opinions.loading') }}</p>
                 <div id="opinion-stars" class="mb-2">
                     <!-- Estrelles es generaran aquí -->
                 </div>
@@ -125,13 +125,13 @@
                 if (opinions.length > 0) {
                     updateOpinion(0); // Mostra la primera opinió
                 } else {
-                    opinionText.text("No hi ha opinions disponibles.");
+                    opinionText.text("{{ __('messages.opinions.no_opinions') }}");
                     opinionAuthor.text("-");
                     opinionStars.empty();
                 }
             }).catch(err => {
                 console.error('Error carregant opinions:', err);
-                opinionText.text("Error carregant opinions.");
+                opinionText.text("{{ __('messages.opinions.error_loading') }}");
                 opinionAuthor.text("-");
                 opinionStars.empty();
             });

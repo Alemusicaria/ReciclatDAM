@@ -1,6 +1,6 @@
 <section id="sponsors" class="text-center" style="height: 45vh">
     <div class="container">
-        <h2>Sponsors del programa</h2>
+        <h2>{{ __('messages.sponsors.title') }}</h2>
         <div class="row justify-content-center">
             <!-- Primera fila: 5 sponsors -->
             <div class="col-md-2 col-4">

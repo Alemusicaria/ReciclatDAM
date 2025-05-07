@@ -1,12 +1,12 @@
 <section id="premis" class="text-center py-5">
-    <h2 class="section-title mb-4">Premis i Reconeixements</h2>
+    <h2 class="section-title mb-4">{{ __('messages.awards.title') }}</h2>
     <div class="row g-4">
         <!-- Card 1: Advanced Awards Gallery -->
         <div class="col-md-6">
             <div class="card shadow h-100 container">
                 <div class="card-body">
-                    <h3 class="card-title">Col·lecció de Premis</h3>
-                    <p class="card-text text-muted mb-4">Navega per la nostra col·lecció de premis i reconeixements.</p>
+                    <h3 class="card-title">{{ __('messages.awards.collection_title') }}</h3>
+                    <p class="card-text text-muted mb-4">{{ __('messages.awards.collection_description') }}</p>
 
                     <!-- Professional Gallery -->
                     <div id="awards-gallery" class="awards-gallery">
@@ -29,10 +29,10 @@
         <div class="col-md-6">
             <div class="card shadow h-100 container">
                 <div class="card-body d-flex flex-column">
-                    <h3 class="card-title">Detall del Premi</h3>
+                    <h3 class="card-title">{{ __('messages.awards.detail_title') }}</h3>
                     <div id="selected-award" class="text-center flex-grow-1 d-flex flex-column justify-content-center">
                         <div class="award-image-container mb-4">
-                            <img id="selected-award-image" src="" alt="Premi seleccionat"
+                            <img id="selected-award-image" src="" alt="{{ __('messages.awards.selected_award_alt') }}"
                                 class="img-fluid selected-award-image">
                         </div>
                         <h4 id="selected-award-name" class="mb-3"></h4>
@@ -299,14 +299,14 @@
                     renderGallery();
                     updateSelectedAward(0);
                 } else {
-                    galleryInner.html('<p class="text-center w-100 py-4">No s\'han trobat premis.</p>');
+                    galleryInner.html('<p class="text-center w-100 py-4">{{ __("messages.awards.no_awards_found") }}</p>');
                     selectedAwardImage.attr('src', '');
-                    selectedAwardName.text('No hi ha premis disponibles');
-                    selectedAwardDescription.text('No s\'ha trobat cap premi per mostrar.');
+                    selectedAwardName.text('{{ __("messages.awards.no_awards_available") }}');
+                    selectedAwardDescription.text('{{ __("messages.awards.no_award_to_show") }}');
                 }
             }).catch(err => {
                 console.error('Error fetching awards:', err);
-                galleryInner.html('<p class="text-center w-100 py-4 text-danger">Error carregant els premis.</p>');
+                galleryInner.html('<p class="text-center w-100 py-4 text-danger">{{ __("messages.awards.error_loading") }}</p>');
             });
         }
 
