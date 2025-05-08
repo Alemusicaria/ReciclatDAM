@@ -18,9 +18,14 @@ return [
         'google_play' => 'Descarrega a Google Play',
         'no_results' => 'No s\'han trobat punts de recollida.',
         'search_error' => 'Error en la cerca. Torna-ho a intentar.',
-        'fraction' => 'Fracció:',
+        'fraction' => 'Fracció',
         'hero_image_alt' => 'Imatge Hero',
-        'static_map_alt' => 'Mapa estàtic'
+        'static_map_alt' => 'Mapa estàtic',
+        'city' => 'Ciutat',
+        'no_city' => 'No s\'ha trobat la ciutat',
+        'address' => 'Adreça',
+        'avilable' => 'Disponible',
+        'not_available' => 'No disponible',
     ],
 
     // How it works section
@@ -87,22 +92,41 @@ return [
         'back_to_list' => 'Tornar a la llista',
         'clear_filter' => 'Esborra Filtre',
         'fraction_search' => 'Busca per fracció',
-        'all_fractions' => 'Totes les fraccions'
+        'all_fractions' => 'Totes les fraccions',
+        'map_title' => 'Mapa de punts de recollida',
+        'no_collection_points' => 'No s\'han trobat punts de recollida per aquesta fracció.',
+        'available' => 'Disponible',
+        'yes' => 'Sí',
+        'no' => 'No'
     ],
 
     // Categories
     'categories' => [
-        'paper' => 'Paper i Cartró',
-        'packaging' => 'Envàs lleuger',
-        'organic' => 'Fracció Orgànica',
-        'glass' => 'Envàs vidre',
-        'rest' => 'Fracció Resta',
-        'waste_collection' => 'Deixalleria / Punt verd',
-        'medication' => 'Medicaments',
-        'batteries' => 'Piles i Acumuladors',
-        'special' => 'Especial',
-        'raee' => 'RAEE',
-        'raee_tooltip' => 'Residus Aparells Elèctrics i Electrònics'
+        'slug' => [
+            'paper' => 'Paper',
+            'packaging' => 'Envasos',
+            'organic' => 'Organica',
+            'glass' => 'Vidre',
+            'rest' => 'Resta',
+            'waste_collection' => 'Deixalleria',
+            'medication' => 'Medicaments',
+            'batteries' => 'Piles',
+            'special' => 'Especial',
+            'raee' => 'RAEE'
+        ],
+        'nom' => [
+            'paper' => 'Paper i Cartró',
+            'packaging' => 'Envàs lleuger',
+            'organic' => 'Fracció Orgànica',
+            'glass' => 'Envàs vidre',
+            'rest' => 'Fracció Resta',
+            'waste_collection' => 'Deixalleria / Punt verd',
+            'medication' => 'Medicaments',
+            'batteries' => 'Piles i Acumuladors',
+            'special' => 'Especial',
+            'raee' => 'RAEE',
+            'raee_tooltip' => 'Residus Aparells Elèctrics i Electrònics'
+        ],
     ],
 
     // Fractions specific information
@@ -171,7 +195,7 @@ return [
             'tips' => 'Els productes com pintures, dissolvents, olis, làmpades fluorescents, bateries, radiografies i termòmetres són residus especials. Emmagatzema\'ls de manera segura fins que puguis portar-los a la deixalleria.'
         ],
         'raee' => [
-            'name' => 'RAEE',
+            'name' => 'Residus d\'Aparells Elèctrics i Electrònics',
             'description' => 'Els Residus d\'Aparells Elèctrics i Electrònics (RAEE) inclouen qualsevol dispositiu que funcioni amb electricitat o piles que ha arribat al final de la seva vida útil.',
             'instructions' => 'Porta els RAEE a la deixalleria, punts nets o botigues d\'electrònica que ofereixin el servei de recollida. Els establiments que venen aparells nous tenen l\'obligació de recollir els vells.',
             'benefits' => 'Els RAEE contenen materials valuosos que poden ser recuperats, com metalls preciosos, coure i alumini, i també components tòxics que han de ser tractats adequadament.',

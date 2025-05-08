@@ -107,9 +107,7 @@
 
 <script>
     $(document).ready(function () {
-        // Inicialitza el client d'Algolia
-        const client = algoliasearch("4JU9PG98CF", "d37ffd358dca40447584fb2ffdc28e03");
-        const index = client.initIndex('opinions'); // Nom de l'índex a Algolia
+        const opinionsIndex = window.opinionsIndex; // Usa la variable global
 
         const opinionText = $('#opinion-text');
         const opinionAuthor = $('#opinion-author');
@@ -119,7 +117,7 @@
 
         // Obté les opinions d'Algolia
         function fetchOpinions() {
-            index.search('', { hitsPerPage: 100 }).then(({ hits }) => {
+            opinionsIndex.search('', { hitsPerPage: 100 }).then(({ hits }) => {
                 opinions = hits.filter(opinion => opinion.estrelles >= 3.5 && opinion.estrelles <= 5);
 
                 if (opinions.length > 0) {
@@ -138,8 +136,8 @@
         }
 
         // Actualitza el contingut del card
-        function updateOpinion(index) {
-            const opinion = opinions[index];
+        function updateOpinion(opinionsIndex) {
+            const opinion = opinions[opinionsIndex];
             opinionText.fadeOut(200, function () {
                 $(this).text(`"${opinion.comentari}"`).fadeIn(200);
             });

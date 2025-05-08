@@ -17,16 +17,16 @@
         <div class="row row-16 justify-content-center">
             @php
                 $categories = [
-                    ['slug' => 'Paper', 'nom' => __('messages.categories.paper'), 'color' => '#2859bc'], // Blau
-                    ['slug' => 'Envasos', 'nom' => __('messages.categories.packaging'), 'color' => '#fddd19'], // Groc
-                    ['slug' => 'Organica', 'nom' => __('messages.categories.organic'), 'color' => '#9e6831'], // Marro
-                    ['slug' => 'Vidre', 'nom' => __('messages.categories.glass'), 'color' => '#3fd055'], // Verd
-                    ['slug' => 'Resta', 'nom' => __('messages.categories.rest'), 'color' => '#6d7878'], // Gris
-                    ['slug' => 'Deixalleria', 'nom' => __('messages.categories.waste_collection'), 'color' => '#d62c2d'], // Vermell
-                    ['slug' => 'Medicaments', 'nom' => __('messages.categories.medication'), 'color' => '#b7e53b'], // Verd clar
-                    ['slug' => 'Piles', 'nom' => __('messages.categories.batteries'), 'color' => '#fca614'], // Taronja
-                    ['slug' => 'Especial', 'nom' => __('messages.categories.special'), 'color' => '#2f3939'], // Gris fosc
-                    ['slug' => 'RAEE', 'nom' => __('messages.categories.raee'), 'color' => '#006f3f', 'tooltip' => __('messages.categories.raee_tooltip')] // Verd fosc
+                    ['slug' => __('messages.categories.slug.paper'), 'nom' => __('messages.categories.nom.paper'), 'color' => '#2859bc', 'foto' => 'Paper'], // Blau
+                    ['slug' => __('messages.categories.slug.packaging'), 'nom' => __('messages.categories.nom.packaging'), 'color' => '#fddd19', 'foto' => 'Envasos'], // Groc
+                    ['slug' => __('messages.categories.slug.organic'), 'nom' => __('messages.categories.nom.organic'), 'color' => '#9e6831', 'foto' => 'Organica'], // Marro
+                    ['slug' => __('messages.categories.slug.glass'), 'nom' => __('messages.categories.nom.glass'), 'color' => '#3fd055', 'foto' => 'Vidre'], // Verd
+                    ['slug' => __('messages.categories.slug.rest'), 'nom' => __('messages.categories.nom.rest'), 'color' => '#6d7878', 'foto' => 'Resta'], // Gris
+                    ['slug' => __('messages.categories.slug.waste_collection'), 'nom' => __('messages.categories.nom.waste_collection'), 'color' => '#d62c2d', 'foto' => 'Deixalleria'], // Vermell, // Vermell
+                    ['slug' => __('messages.categories.slug.medication'), 'nom' => __('messages.categories.nom.medication'), 'color' => '#b7e53b', 'foto' => 'Medicaments'], // Verd clar
+                    ['slug' => __('messages.categories.slug.batteries'), 'nom' => __('messages.categories.nom.batteries'), 'color' => '#fca614', 'foto' => 'Piles'], // Taronja
+                    ['slug' => __('messages.categories.slug.special'), 'nom' => __('messages.categories.nom.special'), 'color' => '#2f3939', 'foto' => 'Especial'], // Gris fosc
+                    ['slug' => __('messages.categories.slug.raee'), 'nom' => __('messages.categories.nom.raee'), 'color' => '#006f3f', 'tooltip' => __('messages.categories.nom.raee_tooltip'), 'foto' => 'RAEE'] // Verd fosc
                 ];
 
                 $recyclingInfo = [
@@ -97,8 +97,8 @@
             @foreach ($categories as $categoria)
                 <div class="col-6 col-md-2">
                     <div class="card text-center category-card"
-                        style="height: 200px; background-size: cover; background-position: center; background-image: url('{{ asset("images/Reciclatge/{$categoria['slug']}/{$categoria['slug']}_portada.png") }}');"
-                        data-color="{{ $categoria['color'] }}" data-category="{{ $categoria['slug'] }}">
+                        style="height: 200px; background-size: cover; background-position: center; background-image: url('{{ asset("images/Reciclatge/{$categoria['foto']}/{$categoria['foto']}_portada.png") }}');"
+                        data-color="{{ $categoria['color'] }}" data-category="{{ $categoria['foto'] }}">
                         <!-- Superposició -->
                         <div class="overlay"></div>
                         <div class="card-body d-flex justify-content-center align-items-center">
@@ -164,13 +164,13 @@
         <h2 class="text-center mb-4">{{ __('messages.recycling.map_title') }}</h2>
         <div class="d-flex justify-content-center mb-3">
             @foreach ($categories as $categoria)
-                @if ($categoria['slug'] === 'Organica')
-                    <button class="btn btn-primary mx-2 filter-button" data-fraccio="{{ $categoria['slug'] }}"
+                @if ($categoria['foto'] === 'Organica')
+                    <button class="btn btn-primary mx-2 filter-button" data-fraccio="{{ $categoria['foto'] }}"
                         style="background-color: {{ $categoria['color'] }};">
-                        Orgànica
+                        {{ $categoria['slug'] }}
                     </button>
                 @else
-                    <button class="btn btn-primary mx-2 filter-button" data-fraccio="{{ $categoria['slug'] }}"
+                    <button class="btn btn-primary mx-2 filter-button" data-fraccio="{{ $categoria['foto'] }}"
                         style="background-color: {{ $categoria['color'] }};">
                         {{ $categoria['slug'] }}
                     </button>
@@ -202,7 +202,7 @@
         /* Inicialment transparent */
         z-index: 1;
         /* Es col·loca per sobre de la imatge de fons */
-        transition: all 0.3s ease;
+        transition: transform 0.5s ease-out, opacity 0.25s ease-in;
     }
 
     /* Quan es passa el ratolí, el fons del card canvia al color de la categoria */
@@ -211,6 +211,10 @@
         /* Canvia al color de la categoria */
         opacity: 0.8;
         /* Difuminat */
+        cursor: pointer;
+        /* Canvia el cursor al passar el ratolí */
+        border-radius: 12px;
+        /* Arrodoneix les cantonades */
     }
 
     /* L'icona es torna blanca */
@@ -358,6 +362,10 @@
     .position-relative {
         position: relative;
         /* Assegura que els resultats es posicionin correctament respecte al contenidor */
+    }
+
+    .text-start {
+        margin-left: 10px;
     }
 
     #clear-search {
@@ -556,9 +564,6 @@
 <script type="application/json" id="recycling-info-data">
     @json($recyclingInfo)
 </script>
-
-<!-- Replace the multiple script blocks with a single script tag -->
-<script src="https://cdn.jsdelivr.net/npm/algoliasearch@4"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
@@ -574,11 +579,9 @@
 
         // Initialize tooltips
         $('[data-bs-toggle="tooltip"]').tooltip();
-
-        // Initialize Algolia client
-        const client = algoliasearch("4JU9PG98CF", "d37ffd358dca40447584fb2ffdc28e03");
-        const productIndex = client.initIndex('productes');
-        const puntsIndex = client.initIndex('punts_de_recollida');
+        
+        const productIndex = window.productIndex; // Usa la variable global
+        const puntsIndex = window.puntsIndex; // Usa la variable global
 
         // Get recycling info from PHP
         const recyclingInfo = JSON.parse(document.getElementById('recycling-info-data').textContent);

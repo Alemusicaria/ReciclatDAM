@@ -269,10 +269,8 @@
 </style>
 
 <script>
-    $(document).ready(function () {
-        // Initialize Algolia client
-        const client = algoliasearch("4JU9PG98CF", "d37ffd358dca40447584fb2ffdc28e03");
-        const index = client.initIndex('premis');
+    $(document).ready(function () {   
+        const opinionsIndex = window.opinionsIndex; // Usa la variable global
 
         // DOM elements
         const galleryInner = $('.gallery-inner');
@@ -292,7 +290,7 @@
             // Show loading state
             galleryInner.html('<div class="text-center w-100 py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
 
-            index.search(query, { hitsPerPage: 100 }).then(({ hits }) => {
+            premisIndex.search(query, { hitsPerPage: 100 }).then(({ hits }) => {
                 awards = hits;
 
                 if (awards.length > 0) {
@@ -325,8 +323,8 @@
 
                 const page = $('<div class="gallery-page"></div>');
 
-                pageAwards.forEach((award, index) => {
-                    const globalIndex = pageStart + index;
+                pageAwards.forEach((award, premisIndex) => {
+                    const globalIndex = pageStart + premisIndex;
                     const awardCard = $(`
                         <div class="award-card ${globalIndex === currentAwardIndex ? 'selected' : ''}" data-index="${globalIndex}">
                             <img src="${award.imatge}" alt="${award.nom}">
@@ -376,10 +374,10 @@
         }
 
         // Update selected award
-        function updateSelectedAward(index) {
-            if (index < 0 || index >= awards.length) return;
+        function updateSelectedAward(premisIndex) {
+            if (premisIndex < 0 || premisIndex >= awards.length) return;
 
-            currentAwardIndex = index;
+            currentAwardIndex = premisIndex;
             const award = awards[currentAwardIndex];
 
             // Animate transition

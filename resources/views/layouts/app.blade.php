@@ -286,6 +286,23 @@
             highlightNavLink();
         });
     </script>
+
+    <!-- Cargar la biblioteca de Algolia primero -->
+    <script src="https://cdn.jsdelivr.net/npm/algoliasearch@4.17.2/dist/algoliasearch-lite.umd.js"></script>
+    <!-- Inicializar el cliente como variable global -->
+    <script>
+        // Inicializar cliente Algolia una vez para toda la aplicación
+        window.algoliaClient = algoliasearch("4JU9PG98CF", "d37ffd358dca40447584fb2ffdc28e03", {
+            _useRequestCache: true,
+            logLevel: 'error'
+        });
+
+        // Inicializar índices comunes para su uso en cualquier parte de la aplicación
+        window.productIndex = window.algoliaClient.initIndex('productes');
+        window.puntsIndex = window.algoliaClient.initIndex('punts_de_recollida');
+        window.opinionsIndex = window.algoliaClient.initIndex('opinions');
+        window.premisIndex = window.algoliaClient.initIndex('premis');
+    </script>
 </body>
 
 </html>

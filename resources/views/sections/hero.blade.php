@@ -4,7 +4,8 @@
         <div class="col-lg-5 d-flex align-items-center justify-content-center">
             <div class="card mb-4 p-4 w-100">
                 <div class="card-body text-left">
-                    <h1 class="display-4 fw-bold text-left">{{ __('messages.hero.title') }} <br> {{ __('messages.hero.subtitle') }}</h1>
+                    <h1 class="display-4 fw-bold text-left">{{ __('messages.hero.title') }} <br>
+                        {{ __('messages.hero.subtitle') }}</h1>
                     <p class="lead text-left">{{ __('messages.hero.description') }}</p>
 
                     <div class="hero-search-container">
@@ -15,8 +16,10 @@
                     </div>
 
                     <div class="mt-4 d-flex justify-content-center gap-3">
-                        <img src="" alt="{{ __('messages.hero.apple_store') }}" style="max-width: 180px;" id="apple-store">
-                        <img src="" alt="{{ __('messages.hero.google_play') }}" style="max-width: 180px;" id="google-play">
+                        <img src="" alt="{{ __('messages.hero.apple_store') }}" style="max-width: 180px;"
+                            id="apple-store">
+                        <img src="" alt="{{ __('messages.hero.google_play') }}" style="max-width: 180px;"
+                            id="google-play">
                     </div>
                 </div>
             </div>
@@ -25,8 +28,8 @@
         <!-- Imatge del mòbil -->
         <div class="col-lg-5 d-flex align-items-center justify-content-center">
             <div class="card mb-4 p-3 d-flex align-items-center justify-content-center">
-                <img src="{{ asset('images/mobil.png') }}" class="img-fluid" alt="{{ __('messages.hero.hero_image_alt') }}"
-                    style="max-width: 350px; height: auto;">
+                <img src="{{ asset('images/mobil.png') }}" class="img-fluid"
+                    alt="{{ __('messages.hero.hero_image_alt') }}" style="max-width: 350px; height: auto;">
             </div>
         </div>
     </div>
@@ -189,11 +192,9 @@
     }
 </style>
 
-<script src="https://cdn.jsdelivr.net/npm/algoliasearch@4"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const client = algoliasearch("4JU9PG98CF", "d37ffd358dca40447584fb2ffdc28e03");
-        const index = client.initIndex('punts_de_recollida');
+    document.addEventListener('DOMContentLoaded', function () {        
+        const puntsIndex = window.puntsIndex; // Usa la variable global
 
         const searchInput = document.getElementById('search-input');
         const searchResults = document.getElementById('search-results');
@@ -250,7 +251,7 @@
 
             clearSearchBtn.style.display = 'block';
 
-            index.search(query, {
+            puntsIndex.search(query, {
                 hitsPerPage: 10
             }).then(({ hits }) => {
                 searchResults.innerHTML = '';

@@ -20,7 +20,11 @@ return [
         'search_error' => 'Error en la búsqueda. Vuelve a intentarlo.',
         'fraction' => 'Fracción:',
         'hero_image_alt' => 'Imagen Hero',
-        'static_map_alt' => 'Mapa estático'
+        'static_map_alt' => 'Mapa estático',
+        'city' => 'Ciudad',
+        'address' => 'Dirección',
+        'avilable' => 'Disponible',
+        'not_available' => 'No disponible',
     ],
 
     // How it works section
@@ -87,22 +91,41 @@ return [
         'back_to_list' => 'Volver a la lista',
         'clear_filter' => 'Borrar Filtro',
         'fraction_search' => 'Buscar por fracción',
-        'all_fractions' => 'Todas las fracciones'
+        'all_fractions' => 'Todas las fracciones',
+        'map_title' => 'Mapa de puntos de recogida',
+        'no_collection_points' => 'No se han encontrado puntos de recogida para esta fracción.',
+        'available' => 'Disponible',
+        'yes' => 'Sí',
+        'no' => 'No'
     ],
 
     // Categories
     'categories' => [
-        'paper' => 'Papel y Cartón',
-        'packaging' => 'Envase ligero',
-        'organic' => 'Fracción Orgánica',
-        'glass' => 'Envase vidrio',
-        'rest' => 'Fracción Resto',
-        'waste_collection' => 'Punto Limpio',
-        'medication' => 'Medicamentos',
-        'batteries' => 'Pilas y Acumuladores',
-        'special' => 'Especial',
-        'raee' => 'RAEE',
-        'raee_tooltip' => 'Residuos de Aparatos Eléctricos y Electrónicos'
+        'slug' => [
+            'paper' => 'Papel',
+            'packaging' => 'Envase',
+            'organic' => 'Orgánico',
+            'glass' => 'Vidrio',
+            'rest' => 'Resto',
+            'waste_collection' => 'Punto Limpio',
+            'medication' => 'Medicamentos',
+            'batteries' => 'Pilas',
+            'special' => 'Especial',
+            'raee' => 'RAEE'
+        ],
+        'nom' => [
+            'paper' => 'Papel y Cartón',
+            'packaging' => 'Envase ligero',
+            'organic' => 'Fracción Orgánica',
+            'glass' => 'Envase vidrio',
+            'rest' => 'Fracción Resto',
+            'waste_collection' => 'Punto Limpio',
+            'medication' => 'Medicamentos',
+            'batteries' => 'Pilas y Acumuladores',
+            'special' => 'Especial',
+            'raee' => 'RAEE',
+            'raee_tooltip' => 'Residuos de Aparatos Eléctricos y Electrónicos'
+        ]
     ],
 
     // Fractions specific information
@@ -171,7 +194,7 @@ return [
             'tips' => 'Los productos como pinturas, disolventes, aceites, lámparas fluorescentes, baterías, radiografías y termómetros son residuos especiales. Almacénalos de manera segura hasta que puedas llevarlos al punto limpio.'
         ],
         'raee' => [
-            'name' => 'RAEE',
+            'name' => 'Residuos de Aparatos Eléctricos y Electrónicos',
             'description' => 'Los Residuos de Aparatos Eléctricos y Electrónicos (RAEE) incluyen cualquier dispositivo que funcione con electricidad o pilas que ha llegado al final de su vida útil.',
             'instructions' => 'Lleva los RAEE al punto limpio, puntos limpios móviles o tiendas de electrónica que ofrezcan el servicio de recogida. Los establecimientos que venden aparatos nuevos tienen la obligación de recoger los viejos.',
             'benefits' => 'Los RAEE contienen materiales valiosos que pueden ser recuperados, como metales preciosos, cobre y aluminio, y también componentes tóxicos que deben ser tratados adecuadamente.',

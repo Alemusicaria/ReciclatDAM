@@ -20,7 +20,12 @@ return [
         'search_error' => 'Search error. Please try again.',
         'fraction' => 'Fraction:',
         'hero_image_alt' => 'Hero Image',
-        'static_map_alt' => 'Static Map'
+        'static_map_alt' => 'Static Map',
+        'city' => 'City',
+        'no_city' => 'No city found',
+        'address' => 'Address',
+        'avilable' => 'Available',
+        'not_available' => 'Not Available',
     ],
 
     // How it works section
@@ -87,22 +92,41 @@ return [
         'back_to_list' => 'Back to list',
         'clear_filter' => 'Clear Filter',
         'fraction_search' => 'Search by fraction',
-        'all_fractions' => 'All fractions'
+        'all_fractions' => 'All fractions',
+        'map_title' => 'Collection Points Map',
+        'no_collection_points' => 'No collection points found for this fraction.',
+        'available' => 'Available',
+        'yes' => 'Yes',
+        'no' => 'No'
     ],
 
     // Categories
     'categories' => [
-        'paper' => 'Paper and Cardboard',
-        'packaging' => 'Light Packaging',
-        'organic' => 'Organic Waste',
-        'glass' => 'Glass Container',
-        'rest' => 'General Waste',
-        'waste_collection' => 'Recycling Center',
-        'medication' => 'Medications',
-        'batteries' => 'Batteries and Accumulators',
-        'special' => 'Special Waste',
-        'raee' => 'WEEE',
-        'raee_tooltip' => 'Waste Electrical and Electronic Equipment'
+        'slug' => [
+            'paper' => 'Paper',
+            'packaging' => 'Packaging',
+            'organic' => 'Organic',
+            'glass' => 'Glass',
+            'rest' => 'Rest',
+            'waste_collection' => 'Waste Collection',
+            'medication' => 'Medication',
+            'batteries' => 'Batteries',
+            'special' => 'Special Waste',
+            'raee' => 'RAEE'
+        ],
+        'nom' => [
+            'paper' => 'Paper and Cardboard',
+            'packaging' => 'Light Packaging',
+            'organic' => 'Organic Waste',
+            'glass' => 'Glass Container',
+            'rest' => 'General Waste',
+            'waste_collection' => 'Recycling Center',
+            'medication' => 'Medications',
+            'batteries' => 'Batteries and Accumulators',
+            'special' => 'Special Waste',
+            'raee' => 'WEEE',
+            'raee_tooltip' => 'Waste Electrical and Electronic Equipment'
+        ],
     ],
 
     // Fractions specific information
@@ -171,7 +195,7 @@ return [
             'tips' => 'Products such as paints, solvents, oils, fluorescent lamps, batteries, X-rays and thermometers are special waste. Store them safely until you can take them to the recycling center.'
         ],
         'raee' => [
-            'name' => 'WEEE',
+            'name' => 'Waste Electrical and Electronic Equipment',
             'description' => 'Waste Electrical and Electronic Equipment (WEEE) includes any device that works with electricity or batteries that has reached the end of its useful life.',
             'instructions' => 'Take WEEE to the recycling center, mobile recycling points or electronics stores that offer collection service. Establishments that sell new devices are obliged to collect old ones.',
             'benefits' => 'WEEE contains valuable materials that can be recovered, such as precious metals, copper and aluminum, and also toxic components that must be properly treated.',
