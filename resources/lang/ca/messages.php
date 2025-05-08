@@ -34,7 +34,7 @@ return [
         'download_app' => 'Descarrega l\'App',
         'download_app_desc' => 'Instal·la l\'aplicació al teu dispositiu per començar.',
         'recycle' => 'Recicla',
-        'recycle_desc' => 'Segueix les instruccions per reciclar correctament.',
+        'recycle_desc' => 'Escaneja el producte i llença\'l al contenidor corresponent.',
         'coins' => 'Acumula <b>ECODAMS</b>',
         'coins_desc' => 'Guanya <b>ECODAMS</b> per cada acció de reciclatge.',
         'rewards' => 'Reclama Premis',
@@ -94,7 +94,7 @@ return [
         'fraction_search' => 'Busca per fracció',
         'all_fractions' => 'Totes les fraccions',
         'map_title' => 'Mapa de punts de recollida',
-        'no_collection_points' => 'No s\'han trobat punts de recollida per aquesta fracció.',
+        'no_collection_points' => 'No s\'han trobat punts de recollida per aquesta fracció:',
         'available' => 'Disponible',
         'yes' => 'Sí',
         'no' => 'No'

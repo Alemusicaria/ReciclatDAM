@@ -957,7 +957,7 @@
                         productNoResultsControl = L.control({ position: 'topright' });
                         productNoResultsControl.onAdd = function (map) {
                             let div = L.DomUtil.create('div', 'alert alert-warning');
-                            div.innerHTML = `{{ __('messages.recycling.no_collection_points_for') }} <strong>${productCategory}</strong>`;
+                            div.innerHTML = `{{ __('messages.recycling.no_collection_points') }} <strong>${productCategory}</strong>`;
                             return div;
                         };
                         productNoResultsControl.addTo(productMap);

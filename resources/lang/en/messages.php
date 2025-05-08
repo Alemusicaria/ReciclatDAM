@@ -34,7 +34,7 @@ return [
         'download_app' => 'Download the App',
         'download_app_desc' => 'Install the app on your device to get started.',
         'recycle' => 'Recycle',
-        'recycle_desc' => 'Follow the instructions to recycle correctly.',
+        'recycle_desc' => 'Scan the product and empty it into the corresponding container.',
         'coins' => 'Accumulate <b>ECODAMS</b>',
         'coins_desc' => 'Earn <b>ECODAMS</b> for every recycling action.',
         'rewards' => 'Claim Rewards',
@@ -94,7 +94,7 @@ return [
         'fraction_search' => 'Search by fraction',
         'all_fractions' => 'All fractions',
         'map_title' => 'Collection Points Map',
-        'no_collection_points' => 'No collection points found for this fraction.',
+        'no_collection_points' => 'No collection points found for this fraction:',
         'available' => 'Available',
         'yes' => 'Yes',
         'no' => 'No'
