@@ -4,8 +4,6 @@
 
     @include('sections.hero')
 
-    @include('sections.events')
-
     @include('sections.funcionament')
 
     @include('sections.sponsors')
@@ -13,6 +11,8 @@
     @include('sections.qui_som')
 
     @include('sections.reciclatge')
+
+    @include('sections.events')
 
     @include('sections.premis')
 

@@ -9,7 +9,7 @@
                     <div id="calendar-loader" class="calendar-loader">
                         <div class="calendar-spinner"></div>
                     </div>
-                    <div id="calendar" style="display: none; min-height: 650px;"></div>
+                    <div id="calendar" style="display: none;"></div>
                 </div>
             </div>
         </div>
@@ -60,6 +60,27 @@
         cursor: pointer;
         border-radius: 4px;
         padding: 2px;
+    }
+        /* Estilo específico para el botón "avui" (today) más pequeño */
+    .fc-today-button {
+        padding: 2px 8px !important;
+        margin-left: 5px !important; /* Espacio pequeño después de los botones prev/next */
+        width: 8vh !important; /* Dejar que el ancho se ajuste al contenido */
+        height: 4.3vh !important;
+        min-width: 50px !important; /* Establecer un ancho mínimo */
+    }
+    
+    /* Ajustar el contenedor de botones a la izquierda para que estén juntos */
+    .fc-header-toolbar .fc-left {
+        display: flex !important;
+        align-items: center !important;
+        gap: 1px !important; /* Espacio mínimo entre botones */
+    }
+        
+    /* Asegurar que los botones estén en línea */
+    .fc-button-group {
+        display: inline-flex !important;
+        margin-right: 0 !important;
     }
 
     /* Estilos para el modal */

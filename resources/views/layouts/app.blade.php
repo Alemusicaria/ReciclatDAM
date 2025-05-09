@@ -26,18 +26,35 @@
                 <li class="nav-item">
                     <a class="nav-link" href="#inici">Inici</a>
                 </li>
+
                 <li class="nav-item">
                     <a class="nav-link" href="#funcionament">Com funciona</a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#sponsors">Sponsors</a>
+                </li>
+
                 <li class="nav-item">
                     <a class="nav-link" href="#qui_som">Qui som</a>
                 </li>
+
                 <li class="nav-item">
                     <a class="nav-link" href="#reciclatge">Reciclatge</a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#mapa">Mapa</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#events">Events</a>
+                </li>
+
                 <li class="nav-item">
                     <a class="nav-link" href="#premis">Premis</a>
                 </li>
+
                 <li class="nav-item">
                     <a class="nav-link" href="#opinions">Opinions</a>
                 </li>
@@ -284,6 +301,42 @@
 
             // Executem la funció en carregar la pàgina
             highlightNavLink();
+
+            // Función para resaltar sección activa
+            function highlightNavbar() {
+                // Obtener todas las secciones
+                const sections = document.querySelectorAll('section[id]');
+
+                // Obtener la posición actual de scroll
+                const scrollPosition = window.scrollY + 100; // Añadir offset para mejorar detección
+
+                // Recorrer secciones y verificar posición
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.offsetHeight;
+                    const sectionId = section.getAttribute('id');
+
+                    // Comprobar si estamos en esta sección
+                    if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                        // Quitar clase active de todos los links
+                        document.querySelectorAll('.navbar-nav a.nav-link').forEach(link => {
+                            link.classList.remove('active');
+                        });
+
+                        // Añadir clase active al link correspondiente
+                        const currentLink = document.querySelector('.navbar-nav a[href="#' + sectionId + '"]');
+                        if (currentLink) {
+                            currentLink.classList.add('active');
+                        }
+                    }
+                });
+            }
+
+            // Ejecutar al cargar la página
+            highlightNavbar();
+
+            // Ejecutar al hacer scroll
+            window.addEventListener('scroll', highlightNavbar);
         });
     </script>
 
