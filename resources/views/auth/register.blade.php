@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ca">
+
 <head>
     <title>Register</title>
     <meta charset="UTF-8">
@@ -43,14 +44,21 @@
             font-size: 18px;
             color: #999999;
         }
+        
+        .required-field {
+            color: red;
+            margin-left: 5px;
+        }
     </style>
 </head>
+
 <body>
 
     <div class="limiter">
         <div class="container-login100" style="background-image: url('{{ asset('images/bg-01.jpg') }}');">
             <div class="wrap-login100 p-l-110 p-r-110 p-t-62 p-b-33">
-                <form action="{{ route('register') }}" method="POST" class="login100-form validate-form flex-sb flex-w" enctype="multipart/form-data">
+                <form action="{{ route('register') }}" method="POST" class="login100-form validate-form flex-sb flex-w"
+                    enctype="multipart/form-data">
                     @csrf
                     <div class="login100-form-title p-b-20">
                         <img src="{{ asset('images/logo.png') }}" alt="Logo" style="max-width: 150px;">
@@ -72,20 +80,20 @@
 
                     <div class="p-t-31 p-b-9">
                         <span class="txt1">
-                            Nom
+                            Nom <span class="required-field">*</span>
                         </span>
                     </div>
-                    <div class="wrap-input100 validate-input" data-validate="Nom is required">
+                    <div class="wrap-input100 validate-input" data-validate="El nom és obligatori">
                         <input class="input100" type="text" name="nom" required>
                         <span class="focus-input100"></span>
                     </div>
 
                     <div class="p-t-13 p-b-9">
                         <span class="txt1">
-                            Cognoms
+                            Cognoms <span class="required-field">*</span>
                         </span>
                     </div>
-                    <div class="wrap-input100 validate-input" data-validate="Cognoms is required">
+                    <div class="wrap-input100 validate-input" data-validate="Els cognoms són obligatoris">
                         <input class="input100" type="text" name="cognoms" required>
                         <span class="focus-input100"></span>
                     </div>
@@ -95,7 +103,7 @@
                             Data Naixement
                         </span>
                     </div>
-                    <div class="wrap-input100 validate-input" data-validate="Data Naixement is required">
+                    <div class="wrap-input100">
                         <input class="input100" type="date" name="data_naixement">
                         <span class="focus-input100"></span>
                     </div>
@@ -105,7 +113,7 @@
                             Telefon
                         </span>
                     </div>
-                    <div class="wrap-input100 validate-input" data-validate="Telefon is required">
+                    <div class="wrap-input100">
                         <input class="input100" type="text" name="telefon">
                         <span class="focus-input100"></span>
                     </div>
@@ -115,7 +123,7 @@
                             Ubicacio
                         </span>
                     </div>
-                    <div class="wrap-input100 validate-input" data-validate="Ubicacio is required">
+                    <div class="wrap-input100">
                         <textarea class="input100" name="ubicacio"></textarea>
                         <span class="focus-input100"></span>
                     </div>
@@ -125,27 +133,27 @@
                             Foto de Perfil
                         </span>
                     </div>
-                    <div class="wrap-input100 validate-input" data-validate="Foto de Perfil is required">
+                    <div class="wrap-input100">
                         <input class="input100" type="file" name="foto_perfil">
                         <span class="focus-input100"></span>
                     </div>
-                    
+
                     <div class="p-t-13 p-b-9">
                         <span class="txt1">
-                            Email
+                            Email <span class="required-field">*</span>
                         </span>
                     </div>
-                    <div class="wrap-input100 validate-input" data-validate="Email is required">
+                    <div class="wrap-input100 validate-input" data-validate="L'email és obligatori">
                         <input class="input100" type="email" name="email" required>
                         <span class="focus-input100"></span>
                     </div>
 
                     <div class="p-t-13 p-b-9">
                         <span class="txt1">
-                            Password
+                            Contrasenya <span class="required-field">*</span>
                         </span>
                     </div>
-                    <div class="wrap-input100 validate-input" data-validate="Password is required">
+                    <div class="wrap-input100 validate-input" data-validate="La contrasenya és obligatòria">
                         <input class="input100" type="password" name="password" required>
                         <span class="focus-input100"></span>
                         <span class="btn-show-pass">
@@ -155,17 +163,21 @@
 
                     <div class="p-t-13 p-b-9">
                         <span class="txt1">
-                            Confirm Password
+                            Confirma Contrasenya <span class="required-field">*</span>
                         </span>
                     </div>
-                    <div class="wrap-input100 validate-input" data-validate="Confirm Password is required">
-                        <input class="input100" type="password" name="password_confirmation" required>
+                    <div class="wrap-input100 validate-input" data-validate="La confirmació és obligatòria">
+                        <input class="input100" type="password" name="password_confirmation" required
+                            autocomplete="new-password">
                         <span class="focus-input100"></span>
+                        <span class="btn-show-pass">
+                            <i class="fa fa-eye" id="toggle-password-confirm"></i>
+                        </span>
                     </div>
 
                     <div class="container-login100-form-btn m-t-17">
                         <button class="login100-form-btn">
-                            Register
+                            Registrar
                         </button>
                     </div>
 
@@ -203,6 +215,7 @@
     <script src="{{ asset('js/main.js') }}"></script>
 
     <script>
+        // Toggle para el campo de contraseña
         document.getElementById('toggle-password').addEventListener('click', function () {
             const passwordInput = document.querySelector('input[name="password"]');
             const icon = this;
@@ -212,6 +225,21 @@
                 icon.classList.add('fa-eye-slash');
             } else {
                 passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        // Toggle para el campo de confirmación de contraseña
+        document.getElementById('toggle-password-confirm').addEventListener('click', function () {
+            const confirmPasswordInput = document.querySelector('input[name="password_confirmation"]');
+            const icon = this;
+            if (confirmPasswordInput.type === 'password') {
+                confirmPasswordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                confirmPasswordInput.type = 'password';
                 icon.classList.remove('fa-eye-slash');
                 icon.classList.add('fa-eye');
             }
@@ -246,11 +274,17 @@
                     if ($(input).val().trim().match(/^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{1,5}|[0-9]{1,3})(\]?)$/) == null) {
                         return false;
                     }
-                } else {
+                } else if ($(input).attr('name') == 'password_confirmation') {
+                    var passwordVal = $('input[name="password"]').val().trim();
+                    if ($(input).val().trim() !== passwordVal) {
+                        return false;
+                    }
+                } else if ($(input).attr('required')) {
                     if ($(input).val().trim() == '') {
                         return false;
                     }
                 }
+                return true;
             }
 
             function showValidate(input) {
@@ -267,4 +301,5 @@
     </script>
 
 </body>
+
 </html>

@@ -302,6 +302,8 @@
         window.puntsIndex = window.algoliaClient.initIndex('punts_de_recollida');
         window.opinionsIndex = window.algoliaClient.initIndex('opinions');
         window.premisIndex = window.algoliaClient.initIndex('premis');
+        window.eventsIndex = window.algoliaClient.initIndex('events');
+        window.tipusEventsIndex = window.algoliaClient.initIndex('tipus_events');
     </script>
 </body>
 

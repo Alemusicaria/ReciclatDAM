@@ -17,6 +17,8 @@ use App\Http\Controllers\OpinionsController;
 use App\Http\Controllers\PuntDeRecollidaController;
 use App\Http\Controllers\TipusAlertaController;
 use App\Http\Controllers\AlertaPuntDeRecollidaController;
+use App\Http\Controllers\EventsController;
+use App\Http\Controllers\TipusEventController;
 
 Route::localizedGroup(function () {
     Route::get('auth/{provider}', [SocialiteController::class, 'redirectToProvider']);
@@ -70,4 +72,15 @@ Route::localizedGroup(function () {
     Route::resource('punts_de_recollida', PuntDeRecollidaController::class);
     Route::resource('tipus_alertes', TipusAlertaController::class);
     Route::resource('alertes_punts_de_recollida', AlertaPuntDeRecollidaController::class);
+
+    // Rutas para eventos con calendario
+    Route::get('/events', [EventsController::class, 'index'])->name('events');
+    Route::get('/events/data', [EventsController::class, 'getEvents'])->name('events.getEvents');
+    Route::get('/events/search', [EventsController::class, 'search'])->name('events.search');
+    Route::get('/events/{id}', [EventsController::class, 'show'])->name('events.show');
+    Route::post('/events/{id}/register', [EventsController::class, 'register'])->name('events.register')->middleware('auth');
+
+    // Ruta para tipos de eventos
+    Route::get('/tipus-events/search', [TipusEventController::class, 'search'])->name('tipus-events.search');
+    Route::get('/events/{id}/check-registration', [EventsController::class, 'checkRegistration'])->name('events.checkRegistration')->middleware('auth');
 });

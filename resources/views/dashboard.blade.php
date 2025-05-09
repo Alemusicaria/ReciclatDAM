@@ -4,6 +4,8 @@
 
     @include('sections.hero')
 
+    @include('sections.events')
+
     @include('sections.funcionament')
 
     @include('sections.sponsors')
