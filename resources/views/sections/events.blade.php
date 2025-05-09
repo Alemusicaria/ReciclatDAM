@@ -228,16 +228,16 @@
             calendar.render();
         }
 
-                // Función para mostrar detalles del evento
+        // Función para mostrar detalles del evento
         function showEventDetails(event) {
             // Actualizar título del modal
             document.getElementById('eventModalLabel').textContent = event.title;
-        
+
             // Formatear fechas
             const startDate = formatDate(event.start);
             const startTime = formatTime(event.start);
             const endTime = event.end ? formatTime(event.end) : '';
-        
+
             // Crear contenido HTML para el modal
             const modalContent = `
                 <div class="row g-2">
@@ -275,19 +275,19 @@
                     <span class="ms-2">Verificant l'estat del registre...</span>
                 </div>
             `;
-            
+
             // Actualizar contenido del modal
             document.getElementById('event-details-content').innerHTML = modalContent;
-            
+
             // Mostrar el modal antes de verificar el estado
             const modal = new bootstrap.Modal(document.getElementById('eventModal'));
             modal.show();
-            
+
             // Configurar botón de registro (inicialmente deshabilitado mientras verificamos)
             const registerButton = document.getElementById('register-event-btn');
             registerButton.textContent = 'Verificant...';
             registerButton.disabled = true;
-            
+
             @auth
                 // Verificar el estado de registro en tiempo real con el servidor
                 fetch(`/events/${event.id}/check-registration`, {
@@ -297,52 +297,52 @@
                         'Accept': 'application/json'
                     }
                 })
-                .then(response => response.json())
-                .then(data => {
-                    // Ocultar el loading
-                    document.getElementById('registration-status-loading').style.display = 'none';
-                    
-                    const isRegistered = data.registered;
-                    const isFull = data.full;
-                    
-                    // Actualizar el estado en la memoria por si acaso
-                    event.extendedProps.userRegistered = isRegistered;
-                    
-                    if (isRegistered) {
-                        registerButton.textContent = 'Ja estàs registrat';
-                        registerButton.disabled = true;
-                        
-                        // Añadir mensaje indicando que ya está registrado con más estilo
-                        document.getElementById('event-details-content').insertAdjacentHTML('beforeend', data.html);
-                    } else if (isFull) {
-                        registerButton.textContent = 'Aforament complet';
-                        registerButton.disabled = true;
-                        
-                        // Mostrar mensaje de aforo completo
-                        if (data.html) {
+                    .then(response => response.json())
+                    .then(data => {
+                        // Ocultar el loading
+                        document.getElementById('registration-status-loading').style.display = 'none';
+
+                        const isRegistered = data.registered;
+                        const isFull = data.full;
+
+                        // Actualizar el estado en la memoria por si acaso
+                        event.extendedProps.userRegistered = isRegistered;
+
+                        if (isRegistered) {
+                            registerButton.textContent = 'Ja estàs registrat';
+                            registerButton.disabled = true;
+
+                            // Añadir mensaje indicando que ya está registrado con más estilo
                             document.getElementById('event-details-content').insertAdjacentHTML('beforeend', data.html);
+                        } else if (isFull) {
+                            registerButton.textContent = 'Aforament complet';
+                            registerButton.disabled = true;
+
+                            // Mostrar mensaje de aforo completo
+                            if (data.html) {
+                                document.getElementById('event-details-content').insertAdjacentHTML('beforeend', data.html);
+                            }
+                        } else {
+                            registerButton.textContent = 'Registrar-me';
+                            registerButton.disabled = false;
+                            registerButton.onclick = function () {
+                                registerForEvent(event.id);
+                            };
                         }
-                    } else {
+                    })
+                    .catch(error => {
+                        console.error('Error al verificar el registro:', error);
+                        document.getElementById('registration-status-loading').style.display = 'none';
                         registerButton.textContent = 'Registrar-me';
                         registerButton.disabled = false;
                         registerButton.onclick = function () {
                             registerForEvent(event.id);
                         };
-                    }
-                })
-                .catch(error => {
-                    console.error('Error al verificar el registro:', error);
-                    document.getElementById('registration-status-loading').style.display = 'none';
-                    registerButton.textContent = 'Registrar-me';
-                    registerButton.disabled = false;
-                    registerButton.onclick = function () {
-                        registerForEvent(event.id);
-                    };
-                });
+                    });
             @else
                 // Ocultar el loading
                 document.getElementById('registration-status-loading').style.display = 'none';
-                
+
                 // Si no está autenticado, redirigir al login
                 registerButton.textContent = 'Inicia sessió per registrar-te';
                 registerButton.onclick = function () {
@@ -354,8 +354,8 @@
         // Función para registrarse en un evento
         function registerForEvent(eventId) {
             @auth
-                    // Mostrar indicador de carga
-                    const registerButton = document.getElementById('register-event-btn');
+                            // Mostrar indicador de carga
+                            const registerButton = document.getElementById('register-event-btn');
                 registerButton.textContent = 'Registrant...';
                 registerButton.disabled = true;
 
@@ -410,17 +410,17 @@
 
                         // Mostrar mensaje de error integrado
                         const errorHtml = `
-                            <div class="alert alert-danger mt-2 small">
-                                <div class="d-flex align-items-center">
-                                    <div class="me-3">
-                                        <i class="fas fa-exclamation-circle fa-2x text-danger"></i>
-                                    </div>
-                                    <div>
-                                        <strong>Error!</strong> 
-                                        <p class="mb-0">Hi ha hagut un error. Torna-ho a provar més tard.</p>
-                                    </div>
-                                </div>
-                            </div>`;
+                                    <div class="alert alert-danger mt-2 small">
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                <i class="fas fa-exclamation-circle fa-2x text-danger"></i>
+                                            </div>
+                                            <div>
+                                                <strong>Error!</strong> 
+                                                <p class="mb-0">Hi ha hagut un error. Torna-ho a provar més tard.</p>
+                                            </div>
+                                        </div>
+                                    </div>`;
                         document.getElementById('event-details-content').insertAdjacentHTML('beforeend', errorHtml);
                     });
             @else
@@ -438,6 +438,87 @@
         function formatTime(date) {
             const options = { hour: '2-digit', minute: '2-digit' };
             return date.toLocaleTimeString('ca-ES', options);
+        }
+        // Reemplazar el manejo de cierre del modal
+        document.querySelector('#eventModal .btn-close').addEventListener('click', function () {
+            closeEventModal();
+        });
+
+        // También arreglar el botón de "Tancar"
+        document.querySelector('#eventModal .btn-secondary').addEventListener('click', function () {
+            closeEventModal();
+        });
+
+        // Función auxiliar para cerrar el modal
+        function closeEventModal() {
+            const modalElement = document.getElementById('eventModal');
+
+            // Intentar diferentes métodos de cierre según la versión de Bootstrap
+            try {
+                // Bootstrap 5
+                if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal !== 'undefined') {
+                    const modal = bootstrap.Modal.getInstance(modalElement);
+                    if (modal) {
+                        modal.hide();
+                        // Esperar a que termine la animación y luego limpiar
+                        setTimeout(() => {
+                            cleanupModalEffects();
+                        }, 300);
+                        return;
+                    }
+                }
+
+                // Bootstrap 4 (jQuery)
+                if (typeof $ !== 'undefined') {
+                    $(modalElement).modal('hide');
+                    setTimeout(() => {
+                        cleanupModalEffects();
+                    }, 300);
+                    return;
+                }
+
+                // Si llegamos aquí, hacemos la limpieza manual directamente
+                cleanupModalEffects();
+
+            } catch (e) {
+                console.error('Error al cerrar el modal:', e);
+                cleanupModalEffects();
+            }
+        }
+
+        // Función para limpiar completamente los efectos del modal
+        function cleanupModalEffects() {
+            // 1. Ocultar el modal manualmente
+            const modalElement = document.getElementById('eventModal');
+            modalElement.style.display = 'none';
+            modalElement.classList.remove('show');
+            modalElement.setAttribute('aria-hidden', 'true');
+            modalElement.removeAttribute('aria-modal');
+            modalElement.removeAttribute('role');
+
+            // 2. Eliminar la clase modal-open del body
+            document.body.classList.remove('modal-open');
+
+            // 3. Eliminar estilos inline que Bootstrap puede haber añadido
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+
+            // 4. Eliminar TODOS los backdrops
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(backdrop => {
+                backdrop.classList.remove('show');
+                setTimeout(() => {
+                    backdrop.remove();
+                }, 150);
+            });
+
+            // 5. Si hay múltiples backdrops, eliminarlos todos usando jQuery si está disponible
+            if (typeof $ !== 'undefined') {
+                $('.modal-backdrop').remove();
+            }
+
+            // 6. Crear un mensaje en la consola para confirmación
+            console.log('Modal y backdrop eliminados manualmente');
         }
     });
 </script>
