@@ -14,10 +14,10 @@ class PuntDeRecollida extends Model
     protected $fillable = [
         'nom',
         'ciutat',
-        'adreça',
+        'adreca',
         'latitud',
         'longitud',
-        'fracció',
+        'fraccio',
         'disponible',
     ];
 
@@ -30,10 +30,10 @@ class PuntDeRecollida extends Model
             'id' => $this->id,
             'nom' => $this->nom,
             'ciutat' => $this->ciutat,
-            'adreça' => $this->adreça,
+            'adreca' => $this->adreca,
             'latitud' => $this->latitud,
             'longitud' => $this->longitud,
-            'fracció' => $this->fracció,
+            'fraccio' => $this->fraccio,
             'disponible' => $this->disponible,
         ];
     }

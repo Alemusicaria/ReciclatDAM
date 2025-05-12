@@ -150,6 +150,126 @@
             transform: rotate(360deg);
         }
     }
+        /* Estilos mejorados para el modo oscuro del calendario */
+    body.dark .calendar-container {
+        background-color: #1a202c;
+        color: #e2e8f0;
+        border: 1px solid #2d3748;
+    }
+    
+    /* Encabezado y controles en modo oscuro */
+    body.dark .fc-toolbar {
+        color: #e2e8f0;
+    }
+    
+    body.dark .fc-button-primary {
+        background-color: #2d3748 !important;
+        border-color: #4a5568 !important;
+        color: #e2e8f0 !important;
+    }
+    
+    body.dark .fc-button-primary:hover {
+        background-color: #4a5568 !important;
+        border-color: #4a5568 !important;
+    }
+    
+    body.dark .fc-button-primary:disabled {
+        background-color: #2d3748 !important;
+        border-color: #4a5568 !important;
+        opacity: 0.7;
+    }
+    
+    body.dark .fc-button-active {
+        background-color: #38a169 !important;
+        border-color: #38a169 !important;
+        color: white !important;
+    }
+    
+    /* Celdas del calendario en modo oscuro */
+    body.dark .fc-daygrid-day {
+        background-color: #1a202c !important;
+        border-color: #2d3748 !important;
+    }
+    
+    body.dark .fc-col-header-cell {
+        background-color: #2d3748 !important;
+        border-color: #4a5568 !important;
+        color: #e2e8f0;
+    }
+    
+    body.dark .fc-day-today {
+        background-color: rgba(56, 161, 105, 0.1) !important;
+    }
+    
+    body.dark .fc-day-past {
+        opacity: 0.7;
+    }
+    
+    /* Números de día en modo oscuro */
+    body.dark .fc-daygrid-day-number {
+        color: #e2e8f0;
+    }
+    
+    /* Eventos en modo oscuro */
+    body.dark .fc-event {
+        border: none !important;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    body.dark .fc-event-title {
+        font-weight: 500;
+    }
+    
+    body.dark .fc-list-day-cushion {
+        background-color: #2d3748 !important;
+    }
+    
+    body.dark .fc-list-event:hover td {
+        background-color: #4a5568 !important;
+    }
+    
+    body.dark .fc-list-event-title {
+        color: #e2e8f0;
+    }
+    
+    /* Texto "No hay eventos" en modo oscuro */
+    body.dark .fc-list-empty {
+        background-color: #1a202c !important;
+        color: #a0aec0;
+    }
+    
+    /* Otros elementos como popover */
+    body.dark .fc-popover {
+        background-color: #2d3748 !important;
+        border-color: #4a5568 !important;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+    
+    body.dark .fc-popover-header {
+        background-color: #4a5568 !important;
+        color: #e2e8f0;
+    }
+    
+    /* Para la semana y vista de tiempo */
+    body.dark .fc-timegrid-slot {
+        background-color: #1a202c !important;
+        border-color: #2d3748 !important;
+    }
+    
+    body.dark .fc-timegrid-axis {
+        background-color: #2d3748 !important;
+        color: #a0aec0;
+    }
+    
+    body.dark .fc-timegrid-event {
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Spinner del loader en modo oscuro */
+    body.dark .calendar-spinner {
+        border-color: rgba(255, 255, 255, 0.1);
+        border-left-color: #48bb78;
+    }
 </style>
 
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js'></script>
