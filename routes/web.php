@@ -21,14 +21,13 @@ use App\Http\Controllers\EventsController;
 use App\Http\Controllers\TipusEventController;
 
 Route::localizedGroup(function () {
-    Route::get('auth/{provider}', [SocialiteController::class, 'redirectToProvider']);
-    Route::get('auth/{provider}/callback', [SocialiteController::class, 'handleProviderCallback']);
-
     Route::get('set-password', [SocialiteController::class, 'showSetPasswordForm'])->name('set-password');
     Route::post('set-password', [SocialiteController::class, 'setPassword']);
 
     Route::get('login/{provider}', [SocialiteController::class, 'redirectToProvider']);
     Route::get('login/{provider}/callback', [SocialiteController::class, 'handleProviderCallback']);
+
+
     Route::post('/save-navigator-info', [NavigatorInfoController::class, 'store']);
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

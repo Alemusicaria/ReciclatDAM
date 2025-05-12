@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Exception;
+use Illuminate\Support\Str;
 
 class SocialiteController extends Controller
 {
@@ -20,43 +21,72 @@ class SocialiteController extends Controller
     public function handleProviderCallback($provider)
     {
         try {
-            $user = Socialite::driver($provider)->user();
-            $findUser = User::where('email', $user->getEmail())->first();
-
+            $socialUser = Socialite::driver($provider)->user();
+            $findUser = User::where('email', $socialUser->getEmail())->first();
+    
+            // Registrar información detallada para depuración
+            Log::info('Social login attempt', [
+                'provider' => $provider,
+                'email' => $socialUser->getEmail(),
+                'user_exists' => $findUser ? 'yes' : 'no'
+            ]);
+    
             if ($findUser) {
-                Auth::login($findUser);
+                // El usuario ya existe, solo inicia sesión
+                Auth::login($findUser, true); // Añadir "true" para "remember me"
                 Log::info('User logged in: ' . $findUser->email);
-                return redirect()->intended('dashboard');
+                return redirect()->intended('/');
             } else {
-                $avatar = $user->getAvatar();
+                // Crear nuevo usuario
+                $avatar = $socialUser->getAvatar();
                 if (!str_starts_with($avatar, 'https://')) {
                     $avatar = 'images/default-profile.png';
                 }
-
-                // Crear l'usuari amb una contrasenya temporal
+    
+                // Dividir el nombre completo
+                $fullName = $socialUser->getName();
+                $nameParts = explode(' ', $fullName);
+                $firstName = $nameParts[0];
+                $lastName = count($nameParts) > 1 ? implode(' ', array_slice($nameParts, 1)) : '';
+    
+                // Crear el usuario con todos los campos necesarios
                 $newUser = User::create([
-                    'nom' => $user->getName(),
-                    'email' => $user->getEmail(),
-                    'password' => Hash::make('temporary_password'), // Contrasenya temporal
+                    'nom' => $firstName,
+                    'cognoms' => $lastName,
+                    'email' => $socialUser->getEmail(),
+                    'password' => Hash::make(Str::random(16)), // Contraseña aleatoria segura
                     'rol_id' => 2,
-                    'foto_perfil' => $avatar // Guardar la foto de perfil
+                    'foto_perfil' => $avatar,
+                    'punts_totals' => 0,
+                    'punts_actuals' => 0,
+                    'punts_gastats' => 0
                 ]);
+    
+                // Verificar explícitamente que el usuario se creó
+                if (!$newUser->exists) {
+                    Log::error('Failed to create user', ['email' => $socialUser->getEmail()]);
+                    return redirect('login')->withErrors(['msg' => 'Error creating user account']);
+                }
+    
+                // Forzar recuperación del usuario de la base de datos antes de login
+                $newUser = User::where('id', $newUser->id)->first();
 
-                // Guardar l'usuari a la sessió per utilitzar-lo després
-                session(['social_user' => $newUser]);
-                session(['social_login' => true]);
-                Log::info('New user created and stored in session: ' . $newUser->email);
-
-                // Loguejar l'usuari
-                Auth::login($newUser);
-
-                // Redirigir al dashboard
-                return redirect()->intended('dashboard');
+                // Login con "remember me" activado
+                Auth::login($newUser, true);
+                
+                Log::info('New user created and logged in: ' . $newUser->email);
+    
+                // Redirigir a home con flush de sesión
+                return redirect('/')->with('success', 'Benvingut/da a Reciclat DAM!');
             }
-
+    
         } catch (Exception $e) {
-            Log::error('Error logging in with ' . $provider . ': ' . $e->getMessage());
-            return redirect('login')->withErrors(['msg' => 'Error logging in with ' . $provider]);
+            Log::error('Social login error', [
+                'provider' => $provider,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect('login')->withErrors(['msg' => 'Error al iniciar sesión con ' . $provider . '. Por favor, inténtalo de nuevo.']);
         }
     }
 
