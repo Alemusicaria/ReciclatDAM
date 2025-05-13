@@ -1,35 +1,802 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container-fluid h-100 mt-5 pt-5">
-        <h1>Perfil de l'usuari: {{ $user->nom }} {{ $user->cognoms }}</h1>
-        <p><strong>Email:</strong> {{ $user->email }}</p>
-        <p><strong>Data de naixement:</strong> {{ $user->data_naixement }}</p>
-        <p><strong>Telèfon:</strong> {{ $user->telefon }}</p>
-        <p><strong>Ubicació:</strong> {{ $user->ubicacio }}</p>
-        <p><strong>Punts Actuals:</strong> {{ $user->punts_actuals }}</p>
-        @if(Auth::user()->foto_perfil)
-            @if(str_starts_with(Auth::user()->foto_perfil, 'https://'))
-                <img src="{{ Auth::user()->foto_perfil }}" alt="Profile Photo" class="rounded-circle"
-                    style="width: 30px; height: 30px; margin-right: 10px;">
-            @elseif(file_exists(public_path('storage/' . Auth::user()->foto_perfil)))
-                <img src="{{ asset('storage/' . Auth::user()->foto_perfil) }}" alt="Profile Photo" class="rounded-circle"
-                    style="width: 30px; height: 30px; margin-right: 10px;">
-            @else
-                <img src="{{ asset('images/default-profile.png') }}" alt="Default Profile Photo" class="rounded-circle"
-                    style="width: 30px; height: 30px; margin-right: 10px;">
-            @endif
-        @else
-            <img src="{{ asset('images/default-profile.png') }}" alt="Default Profile Photo" class="rounded-circle"
-                style="width: 30px; height: 30px; margin-right: 10px;">
-        @endif
-        <div class="mt-3">
-            <a href="{{ route('users.edit', $user->id) }}" class="btn btn-primary">Edita</a>
-            <form action="{{ route('users.destroy', $user->id) }}" method="POST" style="display: inline;">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn btn-danger">Elimina</button>
-            </form>
+    <div class="container profile-container" style="margin-top: 8rem !important;">
+        <div class="row">
+            <div class="col-lg-4">
+                <!-- Tarjeta de perfil principal -->
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="position-relative mb-4">
+                            <!-- Imagen de perfil -->
+                            @if(Auth::user()->foto_perfil)
+                                @if(str_starts_with(Auth::user()->foto_perfil, 'https://'))
+                                    <img src="{{ Auth::user()->foto_perfil }}" alt="Foto de perfil"
+                                        class="rounded-circle img-thumbnail shadow"
+                                        style="width: 150px; height: 150px; object-fit: cover;">
+                                @elseif(file_exists(public_path('storage/' . Auth::user()->foto_perfil)))
+                                    <img src="{{ asset('storage/' . Auth::user()->foto_perfil) }}" alt="Foto de perfil"
+                                        class="rounded-circle img-thumbnail shadow"
+                                        style="width: 150px; height: 150px; object-fit: cover;">
+                                @else
+                                    <img src="{{ asset('images/default-profile.png') }}" alt="Foto de perfil"
+                                        class="rounded-circle img-thumbnail shadow"
+                                        style="width: 150px; height: 150px; object-fit: cover;">
+                                @endif
+                            @else
+                                <img src="{{ asset('images/default-profile.png') }}" alt="Foto de perfil"
+                                    class="rounded-circle img-thumbnail shadow"
+                                    style="width: 150px; height: 150px; object-fit: cover;">
+                            @endif
+
+                            <!-- Icono para editar foto -->
+                            <div class="position-absolute bottom-0 end-0">
+                                <button class="btn btn-sm btn-success rounded-circle" style="width: 35px; height: 35px;"
+                                    title="Canviar foto">
+                                    <i class="fas fa-camera"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <h3 class="mb-1">{{ $user->nom }} {{ $user->cognoms }}</h3>
+                        <p class="text-muted mb-3">{{ $user->email }}</p>
+
+                        <!-- Contador de puntos destacado -->
+                        <div class="d-flex justify-content-center mb-3">
+                            <div class="points-badge bg-success bg-opacity-10 text-success">
+                                <i class="fas fa-coins me-2"></i>
+                                <span class="fw-bold">{{ $user->punts_actuals }}</span> ECODAMS
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="d-grid gap-2 d-flex justify-content-center">
+                            <a href="{{ route('users.edit', $user->id) }}" class="btn btn-primary">
+                                <i class="fas fa-edit me-1"></i> Editar perfil
+                            </a>
+                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
+                                data-bs-target="#deleteModal">
+                                <i class="fas fa-trash-alt me-1"></i> Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta de estadísticas visuales -->
+                <div class="card mb-4 stats-card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">
+                            <i class="fas fa-chart-pie me-2"></i>Distribució de Punts
+                        </h5>
+                        <div id="pointsDistributionChart" class="chart-container"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <!-- Contadores de estadísticas -->
+                <div class="row mb-4">
+                    <div class="col-md-4 mb-3">
+                        <div class="stats-counter text-center">
+                            <div class="mb-2">
+                                <i class="fas fa-trophy fa-2x text-warning"></i>
+                            </div>
+                            <h3>{{ $user->punts_totals ?? 0 }}</h3>
+                            <p class="text-muted mb-0">Punts totals</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="stats-counter text-center">
+                            <div class="mb-2">
+                                <i class="fas fa-wallet fa-2x text-success"></i>
+                            </div>
+                            <h3>{{ $user->punts_actuals ?? 0 }}</h3>
+                            <p class="text-muted mb-0">Punts actuals</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="stats-counter text-center">
+                            <div class="mb-2">
+                                <i class="fas fa-shopping-cart fa-2x text-danger"></i>
+                            </div>
+                            <h3>{{ $user->punts_gastats ?? 0 }}</h3>
+                            <p class="text-muted mb-0">Punts gastats</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfico de actividad -->
+                <div class="card mb-4 stats-card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <i class="fas fa-chart-line me-2"></i>Activitat recent
+                        </h5>
+                        <div id="activityChart" class="chart-container"></div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta de información personal -->
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-user me-2"></i>Informació personal
+                        </h5>
+                        <hr>
+
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <p class="mb-0 text-muted">Nom complet</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <p class="mb-0">{{ $user->nom }} {{ $user->cognoms }}</p>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <p class="mb-0 text-muted">Email</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <p class="mb-0">{{ $user->email }}</p>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <p class="mb-0 text-muted">Telèfon</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <p class="mb-0">{{ $user->telefon ?? 'No especificat' }}</p>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <p class="mb-0 text-muted">Data de naixement</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <p class="mb-0">{{ $user->data_naixement ?? 'No especificada' }}</p>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0 text-muted">Ubicació</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <p class="mb-0">{{ $user->ubicacio ?? 'No especificada' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación para eliminar cuenta -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirmar eliminació</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Estàs segur que vols eliminar el teu compte? Aquesta acció no es pot desfer.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
+                    <form action="{{ route('users.destroy', $user->id) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger">Eliminar compte</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 @endsection
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts@3.35.3/dist/apexcharts.min.css">
+<style>
+    .profile-container {
+        max-width: 1000px;
+        margin: 0 auto !important;
+    }
+
+    .stats-card {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .stats-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .chart-container {
+        height: 250px;
+        margin-bottom: 1rem;
+    }
+
+    .points-badge {
+        padding: 8px 16px;
+        border-radius: 50px;
+        display: inline-flex;
+        align-items: center;
+        box-shadow: 0 3px 10px rgba(46, 125, 50, 0.2);
+    }
+
+    .stats-counter {
+        padding: 1.5rem;
+        border-radius: 12px;
+        background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .stats-counter:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    body.dark .stats-counter {
+        background: linear-gradient(145deg, #2d3748, #1a202c);
+    }
+
+    .edit-profile-container {
+        max-width: 1000px;
+        margin: 5rem auto 0 auto !important;
+        padding: 2rem;
+    }
+
+    .edit-panel {
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        margin-bottom: 30px;
+        transition: all 0.3s ease;
+    }
+
+    .edit-panel:hover {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    body.dark .edit-panel {
+        background-color: #2d3748;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .edit-header {
+        padding: 25px 30px;
+        border-bottom: 1px solid #f1f1f1;
+        display: flex;
+        align-items: center;
+    }
+
+    body.dark .edit-header {
+        border-color: #444;
+    }
+
+    .edit-header i {
+        margin-right: 15px;
+        font-size: 24px;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background-color: rgba(56, 142, 60, 0.1);
+        color: #388e3c;
+    }
+
+    body.dark .edit-header i {
+        background-color: rgba(56, 142, 60, 0.2);
+        color: #4caf50;
+    }
+
+    .edit-header h4 {
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .edit-body {
+        padding: 30px;
+    }
+
+    .input-group {
+        margin-bottom: 25px;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .input-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .input-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #555;
+        transition: all 0.3s ease;
+    }
+
+    body.dark .input-group label {
+        color: #e2e8f0;
+    }
+
+    .input-group input,
+    .input-group textarea,
+    .input-group select {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        background-color: #fff;
+        color: #333;
+    }
+
+    .input-group input:focus,
+    .input-group textarea:focus,
+    .input-group select:focus {
+        border-color: #388e3c;
+        box-shadow: 0 0 0 3px rgba(56, 142, 60, 0.2);
+        outline: none;
+    }
+
+    body.dark .input-group input,
+    body.dark .input-group textarea,
+    body.dark .input-group select {
+        background-color: #384151;
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+
+    body.dark .input-group input:focus,
+    body.dark .input-group textarea:focus,
+    body.dark .input-group select:focus {
+        border-color: #4caf50;
+        box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+    }
+
+    .photo-upload-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .photo-preview {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        overflow: hidden;
+        margin-bottom: 15px;
+        border: 4px solid #fff;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+
+    body.dark .photo-preview {
+        border-color: #2d3748;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .photo-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .photo-upload-btn {
+        background-color: #388e3c;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+    }
+
+    .photo-upload-btn:hover {
+        background-color: #2e7d32;
+        transform: translateY(-2px);
+    }
+
+    .photo-upload-btn i {
+        margin-right: 8px;
+    }
+
+    .actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .btn-cancel {
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 500;
+        background-color: transparent;
+        border: 2px solid #e9ecef;
+        color: #666;
+        transition: all 0.3s ease;
+    }
+
+    .btn-cancel:hover {
+        background-color: #f8f9fa;
+    }
+
+    body.dark .btn-cancel {
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+
+    body.dark .btn-cancel:hover {
+        background-color: #384151;
+    }
+
+    .btn-save {
+        padding: 10px 25px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 500;
+        background-color: #388e3c;
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+    .btn-save:hover {
+        background-color: #2e7d32;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(46, 125, 50, 0.3);
+    }
+
+    /* Estilos para input file oculto */
+    #photo-upload {
+        display: none;
+    }
+
+    /* Animaciones para cambios de estado */
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .edit-panel {
+        animation: slideIn 0.3s ease-out;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/apexcharts@3.35.3/dist/apexcharts.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Variables con datos del usuario
+        const puntsActuals = {{ Auth::user()->punts_actuals ?? 0 }};
+        const puntsGastats = {{ Auth::user()->punts_gastats ?? 0 }};
+        const puntsTotals = {{ Auth::user()->punts_totals ?? 0 }};
+        const userId = {{ Auth::user()->id }};
+
+        // Configurar el tema de ApexCharts según el modo oscuro/claro
+        const isDarkMode = document.body.classList.contains('dark');
+        const textColor = isDarkMode ? '#e2e8f0' : '#333';
+        const gridColor = isDarkMode ? '#4a5568' : '#e9e9e9';
+
+        // Gráfico de distribución de puntos (donut chart)
+        const pointsDistributionOptions = {
+            series: [puntsActuals, puntsGastats],
+            chart: {
+                type: 'donut',
+                height: 250,
+                fontFamily: 'Roboto, sans-serif',
+                foreColor: textColor
+            },
+            labels: ['Punts Actuals', 'Punts Gastats'],
+            colors: ['#2e7d32', '#d32f2f'],
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '65%',
+                        labels: {
+                            show: true,
+                            name: {
+                                show: true,
+                                fontSize: '14px',
+                                fontWeight: 500
+                            },
+                            value: {
+                                show: true,
+                                fontSize: '20px',
+                                fontWeight: 600,
+                                formatter: function (val) {
+                                    return val;
+                                }
+                            },
+                            total: {
+                                show: true,
+                                label: 'Total',
+                                formatter: function (w) {
+                                    return puntsTotals;
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            legend: {
+                position: 'bottom',
+                fontSize: '14px'
+            },
+            responsive: [{
+                breakpoint: 480,
+                options: {
+                    chart: {
+                        height: 300
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }]
+        };
+
+        // Obtener datos de actividad del usuario usando el índice Algolia de códigos
+        // Obtener datos de actividad del usuario usando el índice Algolia de códigos
+        async function loadActivityData() {
+            // Verificar si existe el índice de códigos
+            if (!window.codisIndex) {
+                console.error('El índice codisIndex no está definido en window');
+                return []; // Retornar array vacío en lugar de datos falsos
+            }
+
+            console.log('Iniciando carga de datos de actividad para usuario ID:', userId);
+
+            // Define los meses en catalán
+            const mesesCatalanes = ['Gen', 'Feb', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Oct', 'Nov', 'Des'];
+
+            // Inicializa datos para últimos 6 meses con valor 0
+            let activityData = {};
+            for (let i = 5; i >= 0; i--) {
+                const date = new Date();
+                date.setMonth(date.getMonth() - i);
+                const monthIndex = date.getMonth(); // 0-11
+                const monthName = mesesCatalanes[monthIndex];
+                activityData[monthName] = 0;
+            }
+
+            console.log('Meses inicializados:', activityData);
+
+            try {
+                // Obtener TODOS los códigos sin filtro
+                console.log('Consultando Algolia sin filtro para obtener todos los códigos');
+                const searchResults = await window.codisIndex.search('', {
+                    hitsPerPage: 1000
+                });
+
+                console.log('Resultados completos de Algolia:', searchResults);
+                const allHits = searchResults.hits;
+                console.log('Total de códigos encontrados:', allHits.length);
+
+                // Mostrar estructura de un código para depuración
+                if (allHits.length > 0) {
+                    console.log('Estructura de un código de ejemplo:', allHits[0]);
+                    console.log('Nombres de campos disponibles:', Object.keys(allHits[0]));
+                }
+
+                // Filtrar manualmente por user_id
+                const hits = allHits.filter(codi => {
+                    // Comprobar todas las posibles variantes del campo user_id
+                    const possibleFields = ['user_id', 'userId', 'user', 'userID', 'userid'];
+
+                    for (const field of possibleFields) {
+                        if (codi[field] !== undefined &&
+                            (codi[field] === userId || codi[field] === userId.toString())) {
+                            console.log(`Código coincidente encontrado usando campo "${field}": `, codi);
+                            return true;
+                        }
+                    }
+
+                    // Si no encontramos coincidencia con ningún campo estándar,
+                    // revisar todos los campos del código por si acaso
+                    for (const [key, value] of Object.entries(codi)) {
+                        if (key.toLowerCase().includes('user') &&
+                            (value === userId || value === userId.toString())) {
+                            console.log(`Código coincidente encontrado usando campo "${key}": `, codi);
+                            return true;
+                        }
+                    }
+
+                    return false;
+                });
+
+                console.log(`Códigos filtrados para el usuario ${userId}:`, hits);
+
+                if (hits.length === 0) {
+                    console.log('No se encontraron códigos para este usuario');
+                    // Simplemente convertir y retornar los datos inicializados (con valores en cero)
+                    const emptyData = Object.keys(activityData).map(month => ({
+                        x: month,
+                        y: activityData[month] // Que será 0 para todos los meses
+                    }));
+                    return emptyData;
+                }
+
+                // Procesar los resultados y sumar puntos por mes
+                hits.forEach(codi => {
+                    console.log('Procesando código:', codi);
+
+                    // Extraer mes de data_escaneig
+                    const date = new Date(codi.data_escaneig);
+                    console.log('Fecha del código:', date);
+                    const monthIndex = date.getMonth(); // 0-11
+
+                    // Solo considerar códigos de los últimos 6 meses
+                    const sixMonthsAgo = new Date();
+                    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+                    if (date >= sixMonthsAgo) {
+                        const monthName = mesesCatalanes[monthIndex];
+                        console.log('Mes del código:', monthName, 'Puntos:', codi.punts);
+
+                        if (monthName in activityData) {
+                            activityData[monthName] += codi.punts;
+                        }
+                    }
+                });
+
+                console.log('Datos de actividad después de procesar:', activityData);
+
+                // Convertir a formato para el gráfico
+                const formattedData = Object.keys(activityData).map(month => ({
+                    x: month,
+                    y: activityData[month]
+                }));
+
+                console.log('Datos formateados para el gráfico:', formattedData);
+                return formattedData;
+
+            } catch (error) {
+                console.error('Error al cargar datos de actividad:', error);
+                // Retornar datos vacíos en caso de error
+                return Object.keys(activityData).map(month => ({
+                    x: month,
+                    y: 0
+                }));
+            }
+        }
+
+        // Verificar si el elemento del gráfico existe
+        async function initCharts() {
+            try {
+                console.log('Iniciando inicialización de gráficos');
+
+                // Verificar si existen los contenedores de los gráficos
+                const pointsChartEl = document.querySelector("#pointsDistributionChart");
+                const activityChartEl = document.querySelector("#activityChart");
+
+                console.log('Elemento para gráfico de distribución:', pointsChartEl ? 'Existe' : 'No existe');
+                console.log('Elemento para gráfico de actividad:', activityChartEl ? 'Existe' : 'No existe');
+
+                // Cargar datos de actividad
+                console.log('Cargando datos de actividad...');
+                const activityData = await loadActivityData();
+                console.log('Datos de actividad cargados:', activityData);
+
+                // Gráfico de actividad (área)
+                const activityChartOptions = {
+                    series: [{
+                        name: 'Punts acumulats',
+                        data: activityData.map(item => item.y)
+                    }],
+                    chart: {
+                        type: 'area',
+                        height: 250,
+                        fontFamily: 'Roboto, sans-serif',
+                        foreColor: textColor,
+                        toolbar: {
+                            show: false
+                        },
+                        zoom: {
+                            enabled: false
+                        }
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    stroke: {
+                        curve: 'smooth',
+                        width: 3
+                    },
+                    colors: ['#2e7d32'],
+                    fill: {
+                        type: 'gradient',
+                        gradient: {
+                            shadeIntensity: 1,
+                            opacityFrom: 0.7,
+                            opacityTo: 0.2,
+                            stops: [0, 90, 100]
+                        }
+                    },
+                    xaxis: {
+                        categories: activityData.map(item => item.x),
+                        labels: {
+                            style: {
+                                fontSize: '12px',
+                                colors: textColor
+                            }
+                        }
+                    },
+                    yaxis: {
+                        title: {
+                            text: 'Punts',
+                            style: {
+                                fontSize: '14px',
+                                color: textColor
+                            }
+                        },
+                        labels: {
+                            style: {
+                                colors: textColor
+                            }
+                        }
+                    },
+                    grid: {
+                        borderColor: gridColor,
+                        strokeDashArray: 5
+                    },
+                    tooltip: {
+                        theme: isDarkMode ? 'dark' : 'light',
+                        y: {
+                            formatter: function (value) {
+                                return value + ' punts';
+                            }
+                        }
+                    }
+                };
+
+                // Renderizar gráficos
+                if (pointsChartEl) {
+                    console.log('Renderizando gráfico de distribución');
+                    const pointsDistributionChart = new ApexCharts(pointsChartEl, pointsDistributionOptions);
+                    pointsDistributionChart.render();
+                    console.log('Gráfico de distribución renderizado');
+                }
+
+                if (activityChartEl) {
+                    console.log('Renderizando gráfico de actividad');
+                    const activityChart = new ApexCharts(activityChartEl, activityChartOptions);
+                    activityChart.render();
+                    console.log('Gráfico de actividad renderizado');
+                }
+            } catch (error) {
+                console.error("Error detallado al inicializar los gráficos:", error);
+                console.error("Stack trace:", error.stack);
+            }
+        }
+
+        // Iniciar
+        initCharts();
+    });
+</script>
