@@ -12,29 +12,32 @@
                             @if(Auth::user()->foto_perfil)
                                 @if(str_starts_with(Auth::user()->foto_perfil, 'https://'))
                                     <img src="{{ Auth::user()->foto_perfil }}" alt="Foto de perfil"
-                                        class="rounded-circle img-thumbnail shadow"
+                                        class="rounded-circle img-thumbnail shadow" id="profile-image"
                                         style="width: 150px; height: 150px; object-fit: cover;">
                                 @elseif(file_exists(public_path('storage/' . Auth::user()->foto_perfil)))
                                     <img src="{{ asset('storage/' . Auth::user()->foto_perfil) }}" alt="Foto de perfil"
-                                        class="rounded-circle img-thumbnail shadow"
+                                        class="rounded-circle img-thumbnail shadow" id="profile-image"
                                         style="width: 150px; height: 150px; object-fit: cover;">
                                 @else
                                     <img src="{{ asset('images/default-profile.png') }}" alt="Foto de perfil"
-                                        class="rounded-circle img-thumbnail shadow"
+                                        class="rounded-circle img-thumbnail shadow" id="profile-image"
                                         style="width: 150px; height: 150px; object-fit: cover;">
                                 @endif
                             @else
                                 <img src="{{ asset('images/default-profile.png') }}" alt="Foto de perfil"
-                                    class="rounded-circle img-thumbnail shadow"
+                                    class="rounded-circle img-thumbnail shadow" id="profile-image"
                                     style="width: 150px; height: 150px; object-fit: cover;">
                             @endif
 
                             <!-- Icono para editar foto -->
                             <div class="position-absolute bottom-0 end-0">
-                                <button class="btn btn-sm btn-success rounded-circle" style="width: 35px; height: 35px;"
+                                <label for="photo-upload" class="btn btn-sm btn-success rounded-circle change-photo-btn"
+                                    style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;"
                                     title="Canviar foto">
                                     <i class="fas fa-camera"></i>
-                                </button>
+                                </label>
+                                <input type="file" id="photo-upload" name="foto_perfil" accept="image/*"
+                                    style="display: none;">
                             </div>
                         </div>
 
@@ -796,7 +799,210 @@
             }
         }
 
+
+
+        // Función para manejar el cambio de foto de perfil
+        function setupPhotoUpload() {
+            const photoUpload = document.getElementById('photo-upload');
+            const profileImage = document.getElementById('profile-image');
+            const changePhotoBtn = document.querySelector('.change-photo-btn');
+
+            if (!photoUpload || !profileImage) {
+                console.error('Elementos de foto de perfil no encontrados');
+                return;
+            }
+
+            // Configurar evento para cuando se selecciona una nueva foto
+            photoUpload.addEventListener('change', function () {
+                const file = this.files[0];
+                if (!file) return;
+
+                // Validar tipo de archivo
+                const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Por favor selecciona una imagen válida (JPG, PNG o GIF)');
+                    return;
+                }
+
+                // Validar tamaño (máximo 5 MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('La imagen es demasiado grande. El tamaño máximo es 5 MB.');
+                    return;
+                }
+
+                // Mostrar vista previa
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    profileImage.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+
+                // Mostrar indicador de carga
+                const loadingOverlay = document.createElement('div');
+                loadingOverlay.style.position = 'absolute';
+                loadingOverlay.style.top = '0';
+                loadingOverlay.style.left = '0';
+                loadingOverlay.style.width = '100%';
+                loadingOverlay.style.height = '100%';
+                loadingOverlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
+                loadingOverlay.style.borderRadius = '50%';
+                loadingOverlay.style.display = 'flex';
+                loadingOverlay.style.justifyContent = 'center';
+                loadingOverlay.style.alignItems = 'center';
+                loadingOverlay.innerHTML = '<i class="fas fa-spinner fa-spin text-white fa-2x"></i>';
+                profileImage.parentElement.appendChild(loadingOverlay);
+
+                // Subir la imagen
+                const formData = new FormData();
+                formData.append('foto_perfil', file);
+                formData.append('_token', '{{ csrf_token() }}');
+                formData.append('_method', 'PUT');
+
+                // Deshabilitar botón durante la carga
+                changePhotoBtn.disabled = true;
+
+                // En show.blade.php - en la función photoUpload.addEventListener('change', ...)
+                fetch('{{ route('users.update', Auth::user()->id) }}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest' // Añadir esta cabecera para identificar peticiones AJAX
+                    }
+                })
+                    .then(response => {
+                        console.log('Respuesta del servidor:', response);
+
+                        // Si la respuesta no es OK, vamos a intentar analizar el mensaje de error
+                        if (!response.ok) {
+                            return response.json().then(errorData => {
+                                throw new Error(errorData.message || 'Error del servidor: ' + response.status);
+                            }).catch(e => {
+                                // Si no podemos parsear JSON, lanzamos el error genérico
+                                throw new Error('Error en la respuesta del servidor: ' + response.statusText);
+                            });
+                        }
+
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Datos de respuesta:', data);
+
+                        // Eliminar indicador de carga
+                        loadingOverlay.remove();
+
+                        // Habilitar botón nuevamente
+                        changePhotoBtn.disabled = false;
+
+                        if (data.success) {
+                            // Actualizar imagen del perfil con la URL proporcionada por el servidor
+                            if (data.path) {
+                                profileImage.src = data.path;
+
+                                // Actualizar también la imagen en la barra de navegación
+                                const navbarProfileImg = document.querySelector('.navbar-nav .nav-link.dropdown-toggle img.rounded-circle');
+                                if (navbarProfileImg) {
+                                    navbarProfileImg.src = data.path;
+                                    console.log('Imagen del navbar actualizada');
+                                } else {
+                                    console.warn('No se encontró la imagen del perfil en el navbar');
+                                }
+                            }
+
+                            // Mostrar mensaje de éxito
+                            showNotification('success', 'Foto actualizada correctamente');
+                        } else {
+                            // Mostrar mensaje de error
+                            showNotification('error', data.message || 'Error al actualizar la foto');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error detallado:', error);
+
+                        // Eliminar indicador de carga
+                        loadingOverlay.remove();
+
+                        // Habilitar botón nuevamente
+                        changePhotoBtn.disabled = false;
+
+                        // Mostrar mensaje de error
+                        showNotification('error', error.message || 'Error al subir la imagen. Inténtalo de nuevo.');
+                    });
+            });
+        }
+
+        // Función para mostrar notificaciones perfectamente centradas
+        function showNotification(type, message) {
+            // Primero, eliminar notificaciones anteriores si existen
+            const existingNotifications = document.querySelectorAll('.notification-toast');
+            existingNotifications.forEach(el => el.remove());
+
+            // Crear overlay semitransparente
+            const overlay = document.createElement('div');
+            overlay.className = 'notification-overlay';
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
+            overlay.style.zIndex = '9998';
+            overlay.style.display = 'flex';
+            overlay.style.justifyContent = 'center';
+            overlay.style.alignItems = 'center';
+            overlay.style.opacity = '0';
+            overlay.style.transition = 'opacity 0.3s ease';
+
+            // Crear elemento de notificación
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} notification-toast`;
+
+            // Usar flexbox para centrar perfectamente el contenido interno
+            notification.style.display = 'flex';
+            notification.style.alignItems = 'center';
+            notification.style.justifyContent = 'center';
+            notification.style.textAlign = 'center';
+            notification.style.minWidth = '300px';
+            notification.style.maxWidth = '80%';
+            notification.style.padding = '20px 30px';
+            notification.style.borderRadius = '12px';
+            notification.style.boxShadow = '0 5px 20px rgba(0,0,0,0.3)';
+            notification.style.transform = 'scale(0.9)';
+            notification.style.transition = 'transform 0.3s ease';
+
+            // Contenido con iconos más grandes
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} mb-3 fa-3x"></i>
+                    <span class="fs-4">${message}</span>
+                </div>
+            `;
+
+            // Añadir notificación al overlay
+            overlay.appendChild(notification);
+
+            // Añadir overlay al DOM
+            document.body.appendChild(overlay);
+
+            // Animar entrada
+            requestAnimationFrame(() => {
+                overlay.style.opacity = '1';
+                notification.style.transform = 'scale(1)';
+            });
+
+            // Eliminar después de 2.5 segundos
+            setTimeout(() => {
+                overlay.style.opacity = '0';
+                notification.style.transform = 'scale(0.9)';
+
+                // Eliminar del DOM después de la animación
+                setTimeout(() => {
+                    document.body.removeChild(overlay);
+                }, 300);
+            }, 2500);
+        }
+
         // Iniciar
         initCharts();
+        setupPhotoUpload();
     });
 </script>

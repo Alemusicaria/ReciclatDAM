@@ -62,35 +62,103 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        $request->validate([
-            'nom' => 'nullable|string|max:255',
-            'cognoms' => 'nullable|string|max:255',
-            'email' => 'nullable|string|email|max:255|unique:users,email,' . $user->id,
-            'data_naixement' => 'nullable|date',
-            'telefon' => 'nullable|string|max:15',
-            'ubicacio' => 'nullable|string|max:255',
-            'foto_perfil' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validació per a la foto de perfil
-        ]);
-
-        // Actualitzar camps de l'usuari
-        $user->update($request->only(['nom', 'cognoms', 'email', 'data_naixement', 'telefon', 'ubicacio']));
-
-        // Si s'ha pujat una nova foto de perfil
-        if ($request->hasFile('foto_perfil')) {
-            // Esborra la foto de perfil antiga si existeix
-            if ($user->foto_perfil) {
-                Storage::disk('public')->delete($user->foto_perfil);
+        try {
+            $request->validate([
+                'nom' => 'nullable|string|max:255',
+                'cognoms' => 'nullable|string|max:255',
+                'email' => 'nullable|string|email|max:255|unique:users,email,' . $user->id,
+                'data_naixement' => 'nullable|date',
+                'telefon' => 'nullable|string|max:15',
+                'ubicacio' => 'nullable|string|max:255',
+                'foto_perfil' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // Aumentado a 5MB
+            ]);
+    
+            // Si la solicitud solo contiene foto_perfil, es una actualización de foto vía AJAX
+            if ($request->hasFile('foto_perfil')) {
+                // Registrar información para depuración
+                \Log::info('Actualizando foto de perfil', [
+                    'user_id' => $user->id,
+                    'original_filename' => $request->file('foto_perfil')->getClientOriginalName(),
+                    'size' => $request->file('foto_perfil')->getSize(),
+                    'mime' => $request->file('foto_perfil')->getMimeType()
+                ]);
+    
+                try {
+                    // Borrar la foto anterior si existe y no es una URL externa
+                    if ($user->foto_perfil && !str_starts_with($user->foto_perfil, 'https://')) {
+                        if (Storage::disk('public')->exists($user->foto_perfil)) {
+                            Storage::disk('public')->delete($user->foto_perfil);
+                        }
+                    }
+    
+                    // Guardar la nueva foto
+                    $path = $request->file('foto_perfil')->store('profile_photos', 'public');
+                    
+                    // Verificar que el archivo se guardó correctamente
+                    if (!$path || !Storage::disk('public')->exists($path)) {
+                        throw new \Exception('No se pudo guardar el archivo en el almacenamiento.');
+                    }
+                    
+                    $user->foto_perfil = $path;
+                    $user->save();
+    
+                    // Respuesta JSON para peticiones AJAX
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Foto de perfil actualitzada correctament',
+                        'path' => Storage::url($path)
+                    ]);
+                } catch (\Exception $e) {
+                    // Registrar el error
+                    \Log::error('Error al guardar foto de perfil', [
+                        'user_id' => $user->id,
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                    
+                    // Respuesta de error en JSON
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Error al actualitzar la foto: ' . $e->getMessage()
+                    ], 500);
+                }
             }
-
-            // Desa la nova foto de perfil
-            $path = $request->file('foto_perfil')->store('profile_photos', 'public');
-            $user->foto_perfil = $path;
-            $user->save();
+    
+            // Para actualizaciones normales del formulario completo
+            $user->update($request->only(['nom', 'cognoms', 'email', 'data_naixement', 'telefon', 'ubicacio']));
+    
+            if ($request->hasFile('foto_perfil')) {
+                // Borrar la foto anterior si existe y no es una URL externa
+                if ($user->foto_perfil && !str_starts_with($user->foto_perfil, 'https://')) {
+                    Storage::disk('public')->delete($user->foto_perfil);
+                }
+    
+                // Guardar la nueva foto
+                $path = $request->file('foto_perfil')->store('profile_photos', 'public');
+                $user->foto_perfil = $path;
+                $user->save();
+            }
+    
+            return redirect()->route('users.show', $user->id)->with('success', 'Perfil actualitzat correctament.');
+        
+        } catch (\Exception $e) {
+            // Registrar el error
+            \Log::error('Error en actualización de usuario', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            return back()->withErrors(['error' => 'Error al actualizar el perfil: ' . $e->getMessage()]);
         }
-
-        return redirect()->route('users.show', $user->id)->with('success', 'Perfil actualitzat correctament.');
     }
-
 
     public function destroy(User $user)
     {
