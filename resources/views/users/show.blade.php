@@ -30,9 +30,9 @@
                             @endif
 
                             <!-- Icono para editar foto -->
-                            <div class="position-absolute bottom-0 end-0">
+                            <div class="position-relative bottom-0 start-0">
                                 <label for="photo-upload" class="btn btn-sm btn-success rounded-circle change-photo-btn"
-                                    style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;"
+                                    style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; margin: auto; margin-top: 1vh;"
                                     title="Canviar foto">
                                     <i class="fas fa-camera"></i>
                                 </label>
@@ -46,20 +46,20 @@
 
                         <!-- Contador de puntos destacado -->
                         <div class="d-flex justify-content-center mb-3">
-                            <div class="points-badge bg-success bg-opacity-10 text-success">
-                                <i class="fas fa-coins me-2"></i>
-                                <span class="fw-bold">{{ $user->punts_actuals }}</span> ECODAMS
+                            <div class="points-badge bg-opacity-10 text-success">
+                                <i class="fas fa-coins" style="margin-right: 5px;"></i>
+                                <span class="fw-bold" style="margin-right: 5px;">{{ $user->punts_actuals }}</span> ECODAMS
                             </div>
                         </div>
 
                         <!-- Botones de acción -->
-                        <div class="d-grid gap-2 d-flex justify-content-center">
-                            <a href="{{ route('users.edit', $user->id) }}" class="btn btn-primary">
-                                <i class="fas fa-edit me-1"></i> Editar perfil
+                        <div class="d-flex justify-content-center gap-3 mt-4">
+                            <a href="{{ route('users.edit', $user->id) }}" class="btn-modern btn-edit">
+                                <i class="fas fa-edit me-2"></i>
                             </a>
-                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
+                            <button type="button" class="btn-modern btn-delete" data-bs-toggle="modal"
                                 data-bs-target="#deleteModal">
-                                <i class="fas fa-trash-alt me-1"></i> Eliminar
+                                <i class="fas fa-trash-alt me-2"></i>
                             </button>
                         </div>
                     </div>
@@ -69,7 +69,7 @@
                 <div class="card mb-4 stats-card">
                     <div class="card-body">
                         <h5 class="card-title mb-4">
-                            <i class="fas fa-chart-pie me-2"></i>Distribució de Punts
+                            <i class="fas fa-chart-pie me-2" style="margin-right: 5px;"></i>Distribució de Punts
                         </h5>
                         <div id="pointsDistributionChart" class="chart-container"></div>
                     </div>
@@ -112,7 +112,7 @@
                 <div class="card mb-4 stats-card">
                     <div class="card-body">
                         <h5 class="card-title mb-3">
-                            <i class="fas fa-chart-line me-2"></i>Activitat recent
+                            <i class="fas fa-chart-line me-2" style="margin-right: 5px;"></i>Activitat recent
                         </h5>
                         <div id="activityChart" class="chart-container"></div>
                     </div>
@@ -122,7 +122,7 @@
                 <div class="card mb-4 shadow-sm">
                     <div class="card-body">
                         <h5 class="card-title">
-                            <i class="fas fa-user me-2"></i>Informació personal
+                            <i class="fas fa-user me-2" style="margin-right: 5px;"></i>Informació personal
                         </h5>
                         <hr>
 
@@ -487,6 +487,59 @@
 
     .edit-panel {
         animation: slideIn 0.3s ease-out;
+    }
+
+    .btn-modern {
+        width: 40px;
+        border-radius: 50px;
+        margin-left: 15px;
+        margin-right: 15px;
+        font-weight: 500;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-decoration: none;
+    }
+
+    .btn-edit {
+        background-color: #3498db;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background-color: #2980b9;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(52, 152, 219, 0.2);
+        text-decoration: none;
+        color: white;
+    }
+
+    .btn-delete {
+        background-color: e74c3c;
+        color: #white;
+        border: 1px solid #e74c3c;
+    }
+
+    .btn-delete:hover {
+        background-color: #e74c3c;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(231, 76, 60, 0.2);
+        text-decoration: none;
+
+    }
+
+    body.dark .btn-delete {
+        background-color: #2d3748;
+        border-color: #e74c3c;
+    }
+
+    body.dark .btn-delete:hover {
+        background-color: #e74c3c;
     }
 </style>
 
