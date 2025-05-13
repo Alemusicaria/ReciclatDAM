@@ -357,6 +357,13 @@
         window.premisIndex = window.algoliaClient.initIndex('premis');
         window.eventsIndex = window.algoliaClient.initIndex('events');
         window.tipusEventsIndex = window.algoliaClient.initIndex('tipus_events');
+        window.codisIndex = window.algoliaClient.initIndex('codis');
+
+        console.log('Índices de Algolia inicializados:',
+            'events:', !!window.eventsIndex,
+            'tipus_events:', !!window.tipusEventsIndex,
+            'codis:', !!window.codisIndex
+        );
     </script>
 </body>
 
