@@ -19,6 +19,7 @@ use App\Http\Controllers\TipusAlertaController;
 use App\Http\Controllers\AlertaPuntDeRecollidaController;
 use App\Http\Controllers\EventsController;
 use App\Http\Controllers\TipusEventController;
+use App\Http\Controllers\PremiReclamatController;
 
 Route::localizedGroup(function () {
     Route::get('set-password', [SocialiteController::class, 'showSetPasswordForm'])->name('set-password');
@@ -82,4 +83,7 @@ Route::localizedGroup(function () {
     // Ruta para tipos de eventos
     Route::get('/tipus-events/search', [TipusEventController::class, 'search'])->name('tipus-events.search');
     Route::get('/events/{id}/check-registration', [EventsController::class, 'checkRegistration'])->name('events.checkRegistration')->middleware('auth');
+    
+    Route::resource('premis_reclamats', PremiReclamatController::class);
+    Route::get('users/{user}/premis-reclamats', [PremiReclamatController::class, 'userClaims'])->name('users.premis_reclamats');
 });

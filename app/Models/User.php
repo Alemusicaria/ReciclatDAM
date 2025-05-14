@@ -11,11 +11,23 @@ class User extends Authenticatable
     protected $table = 'users';
 
     protected $fillable = [
-        'nom', 'cognoms', 'data_naixement', 'telefon', 'ubicacio', 'punts_totals', 'punts_actuals', 'punts_gastats', 'email', 'password', 'rol_id', 'foto_perfil'
+        'nom',
+        'cognoms',
+        'data_naixement',
+        'telefon',
+        'ubicacio',
+        'punts_totals',
+        'punts_actuals',
+        'punts_gastats',
+        'email',
+        'password',
+        'rol_id',
+        'foto_perfil'
     ];
 
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
     protected $casts = [
@@ -35,5 +47,15 @@ class User extends Authenticatable
     public function rol()
     {
         return $this->belongsTo(Rol::class);
+    }
+    public function events()
+    {
+        return $this->belongsToMany(Event::class, 'event_user')
+            ->withPivot('punts', 'producte_id', 'created_at', 'updated_at');
+    }
+
+    public function premisReclamats()
+    {
+        return $this->hasMany(PremiReclamat::class);
     }
 }

@@ -74,6 +74,183 @@
                         <div id="pointsDistributionChart" class="chart-container"></div>
                     </div>
                 </div>
+
+                                <!-- Historial de premios reclamados -->
+                                <!-- Historial de premios reclamados -->
+                                <div class="card mb-4 shadow-sm">
+                                    <div class="card-body">
+                                        <h5 class="card-title mb-3">
+                                            <i class="fas fa-gift me-2 text-success"></i>Premis reclamats
+                                        </h5>
+                                        
+                                        @if($user->premisReclamats->count() > 0)
+                                            <div class="table-responsive" style="max-height: none; overflow-y: visible;">
+                                                <table class="table table-hover table-sm">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Premi</th>
+                                                            <th>Punts</th>
+                                                            <th>Data</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach($user->premisReclamats->sortByDesc('data_reclamacio') as $premi)
+                                                            <tr style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#premiModal-{{ $premi->id }}">
+                                                                <td>
+                                                                    <div class="d-flex align-items-center">
+                                                                        @if($premi->premi->imatge)
+                                                                            <img src="{{ asset($premi->premi->imatge) }}" 
+                                                                                alt="{{ $premi->premi->nom }}" 
+                                                                                class="me-2" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 10px;">
+                                                                        @else
+                                                                            <div class="me-2 bg-light d-flex align-items-center justify-content-center" 
+                                                                                style="width: 40px; height: 40px; border-radius: 4px; margin-right: 10px;">
+                                                                                <i class="fas fa-gift text-secondary"></i>
+                                                                            </div>
+                                                                        @endif
+                                                                        <div class="text-truncate" style="max-width: 150px;">
+                                                                            <div class="fw-bold text-truncate">{{ $premi->premi->nom }}</div>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                                <td class="align-middle">
+                                                                    <span class="badge bg-success">
+                                                                        <i class="fas fa-coins me-1"></i> {{ $premi->punts_gastats }}
+                                                                    </span>
+                                                                </td>
+                                                                <td class="align-middle">
+                                                                    {{ $premi->data_reclamacio->format('d/m/Y') }}
+                                                                </td>
+                                                            </tr>
+
+                                            <!-- Modal para este premio -->
+                                            <div class="modal fade" id="premiModal-{{ $premi->id }}" tabindex="-1" aria-labelledby="premiModalLabel-{{ $premi->id }}" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="premiModalLabel-{{ $premi->id }}">
+                                                                {{ $premi->premi->nom }}
+                                                            </h5>
+                                                            <button type="button" class="btn btn-sm rounded-circle boto-modal" data-bs-dismiss="modal" aria-label="Close" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: bold;">X</button>                                                       
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="d-flex mb-4">
+                                                                @if($premi->premi->imatge)
+                                                                    <img src="{{ asset($premi->premi->imatge) }}" 
+                                                                        alt="{{ $premi->premi->nom }}" 
+                                                                        class="me-3" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; margin-right: 15px;">
+                                                                @else
+                                                                    <div class="me-3 bg-light d-flex align-items-center justify-content-center" 
+                                                                        style="width: 100px; height: 100px; border-radius: 8px;">
+                                                                        <i class="fas fa-gift fa-3x text-secondary"></i>
+                                                                    </div>
+                                                                @endif
+                                                                <div>
+                                                                    <h6 class="fw-bold mb-2">{{ $premi->premi->nom }}</h6>
+                                                                    <p class="text-muted">{{ $premi->premi->descripcio }}</p>
+                                                                    <div class="badge bg-success mb-2">
+                                                                        <i class="fas fa-coins me-1"></i> {{ $premi->punts_gastats }} punts
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <div class="card mb-3">
+                                                                <div class="card-header bg-light">
+                                                                    <i class="fas fa-info-circle me-2"></i>Detalls de la reclamació
+                                                                </div>
+                                                                <div class="card-body">
+                                                                    <div class="row mb-2">
+                                                                        <div class="col-5 text-muted">Data de reclamació:</div>
+                                                                        <div class="col-7 fw-bold">{{ $premi->data_reclamacio->format('d/m/Y H:i') }}</div>
+                                                                    </div>
+                                                                    
+                                                                    <div class="row mb-2">
+                                                                        <div class="col-5 text-muted">Estat:</div>
+                                                                        <div class="col-7">
+                                                                            @php
+                                                                                $estatClasses = [
+                                                                                    'pendent' => 'bg-warning',
+                                                                                    'procesant' => 'bg-info',
+                                                                                    'entregat' => 'bg-success',
+                                                                                    'cancelat' => 'bg-danger'
+                                                                                ];
+                                                                                $estatIcons = [
+                                                                                    'pendent' => 'fa-clock',
+                                                                                    'procesant' => 'fa-cog',
+                                                                                    'entregat' => 'fa-check-circle',
+                                                                                    'cancelat' => 'fa-times-circle'
+                                                                                ];
+                                                                            @endphp
+                                                                            
+                                                                            <span class="badge {{ $estatClasses[$premi->estat] }}">
+                                                                                <i class="fas {{ $estatIcons[$premi->estat] }} me-1"></i>
+                                                                                {{ ucfirst($premi->estat) }}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                    
+                                                                    @if($premi->codi_seguiment)
+                                                                    <div class="row mb-2">
+                                                                        <div class="col-5 text-muted">Codi de seguiment:</div>
+                                                                        <div class="col-7">
+                                                                            <code>{{ $premi->codi_seguiment }}</code>
+                                                                        </div>
+                                                                    </div>
+                                                                    @endif
+                                                                    
+                                                                    @if($premi->comentaris)
+                                                                    <div class="row mb-2">
+                                                                        <div class="col-5 text-muted">Comentaris:</div>
+                                                                        <div class="col-7">{{ $premi->comentaris }}</div>
+                                                                    </div>
+                                                                    @endif
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <!-- Timeline del estado del premio -->
+                                                            <div class="timeline mt-4">
+                                                                <div class="timeline-item {{ $premi->estat == 'pendent' || $premi->estat == 'procesant' || $premi->estat == 'entregat' ? 'done' : '' }}">
+                                                                    <div class="timeline-marker {{ $premi->estat == 'pendent' || $premi->estat == 'procesant' || $premi->estat == 'entregat' ? 'bg-success' : 'bg-light' }}"></div>
+                                                                    <div class="timeline-content">
+                                                                        <h6 class="mb-0">Reclamat</h6>
+                                                                        <small>{{ $premi->created_at->format('d/m/Y') }}</small>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div class="timeline-item {{ $premi->estat == 'procesant' || $premi->estat == 'entregat' ? 'done' : '' }}">
+                                                                    <div class="timeline-marker {{ $premi->estat == 'procesant' || $premi->estat == 'entregat' ? 'bg-success' : 'bg-light' }}"></div>
+                                                                    <div class="timeline-content">
+                                                                        <h6 class="mb-0">En procés</h6>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div class="timeline-item {{ $premi->estat == 'entregat' ? 'done' : '' }}">
+                                                                    <div class="timeline-marker {{ $premi->estat == 'entregat' ? 'bg-success' : 'bg-light' }}"></div>
+                                                                    <div class="timeline-content">
+                                                                        <h6 class="mb-0">Entregat</h6>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tancar</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <div class="text-center py-4">
+                                <i class="fas fa-gift fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">No has reclamat cap premi encara.</p>
+                                <a href="{{ route('premis.index') }}" class="btn btn-sm btn-success">Explora els premis disponibles</a>
+                            </div>
+                        @endif
+                    </div>
+                </div>                
             </div>
 
             <div class="col-lg-8">
@@ -172,6 +349,135 @@
                         </div>
                     </div>
                 </div>
+                                <!-- Historial de eventos -->
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <i class="fas fa-calendar-check me-2 text-success" style="margin-right: 5px;"></i>Els meus events
+                        </h5>
+                        
+                        <ul class="nav nav-tabs mb-3" id="eventsTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" 
+                                        type="button" role="tab" aria-controls="upcoming" aria-selected="true">Propers</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="past-tab" data-bs-toggle="tab" data-bs-target="#past" 
+                                        type="button" role="tab" aria-controls="past" aria-selected="false">Anteriors</button>
+                            </li>
+                        </ul>
+                        
+                        <div class="tab-content" id="eventsTabsContent">
+                            <!-- Próximos eventos -->
+                            <div class="tab-pane fade show active" id="upcoming" role="tabpanel" aria-labelledby="upcoming-tab">
+                                @if($user->events->where('data_inici', '>=', now())->count() > 0)
+                                    <div class="row">
+                                        @foreach($user->events->where('data_inici', '>=', now())->sortBy('data_inici') as $event)
+                                            <div class="col-md-6 mb-3">
+                                                <div class="event-card p-3 h-100">
+                                                    <div class="d-flex">
+                                                        <div class="event-date text-center me-3" style="margin-right: 5px;">
+                                                            <div class="month">{{ $event->data_inici->format('M') }}</div>
+                                                            <div class="day">{{ $event->data_inici->format('d') }}</div>
+                                                        </div>
+                                                        <div class="event-details">
+                                                            <h6 class="mb-1">{{ $event->nom }}</h6>
+                                                            <p class="text-muted mb-1 small">
+                                                                <i class="fas fa-map-marker-alt me-1"></i> {{ $event->lloc }}
+                                                            </p>
+                                                            <p class="text-muted mb-1 small">
+                                                                <i class="fas fa-clock me-1"></i> {{ $event->data_inici->format('H:i') }}
+                                                            </p>
+                                                            <div class="mt-2">
+                                                                <span class="badge bg-primary">
+                                                                    <i class="fas fa-calendar-day me-1"></i>
+                                                                    {{ $event->data_inici->diffForHumans() }}
+                                                                </span> 
+                                                                <br>
+                                                                @if($event->tipus)
+                                                                    <span class="badge" style="background-color: {{ $event->tipus->color }}; margin-top: 5px;">
+                                                                        {{ $event->tipus->nom }}
+                                                                    </span>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <div class="text-center py-4">
+                                        <i class="fas fa-calendar-day fa-3x text-muted mb-3"></i>
+                                        <p class="text-muted">No tens cap event proper.</p>
+                                        <a href="{{ route('events') }}" class="btn btn-sm btn-success">Explora els events disponibles</a>
+                                    </div>
+                                @endif
+                            </div>
+                            
+                            <!-- Eventos pasados -->
+                            <div class="tab-pane fade" id="past" role="tabpanel" aria-labelledby="past-tab">
+                                @if($user->events->where('data_inici', '<', now())->count() > 0)
+                                    <div class="row">
+                                        @foreach($user->events->where('data_inici', '<', now())->sortByDesc('data_inici') as $event)
+                                            <div class="col-md-6 mb-3">
+                                                <div class="event-card p-3 h-100">
+                                                    <div class="d-flex">
+                                                        <div class="event-date text-center me-3" style="margin-right: 5px;">
+                                                            <div class="month">{{ $event->data_inici->format('M') }}</div>
+                                                            <div class="day">{{ $event->data_inici->format('d') }}</div>
+                                                        </div>
+                                                        <div class="event-details">
+                                                            <h6 class="mb-1">{{ $event->nom }}</h6>
+                                                            <p class="text-muted mb-1 small">
+                                                                <i class="fas fa-map-marker-alt me-1"></i> {{ $event->lloc }}
+                                                            </p>
+                                                            <p class="text-muted mb-1 small">
+                                                                <i class="fas fa-calendar me-1"></i> {{ $event->data_inici->format('d/m/Y') }} - {{ $event->data_inici->format('H:i') }}
+                                                            </p>
+                                                            @if($event->pivot->punts > 0)
+                                                                <div class="text-success mb-1 small">
+                                                                    <i class="fas fa-coins me-1"></i> {{ $event->pivot->punts }} punts obtinguts
+                                                                </div>
+                                                            @endif
+                                                            
+                                                            @if($event->pivot->producte_id)
+                                                                <div class="text-info small">
+                                                                    <i class="fas fa-box me-1"></i> 
+                                                                    <a href="{{ route('productes.show', $event->pivot->producte_id) }}" class="text-decoration-none">
+                                                                        Veure producte relacionat
+                                                                    </a>
+                                                                </div>
+                                                            @endif
+                                                            
+                                                            <div class="mt-2">
+                                                            <span class="badge bg-primary">
+                                                                    <i class="fas fa-calendar-day me-1"></i>
+                                                                    {{ $event->data_inici->diffForHumans() }}
+                                                                </span> 
+                                                                <br>
+                                                                @if($event->tipus)
+                                                                    <span class="badge" style="background-color: {{ $event->tipus->color }}; margin-top: 5px;">
+                                                                        {{ $event->tipus->nom }}
+                                                                    </span>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <div class="text-center py-4">
+                                        <i class="fas fa-history fa-3x text-muted mb-3"></i>
+                                        <p class="text-muted">No has participat en cap event encara.</p>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -199,7 +505,7 @@
         </div>
     </div>
 @endsection
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts@3.35.3/dist/apexcharts.min.css">
 <style>
     .profile-container {
@@ -541,11 +847,145 @@
     body.dark .btn-delete:hover {
         background-color: #e74c3c;
     }
+
+    /* Estilos para tarjetas de eventos */
+    .event-card {
+        border-radius: 10px;
+        background-color: white;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .event-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    body.dark .event-card {
+        background-color: #2d3748;
+        border-color: #4a5568;
+    }
+
+    .event-date {
+        width: 50px;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .event-date .month {
+        background-color: #2e7d32;
+        color: white;
+        font-size: 0.8rem;
+        padding: 2px 0;
+        text-transform: uppercase;
+        font-weight: bold;
+    }
+
+    .event-date .day {
+        background-color: white;
+        color: #333;
+        font-size: 1.2rem;
+        padding: 5px 0;
+        font-weight: bold;
+    }
+
+    body.dark .event-date .day {
+        background-color: #1a202c;
+        color: #e2e8f0;
+    }
+
+    /* Estilos para pestañas */
+    .nav-tabs .nav-link {
+        color: #666;
+        font-weight: 500;
+        border: none;
+        padding: 8px 16px;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: #2e7d32;
+        border-bottom: 2px solid #2e7d32;
+        background: transparent;
+    }
+
+    body.dark .nav-tabs .nav-link {
+        color: #aaa;
+    }
+
+    body.dark .nav-tabs .nav-link.active {
+        color: #4caf50;
+        border-bottom-color: #4caf50;
+    }
+
+    /* Estilos para el timeline */
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+    
+    .timeline:before {
+        content: '';
+        position: absolute;
+        top: -5px;
+        left: 21px;
+        height: 100%;
+        width: 2px;
+        background-color: #e9ecef;
+    }
+    
+    body.dark .timeline:before {
+        background-color: #4a5568;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+    
+    .timeline-marker {
+        position: absolute;
+        left: -30px;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 2px #e9ecef;
+    }
+    
+    body.dark .timeline-marker {
+        border-color: #2d3748;
+        box-shadow: 0 0 0 2px #4a5568;
+    }
+    
+    .timeline-marker.bg-success {
+        background-color: #28a745 !important;
+        box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.3);
+    }
+    
+    .timeline-content {
+        padding-bottom: 5px;
+    }
+    
+    /* Efectos en filas clickeables */
+    .table tr[data-bs-toggle="modal"]:hover {
+        background-color: rgba(0,0,0,0.03);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        transition: all 0.2s ease;
+    }
+    
+    body.dark .table tr[data-bs-toggle="modal"]:hover {
+        background-color: rgba(255,255,255,0.05);
+    }
+    .modal-dialog {
+        margin-top: 8rem !important;
+    }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.35.3/dist/apexcharts.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () { 
         // Variables con datos del usuario
         const puntsActuals = {{ Auth::user()->punts_actuals ?? 0 }};
         const puntsGastats = {{ Auth::user()->punts_gastats ?? 0 }};
@@ -1057,5 +1497,20 @@
         // Iniciar
         initCharts();
         setupPhotoUpload();
+
+        // Activar las pestañas de Bootstrap
+        var triggerTabList = [].slice.call(document.querySelectorAll('#eventsTabs button'))
+        triggerTabList.forEach(function (triggerEl) {
+            var tabTrigger = new bootstrap.Tab(triggerEl)
+            
+            triggerEl.addEventListener('click', function (event) {
+                event.preventDefault()
+                tabTrigger.show()
+            })
+        })
+        
+        // Para propósitos de depuración
+        console.log('Eventos próximos:', {{ $user->events->where('data_inici', '>=', now())->count() }});
+        console.log('Eventos pasados:', {{ $user->events->where('data_inici', '<', now())->count() }});
     });
 </script>

@@ -89,4 +89,8 @@ class Event extends Model
     {
         return $query->where('data_inici', '<', now());
     }
+    public function producte()
+    {
+        return $this->belongsTo(Producte::class, 'producte_id');
+    }
 }
