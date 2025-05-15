@@ -2,7 +2,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Premi;
+use App\Models\PremiReclamat;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class PremiController extends Controller
 {
@@ -109,5 +112,58 @@ class PremiController extends Controller
         $premis = Premi::search($query)->get();
 
         return view('premis.search', compact('premis', 'query'));
+    }
+    public function canjear($id, Request $request)
+    {
+        try {
+            \Log::info('Canje iniciado para premio ID: ' . $id . ' por usuario: ' . Auth::id());
+    
+            $premi = Premi::findOrFail($id);
+            \Log::info('Premio encontrado: ' . $premi->nom);
+    
+            $user = Auth::user();
+            \Log::info('Puntos actuales del usuario: ' . $user->punts_actuals);
+            \Log::info('Puntos requeridos del premio: ' . $premi->punts_requerits);
+    
+            // Verificar puntos
+            if ($user->punts_actuals < $premi->punts_requerits) {
+                \Log::warning('Puntos insuficientes');
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No tens suficients punts'
+                ], 400);
+            }
+    
+            // Registrar canje 
+            $premiReclamat = new PremiReclamat();
+            $premiReclamat->user_id = $user->id;
+            $premiReclamat->premi_id = $premi->id;
+            $premiReclamat->punts_gastats = $premi->punts_requerits;
+            $premiReclamat->data_reclamacio = now();
+            $premiReclamat->estat = 'pendent';
+            $premiReclamat->save();
+            \Log::info('Premio reclamado registrado con ID: ' . $premiReclamat->id);
+    
+            // Actualizar puntos
+            $user->punts_actuals -= $premi->punts_requerits;
+            $user->punts_gastats += $premi->punts_requerits;
+            $user->save();
+            \Log::info('Puntos del usuario actualizados. Nuevos puntos: ' . $user->punts_actuals);
+    
+            // Devolver respuesta JSON
+            return response()->json([
+                'success' => true,
+                'message' => 'Premi reclamat correctament!',
+                'punts_actuals' => $user->punts_actuals,
+                'punts_gastats' => $user->punts_gastats
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error en canje: ' . $e->getMessage());
+            \Log::error($e->getTraceAsString());
+            return response()->json([
+                'success' => false,
+                'message' => 'Hi ha hagut un error en processar la teva sol·licitud: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
