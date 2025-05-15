@@ -65,6 +65,63 @@
                     </div>
                 </div>
 
+                               <!-- Sistema de niveles -->
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <i class="fas fa-trophy me-2 text-primary" style="margin-right: 5px;"></i>Nivell actual
+                        </h5>
+                        
+                        @php
+                            $currentLevel = $user->nivell();
+                            $nextLevel = App\Models\Nivell::where('punts_requerits', '>', $currentLevel->punts_requerits)
+                                ->orderBy('punts_requerits', 'asc')
+                                ->first();
+                            
+                            if ($nextLevel) {
+                                $pointsToNextLevel = $nextLevel->punts_requerits - $user->punts_totals;
+                                $progress = ($user->punts_totals - $currentLevel->punts_requerits) / 
+                                        ($nextLevel->punts_requerits - $currentLevel->punts_requerits) * 100;
+                                $progress = max(0, min(100, $progress));
+                            }
+                        @endphp
+                        
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="me-3 p-3 rounded-circle" style="background-color: {{ $currentLevel->color }}; width: 70px; height: 70px; display: flex; justify-content: center; align-items: center; margin-right: 20px;">
+                                <i class="{{ $currentLevel->icona }} fa-2x text-white"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1">{{ $currentLevel->nom }}</h5>
+                                <p class="mb-0 text-muted">{{ $currentLevel->descripcio }}</p>
+                            </div>
+                        </div>
+                        
+                        @if($nextLevel)
+                            <div class="mt-4">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Nivell {{ $currentLevel->id }}: {{ $currentLevel->nom }}</span>
+                                    <span>Nivell {{ $nextLevel->id }}: {{ $nextLevel->nom }}</span>
+                                </div>
+                                <div class="progress" style="height: 10px;">
+                                    <div class="progress-bar" role="progressbar" 
+                                        style="width: {{ $progress }}%; background-color: {{ $currentLevel->color }};" 
+                                        aria-valuenow="{{ $progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <div class="text-center mt-2">
+                                    <span class="badge bg-primary">
+                                        Falten {{ $pointsToNextLevel }} punts per al següent nivell
+                                    </span>
+                                </div>
+                            </div>
+                        @else
+                            <div class="alert alert-success mt-3">
+                                <i class="fas fa-trophy me-2"></i>
+                                Felicitats! Has assolit el nivell màxim!
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
                 <!-- Tarjeta de estadísticas visuales -->
                 <div class="card mb-4 stats-card">
                     <div class="card-body">
@@ -75,165 +132,165 @@
                     </div>
                 </div>
 
-                                <!-- Historial de premios reclamados -->
-                                <!-- Historial de premios reclamados -->
-                                <div class="card mb-4 shadow-sm">
-                                    <div class="card-body">
-                                        <h5 class="card-title mb-3">
-                                            <i class="fas fa-gift me-2 text-success"></i>Premis reclamats
-                                        </h5>
-                                        
-                                        @if($user->premisReclamats->count() > 0)
-                                            <div class="table-responsive" style="max-height: none; overflow-y: visible;">
-                                                <table class="table table-hover table-sm">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Premi</th>
-                                                            <th>Punts</th>
-                                                            <th>Data</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach($user->premisReclamats->sortByDesc('data_reclamacio') as $premi)
-                                                            <tr style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#premiModal-{{ $premi->id }}">
-                                                                <td>
-                                                                    <div class="d-flex align-items-center">
-                                                                        @if($premi->premi->imatge)
-                                                                            <img src="{{ asset($premi->premi->imatge) }}" 
-                                                                                alt="{{ $premi->premi->nom }}" 
-                                                                                class="me-2" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 10px;">
-                                                                        @else
-                                                                            <div class="me-2 bg-light d-flex align-items-center justify-content-center" 
-                                                                                style="width: 40px; height: 40px; border-radius: 4px; margin-right: 10px;">
-                                                                                <i class="fas fa-gift text-secondary"></i>
-                                                                            </div>
-                                                                        @endif
-                                                                        <div class="text-truncate" style="max-width: 150px;">
-                                                                            <div class="fw-bold text-truncate">{{ $premi->premi->nom }}</div>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                                <td class="align-middle">
-                                                                    <span class="badge bg-success">
-                                                                        <i class="fas fa-coins me-1"></i> {{ $premi->punts_gastats }}
-                                                                    </span>
-                                                                </td>
-                                                                <td class="align-middle">
-                                                                    {{ $premi->data_reclamacio->format('d/m/Y') }}
-                                                                </td>
-                                                            </tr>
+                <!-- Historial de premios reclamados -->
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <i class="fas fa-gift me-2 text-success" style="margin-right: 5px;"></i>Premis reclamats
+                        </h5>
+                        
+                        @if($user->premisReclamats->count() > 0)
+                            <div class="table-responsive" style="max-height: none; overflow-y: visible;">
+                                <table class="table table-hover table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Premi</th>
+                                            <th>Punts</th>
+                                            <th>Data</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($user->premisReclamats->sortByDesc('data_reclamacio') as $premi)
+                                            <tr style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#premiModal-{{ $premi->id }}">
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        @if($premi->premi->imatge)
+                                                            <img src="{{ asset($premi->premi->imatge) }}" 
+                                                                alt="{{ $premi->premi->nom }}" 
+                                                                class="me-2" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 10px;">
+                                                        @else
+                                                            <div class="me-2 bg-light d-flex align-items-center justify-content-center" 
+                                                                style="width: 40px; height: 40px; border-radius: 4px; margin-right: 10px;">
+                                                                <i class="fas fa-gift text-secondary"></i>
+                                                            </div>
+                                                        @endif
+                                                        <div class="text-truncate" style="max-width: 150px;">
+                                                            <div class="fw-bold text-truncate">{{ $premi->premi->nom }}</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="align-middle">
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-coins me-1"></i> {{ $premi->punts_gastats }}
+                                                    </span>
+                                                </td>
+                                                <td class="align-middle">
+                                                    {{ $premi->data_reclamacio->format('d/m/Y') }}
+                                                </td>
+                                            </tr>
 
                                             <!-- Modal para este premio -->
                                             <div class="modal fade" id="premiModal-{{ $premi->id }}" tabindex="-1" aria-labelledby="premiModalLabel-{{ $premi->id }}" aria-hidden="true">
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title" id="premiModalLabel-{{ $premi->id }}">
-                                                                {{ $premi->premi->nom }}
-                                                            </h5>
-                                                            <button type="button" class="btn btn-sm rounded-circle boto-modal" data-bs-dismiss="modal" aria-label="Close" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: bold;">X</button>                                                       
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <div class="d-flex mb-4">
-                                                                @if($premi->premi->imatge)
-                                                                    <img src="{{ asset($premi->premi->imatge) }}" 
-                                                                        alt="{{ $premi->premi->nom }}" 
-                                                                        class="me-3" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; margin-right: 15px;">
-                                                                @else
-                                                                    <div class="me-3 bg-light d-flex align-items-center justify-content-center" 
-                                                                        style="width: 100px; height: 100px; border-radius: 8px;">
-                                                                        <i class="fas fa-gift fa-3x text-secondary"></i>
-                                                                    </div>
-                                                                @endif
-                                                                <div>
-                                                                    <h6 class="fw-bold mb-2">{{ $premi->premi->nom }}</h6>
-                                                                    <p class="text-muted">{{ $premi->premi->descripcio }}</p>
-                                                                    <div class="badge bg-success mb-2">
-                                                                        <i class="fas fa-coins me-1"></i> {{ $premi->punts_gastats }} punts
-                                                                    </div>
-                                                                </div>
+                                                                <h5 class="modal-title" id="premiModalLabel-{{ $premi->id }}">
+                                                                    {{ $premi->premi->nom }}
+                                                                </h5>
+                                                                <button type="button" class="btn btn-sm rounded-circle boto-modal" data-bs-dismiss="modal" aria-label="Close" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: bold;">X</button>                                                       
                                                             </div>
-                                                            
-                                                            <div class="card mb-3">
-                                                                <div class="card-header bg-light">
-                                                                    <i class="fas fa-info-circle me-2" style="margin-right: 5px;"></i>Detalls de la reclamació
-                                                                </div>
-                                                                <div class="card-body">
-                                                                    <div class="row mb-2">
-                                                                        <div class="col-5 text-muted">Data de reclamació:</div>
-                                                                        <div class="col-7 fw-bold">{{ $premi->data_reclamacio->format('d/m/Y H:i') }}</div>
+                                                                <div class="modal-body">
+                                                                    <div class="d-flex mb-4">
+                                                                        @if($premi->premi->imatge)
+                                                                            <img src="{{ asset($premi->premi->imatge) }}" 
+                                                                                alt="{{ $premi->premi->nom }}" 
+                                                                                class="me-3" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; margin-right: 15px;">
+                                                                        @else
+                                                                            <div class="me-3 bg-light d-flex align-items-center justify-content-center" 
+                                                                                style="width: 100px; height: 100px; border-radius: 8px;">
+                                                                                <i class="fas fa-gift fa-3x text-secondary"></i>
+                                                                            </div>
+                                                                        @endif
+                                                                        <div>
+                                                                            <h6 class="fw-bold mb-2">{{ $premi->premi->nom }}</h6>
+                                                                            <p class="text-muted">{{ $premi->premi->descripcio }}</p>
+                                                                            <div class="badge bg-success mb-2">
+                                                                                <i class="fas fa-coins me-1"></i> {{ $premi->punts_gastats }} punts
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
                                                                     
-                                                                    <div class="row mb-2">
-                                                                        <div class="col-5 text-muted">Estat:</div>
-                                                                        <div class="col-7">
-                                                                            @php
-                                                                                $estatClasses = [
-                                                                                    'pendent' => 'bg-warning',
-                                                                                    'procesant' => 'bg-info',
-                                                                                    'entregat' => 'bg-success',
-                                                                                    'cancelat' => 'bg-danger'
-                                                                                ];
-                                                                                $estatIcons = [
-                                                                                    'pendent' => 'fa-clock',
-                                                                                    'procesant' => 'fa-cog',
-                                                                                    'entregat' => 'fa-check-circle',
-                                                                                    'cancelat' => 'fa-times-circle'
-                                                                                ];
-                                                                            @endphp
+                                                                    <div class="card mb-3">
+                                                                        <div class="card-header bg-light">
+                                                                            <i class="fas fa-info-circle me-2" style="margin-right: 5px;"></i>Detalls de la reclamació
+                                                                        </div>
+                                                                        <div class="card-body">
+                                                                            <div class="row mb-2">
+                                                                                <div class="col-5 text-muted">Data de reclamació:</div>
+                                                                                <div class="col-7 fw-bold">{{ $premi->data_reclamacio->format('d/m/Y H:i') }}</div>
+                                                                            </div>
                                                                             
-                                                                            <span class="badge {{ $estatClasses[$premi->estat] }}">
-                                                                                <i class="fas {{ $estatIcons[$premi->estat] }} me-1"></i>
-                                                                                {{ ucfirst($premi->estat) }}
-                                                                            </span>
+                                                                            <div class="row mb-2">
+                                                                                <div class="col-5 text-muted">Estat:</div>
+                                                                                <div class="col-7">
+                                                                                    @php
+                                                                                        $estatClasses = [
+                                                                                            'pendent' => 'bg-warning',
+                                                                                            'procesant' => 'bg-info',
+                                                                                            'entregat' => 'bg-success',
+                                                                                            'cancelat' => 'bg-danger'
+                                                                                        ];
+                                                                                        $estatIcons = [
+                                                                                            'pendent' => 'fa-clock',
+                                                                                            'procesant' => 'fa-cog',
+                                                                                            'entregat' => 'fa-check-circle',
+                                                                                            'cancelat' => 'fa-times-circle'
+                                                                                        ];
+                                                                                    @endphp
+                                                                                    
+                                                                                    <span class="badge {{ $estatClasses[$premi->estat] }}">
+                                                                                        <i class="fas {{ $estatIcons[$premi->estat] }} me-1"></i>
+                                                                                        {{ ucfirst($premi->estat) }}
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                            
+                                                                            @if($premi->codi_seguiment)
+                                                                            <div class="row mb-2">
+                                                                                <div class="col-5 text-muted">Codi de seguiment:</div>
+                                                                                <div class="col-7">
+                                                                                    <code>{{ $premi->codi_seguiment }}</code>
+                                                                                </div>
+                                                                            </div>
+                                                                            @endif
+                                                                            
+                                                                            @if($premi->comentaris)
+                                                                            <div class="row mb-2">
+                                                                                <div class="col-5 text-muted">Comentaris:</div>
+                                                                                <div class="col-7">{{ $premi->comentaris }}</div>
+                                                                            </div>
+                                                                            @endif
                                                                         </div>
                                                                     </div>
                                                                     
-                                                                    @if($premi->codi_seguiment)
-                                                                    <div class="row mb-2">
-                                                                        <div class="col-5 text-muted">Codi de seguiment:</div>
-                                                                        <div class="col-7">
-                                                                            <code>{{ $premi->codi_seguiment }}</code>
+                                                                    <!-- Timeline del estado del premio -->
+                                                                <div class="timeline mt-4">
+                                                                    <div class="timeline-item {{ $premi->estat == 'pendent' || $premi->estat == 'procesant' || $premi->estat == 'entregat' ? 'done' : '' }}">
+                                                                        <div class="timeline-marker {{ $premi->estat == 'pendent' || $premi->estat == 'procesant' || $premi->estat == 'entregat' ? 'bg-success' : 'bg-light' }}" style="margin-top: 2px;"></div>
+                                                                        <div class="timeline-content">
+                                                                            <h6 class="mb-0">Reclamat</h6>
+                                                                            <small>{{ $premi->created_at->format('d/m/Y') }}</small>
                                                                         </div>
                                                                     </div>
-                                                                    @endif
                                                                     
-                                                                    @if($premi->comentaris)
-                                                                    <div class="row mb-2">
-                                                                        <div class="col-5 text-muted">Comentaris:</div>
-                                                                        <div class="col-7">{{ $premi->comentaris }}</div>
+                                                                    <div class="timeline-item {{ $premi->estat == 'procesant' || $premi->estat == 'entregat' ? 'done' : '' }}">
+                                                                        <div class="timeline-marker {{ $premi->estat == 'procesant' || $premi->estat == 'entregat' ? 'bg-success' : 'bg-light' }}" style="margin-top: 1px;"></div>
+                                                                        <div class="timeline-content">
+                                                                            <h6 class="mb-0">En procés</h6>
+                                                                        </div>
                                                                     </div>
-                                                                    @endif
-                                                                </div>
-                                                            </div>
-                                                            
-                                                            <!-- Timeline del estado del premio -->
-                                                            <div class="timeline mt-4">
-                                                                <div class="timeline-item {{ $premi->estat == 'pendent' || $premi->estat == 'procesant' || $premi->estat == 'entregat' ? 'done' : '' }}">
-                                                                    <div class="timeline-marker {{ $premi->estat == 'pendent' || $premi->estat == 'procesant' || $premi->estat == 'entregat' ? 'bg-success' : 'bg-light' }}" style="margin-top: 2px;"></div>
-                                                                    <div class="timeline-content">
-                                                                        <h6 class="mb-0">Reclamat</h6>
-                                                                        <small>{{ $premi->created_at->format('d/m/Y') }}</small>
-                                                                    </div>
-                                                                </div>
-                                                                
-                                                                <div class="timeline-item {{ $premi->estat == 'procesant' || $premi->estat == 'entregat' ? 'done' : '' }}">
-                                                                    <div class="timeline-marker {{ $premi->estat == 'procesant' || $premi->estat == 'entregat' ? 'bg-success' : 'bg-light' }}" style="margin-top: 1px;"></div>
-                                                                    <div class="timeline-content">
-                                                                        <h6 class="mb-0">En procés</h6>
-                                                                    </div>
-                                                                </div>
-                                                                
-                                                                <div class="timeline-item {{ $premi->estat == 'entregat' ? 'done' : '' }}">
-                                                                    <div class="timeline-marker {{ $premi->estat == 'entregat' ? 'bg-success' : 'bg-light' }}" style="margin-top: 1px;"></div>
-                                                                    <div class="timeline-content">
-                                                                        <h6 class="mb-0">Entregat</h6>
+                                                                    
+                                                                    <div class="timeline-item {{ $premi->estat == 'entregat' ? 'done' : '' }}">
+                                                                        <div class="timeline-marker {{ $premi->estat == 'entregat' ? 'bg-success' : 'bg-light' }}" style="margin-top: 1px;"></div>
+                                                                        <div class="timeline-content">
+                                                                            <h6 class="mb-0">Entregat</h6>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tancar</button>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tancar</button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -840,7 +897,7 @@
     }
 
     body.dark .btn-delete {
-        background-color: #2d3748;
+        background-color: #e74c3c;
         border-color: #e74c3c;
     }
 
@@ -981,6 +1038,188 @@
     .modal-dialog {
         margin-top: 8rem !important;
     }
+
+    /* Estilos para el sistema de niveles */
+    .progress {
+        height: 10px;
+        border-radius: 5px;
+        background-color: #e9ecef;
+    }
+    
+    body.dark .progress {
+        background-color: #4a5568;
+    }
+
+        /* Estilos modo oscuro para el perfil de usuario */
+    
+    /* Fondo y colores base */
+    body.dark {
+        --bg-primary: #1a202c;
+        --bg-secondary: #2d3748;
+        --bg-tertiary: #374151;
+        --text-primary: #e2e8f0;
+        --text-secondary: #a0aec0;
+        --border-color: #4a5568;
+        --accent-color: #68d391;
+        --accent-hover: #48bb78;
+        --shadow-color: rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Contenedor principal */
+    body.dark .profile-container {
+        background-color: var(--bg-primary);
+        box-shadow: 0 4px 12px var(--shadow-color);
+    }
+    
+    /* Tarjetas del perfil */
+    body.dark .card {
+        background-color: var(--bg-secondary);
+        border-color: var(--border-color);
+        color: var(--text-primary);
+    }
+    
+    /* Estadísticas en modo oscuro */
+    body.dark .stats-card {
+        background-color: var(--bg-secondary);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    body.dark .stats-counter {
+        background: linear-gradient(145deg, #2d3748, #1a202c);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Gráfico de distribución */
+    body.dark .chart-container {
+        filter: brightness(0.9);
+    }
+    
+    body.dark #pointsDistributionChart {
+        background-color: var(--bg-secondary);
+    }
+    
+    /* Insignias de puntos */
+    body.dark .points-badge {
+        background-color: var(--bg-tertiary);
+        color: var(--accent-color);
+        box-shadow: 0 3px 10px rgba(104, 211, 145, 0.2);
+    }
+    
+    /* Sistema de niveles */
+    body.dark .progress-bar {
+        box-shadow: 0 0 10px rgba(104, 211, 145, 0.3);
+    }
+    
+    body.dark .badge.bg-primary {
+        background-color: var(--accent-color) !important;
+        color: #1a202c;
+    }
+    
+    /* Alertas */
+    body.dark .alert-success {
+        background-color: rgba(72, 187, 120, 0.2);
+        color: var(--accent-color);
+        border-color: rgba(72, 187, 120, 0.3);
+    }
+    
+    body.dark .alert-info {
+        background-color: rgba(66, 153, 225, 0.2);
+        color: #90cdf4;
+        border-color: rgba(66, 153, 225, 0.3);
+    }
+    
+    /* Tablas */
+    body.dark .table {
+        color: var(--text-primary);
+        border-color: var(--border-color);
+    }
+    
+    body.dark .table thead th {
+        border-bottom-color: var(--border-color);
+        color: var(--accent-color);
+    }
+    
+    body.dark .table td {
+        border-color: var(--border-color);
+    }
+    
+    /* Formularios */
+    body.dark input,
+    body.dark select,
+    body.dark textarea {
+        background-color: var(--bg-tertiary);
+        border-color: var(--border-color);
+        color: var(--text-primary);
+    }
+    
+    body.dark input:focus,
+    body.dark select:focus,
+    body.dark textarea:focus {
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 0.2rem rgba(104, 211, 145, 0.25);
+    }
+    
+    /* Modales */
+    body.dark .modal-content {
+        background-color: var(--bg-secondary);
+        border-color: var(--border-color);
+    }
+    
+    body.dark .modal-header,
+    body.dark .modal-footer {
+        border-color: var(--border-color);
+    }
+    
+    /* Botones */
+    body.dark .btn-primary {
+        background-color: var(--accent-color);
+        border-color: var(--accent-color);
+    }
+    
+    body.dark .btn-primary:hover {
+        background-color: var(--accent-hover);
+        border-color: var(--accent-hover);
+    }
+    
+    body.dark .btn-outline-primary {
+        color: var(--accent-color);
+        border-color: var(--accent-color);
+    }
+    
+    body.dark .btn-outline-primary:hover {
+        background-color: var(--accent-color);
+        color: var(--bg-primary);
+    }
+    
+    /* Pestañas de navegación */
+    body.dark .nav-tabs {
+        border-bottom-color: var(--border-color);
+    }
+    
+    body.dark .nav-tabs .nav-link {
+        color: var(--text-secondary);
+    }
+    
+    body.dark .nav-tabs .nav-link.active {
+        color: var(--accent-color);
+        background-color: transparent;
+        border-color: transparent transparent var(--accent-color);
+    }
+    
+    /* Iconos */
+    body.dark i.fas,
+    body.dark i.fab {
+        color: var(--text-secondary);
+    }
+    
+    body.dark .text-primary i.fas,
+    body.dark .text-primary i.fab {
+        color: var(--accent-color);
+    }
+
+    body.dark .apexcharts-legend-text {
+        color: var(--text-primary) !important;
+    }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.35.3/dist/apexcharts.min.js"></script>
@@ -994,7 +1233,7 @@
 
         // Configurar el tema de ApexCharts según el modo oscuro/claro
         const isDarkMode = document.body.classList.contains('dark');
-        const textColor = isDarkMode ? '#e2e8f0' : '#333';
+        const textColor = isDarkMode ? '#e2e8f0' : '#e2e8f0';
         const gridColor = isDarkMode ? '#4a5568' : '#e9e9e9';
 
         // Gráfico de distribución de puntos (donut chart)
@@ -1067,7 +1306,6 @@
                 return []; // Retornar array vacío en lugar de datos falsos
             }
 
-            console.log('Iniciando carga de datos de actividad para usuario ID:', userId);
 
             // Define los meses en catalán
             const mesesCatalanes = ['Gen', 'Feb', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Oct', 'Nov', 'Des'];
@@ -1082,24 +1320,14 @@
                 activityData[monthName] = 0;
             }
 
-            console.log('Meses inicializados:', activityData);
 
             try {
                 // Obtener TODOS los códigos sin filtro
-                console.log('Consultando Algolia sin filtro para obtener todos los códigos');
                 const searchResults = await window.codisIndex.search('', {
                     hitsPerPage: 1000
                 });
 
-                console.log('Resultados completos de Algolia:', searchResults);
                 const allHits = searchResults.hits;
-                console.log('Total de códigos encontrados:', allHits.length);
-
-                // Mostrar estructura de un código para depuración
-                if (allHits.length > 0) {
-                    console.log('Estructura de un código de ejemplo:', allHits[0]);
-                    console.log('Nombres de campos disponibles:', Object.keys(allHits[0]));
-                }
 
                 // Filtrar manualmente por user_id
                 const hits = allHits.filter(codi => {
@@ -1109,7 +1337,6 @@
                     for (const field of possibleFields) {
                         if (codi[field] !== undefined &&
                             (codi[field] === userId || codi[field] === userId.toString())) {
-                            console.log(`Código coincidente encontrado usando campo "${field}": `, codi);
                             return true;
                         }
                     }
@@ -1119,7 +1346,6 @@
                     for (const [key, value] of Object.entries(codi)) {
                         if (key.toLowerCase().includes('user') &&
                             (value === userId || value === userId.toString())) {
-                            console.log(`Código coincidente encontrado usando campo "${key}": `, codi);
                             return true;
                         }
                     }
@@ -1127,10 +1353,8 @@
                     return false;
                 });
 
-                console.log(`Códigos filtrados para el usuario ${userId}:`, hits);
 
                 if (hits.length === 0) {
-                    console.log('No se encontraron códigos para este usuario');
                     // Simplemente convertir y retornar los datos inicializados (con valores en cero)
                     const emptyData = Object.keys(activityData).map(month => ({
                         x: month,
@@ -1141,11 +1365,8 @@
 
                 // Procesar los resultados y sumar puntos por mes
                 hits.forEach(codi => {
-                    console.log('Procesando código:', codi);
-
                     // Extraer mes de data_escaneig
                     const date = new Date(codi.data_escaneig);
-                    console.log('Fecha del código:', date);
                     const monthIndex = date.getMonth(); // 0-11
 
                     // Solo considerar códigos de los últimos 6 meses
@@ -1154,7 +1375,6 @@
 
                     if (date >= sixMonthsAgo) {
                         const monthName = mesesCatalanes[monthIndex];
-                        console.log('Mes del código:', monthName, 'Puntos:', codi.punts);
 
                         if (monthName in activityData) {
                             activityData[monthName] += codi.punts;
@@ -1162,17 +1382,13 @@
                     }
                 });
 
-                console.log('Datos de actividad después de procesar:', activityData);
-
                 // Convertir a formato para el gráfico
                 const formattedData = Object.keys(activityData).map(month => ({
                     x: month,
                     y: activityData[month]
                 }));
 
-                console.log('Datos formateados para el gráfico:', formattedData);
                 return formattedData;
-
             } catch (error) {
                 console.error('Error al cargar datos de actividad:', error);
                 // Retornar datos vacíos en caso de error
@@ -1186,19 +1402,12 @@
         // Verificar si el elemento del gráfico existe
         async function initCharts() {
             try {
-                console.log('Iniciando inicialización de gráficos');
-
                 // Verificar si existen los contenedores de los gráficos
                 const pointsChartEl = document.querySelector("#pointsDistributionChart");
                 const activityChartEl = document.querySelector("#activityChart");
 
-                console.log('Elemento para gráfico de distribución:', pointsChartEl ? 'Existe' : 'No existe');
-                console.log('Elemento para gráfico de actividad:', activityChartEl ? 'Existe' : 'No existe');
-
                 // Cargar datos de actividad
-                console.log('Cargando datos de actividad...');
                 const activityData = await loadActivityData();
-                console.log('Datos de actividad cargados:', activityData);
 
                 // Gráfico de actividad (área)
                 const activityChartOptions = {
@@ -1274,17 +1483,13 @@
 
                 // Renderizar gráficos
                 if (pointsChartEl) {
-                    console.log('Renderizando gráfico de distribución');
                     const pointsDistributionChart = new ApexCharts(pointsChartEl, pointsDistributionOptions);
                     pointsDistributionChart.render();
-                    console.log('Gráfico de distribución renderizado');
                 }
 
                 if (activityChartEl) {
-                    console.log('Renderizando gráfico de actividad');
                     const activityChart = new ApexCharts(activityChartEl, activityChartOptions);
                     activityChart.render();
-                    console.log('Gráfico de actividad renderizado');
                 }
             } catch (error) {
                 console.error("Error detallado al inicializar los gráficos:", error);
@@ -1363,8 +1568,6 @@
                     }
                 })
                     .then(response => {
-                        console.log('Respuesta del servidor:', response);
-
                         // Si la respuesta no es OK, vamos a intentar analizar el mensaje de error
                         if (!response.ok) {
                             return response.json().then(errorData => {
@@ -1378,8 +1581,6 @@
                         return response.json();
                     })
                     .then(data => {
-                        console.log('Datos de respuesta:', data);
-
                         // Eliminar indicador de carga
                         loadingOverlay.remove();
 
@@ -1395,7 +1596,6 @@
                                 const navbarProfileImg = document.querySelector('.navbar-nav .nav-link.dropdown-toggle img.rounded-circle');
                                 if (navbarProfileImg) {
                                     navbarProfileImg.src = data.path;
-                                    console.log('Imagen del navbar actualizada');
                                 } else {
                                     console.warn('No se encontró la imagen del perfil en el navbar');
                                 }
@@ -1508,9 +1708,5 @@
                 tabTrigger.show()
             })
         })
-        
-        // Para propósitos de depuración
-        console.log('Eventos próximos:', {{ $user->events->where('data_inici', '>=', now())->count() }});
-        console.log('Eventos pasados:', {{ $user->events->where('data_inici', '<', now())->count() }});
     });
 </script>
