@@ -157,6 +157,7 @@ button:hover {
 .navbar-toggler-icon {
     background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba%2855, 55, 55, 0.5%29' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
 }
+
 /* Estilo para enlaces activos en el navbar */
 .navbar-nav .nav-link.active {
     font-weight: 600;
@@ -169,22 +170,30 @@ button:hover {
     content: '';
     position: absolute;
     bottom: 5px;
-    left: 25%; /* Ajustar posición para centrar */
-    width: 50%; /* Mantener el 50% del ancho */
-    height: 3px; /* Aumentar ligeramente para mejor visibilidad */
-    background-color: #000000; /* Color verde que coincide con tu tema */
-    border-radius: 4px; /* Bordes redondeados */
-    transition: all 0.3s ease; /* Transición suave */
+    left: 25%;
+    /* Ajustar posición para centrar */
+    width: 50%;
+    /* Mantener el 50% del ancho */
+    height: 3px;
+    /* Aumentar ligeramente para mejor visibilidad */
+    background-color: #000000;
+    /* Color verde que coincide con tu tema */
+    border-radius: 4px;
+    /* Bordes redondeados */
+    transition: all 0.3s ease;
+    /* Transición suave */
 }
 
 /* Para modo oscuro */
 body.dark .navbar-nav .nav-link.active {
-    color: #66bb6a !important; /* Versión más clara para modo oscuro */
+    color: #66bb6a !important;
+    /* Versión más clara para modo oscuro */
 }
 
 body.dark .navbar-nav .nav-link.active::after {
     background-color: #66bb6a;
 }
+
 /* Fixed Bottom Right Styles */
 .fixed-bottom-right {
     position: fixed;
