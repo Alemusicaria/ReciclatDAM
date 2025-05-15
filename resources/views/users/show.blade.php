@@ -156,7 +156,7 @@
                                                             
                                                             <div class="card mb-3">
                                                                 <div class="card-header bg-light">
-                                                                    <i class="fas fa-info-circle me-2"></i>Detalls de la reclamació
+                                                                    <i class="fas fa-info-circle me-2" style="margin-right: 5px;"></i>Detalls de la reclamació
                                                                 </div>
                                                                 <div class="card-body">
                                                                     <div class="row mb-2">
@@ -210,7 +210,7 @@
                                                             <!-- Timeline del estado del premio -->
                                                             <div class="timeline mt-4">
                                                                 <div class="timeline-item {{ $premi->estat == 'pendent' || $premi->estat == 'procesant' || $premi->estat == 'entregat' ? 'done' : '' }}">
-                                                                    <div class="timeline-marker {{ $premi->estat == 'pendent' || $premi->estat == 'procesant' || $premi->estat == 'entregat' ? 'bg-success' : 'bg-light' }}"></div>
+                                                                    <div class="timeline-marker {{ $premi->estat == 'pendent' || $premi->estat == 'procesant' || $premi->estat == 'entregat' ? 'bg-success' : 'bg-light' }}" style="margin-top: 2px;"></div>
                                                                     <div class="timeline-content">
                                                                         <h6 class="mb-0">Reclamat</h6>
                                                                         <small>{{ $premi->created_at->format('d/m/Y') }}</small>
@@ -218,14 +218,14 @@
                                                                 </div>
                                                                 
                                                                 <div class="timeline-item {{ $premi->estat == 'procesant' || $premi->estat == 'entregat' ? 'done' : '' }}">
-                                                                    <div class="timeline-marker {{ $premi->estat == 'procesant' || $premi->estat == 'entregat' ? 'bg-success' : 'bg-light' }}"></div>
+                                                                    <div class="timeline-marker {{ $premi->estat == 'procesant' || $premi->estat == 'entregat' ? 'bg-success' : 'bg-light' }}" style="margin-top: 1px;"></div>
                                                                     <div class="timeline-content">
                                                                         <h6 class="mb-0">En procés</h6>
                                                                     </div>
                                                                 </div>
                                                                 
                                                                 <div class="timeline-item {{ $premi->estat == 'entregat' ? 'done' : '' }}">
-                                                                    <div class="timeline-marker {{ $premi->estat == 'entregat' ? 'bg-success' : 'bg-light' }}"></div>
+                                                                    <div class="timeline-marker {{ $premi->estat == 'entregat' ? 'bg-success' : 'bg-light' }}" style="margin-top: 1px;"></div>
                                                                     <div class="timeline-content">
                                                                         <h6 class="mb-0">Entregat</h6>
                                                                     </div>

@@ -37,6 +37,7 @@
                         </div>
                         <h4 id="selected-award-name" class="mb-3"></h4>
                         <p id="selected-award-description" class="card-text"></p>
+                        <div id="award-action-button-container"></div>
                         <div class="d-flex justify-content-center mt-auto pt-3">
                             <button id="prev-selected-award" class="btn">&larr;</button>
                             <button id="next-selected-award" class="btn">&rarr;</button>
@@ -269,8 +270,11 @@
 </style>
 
 <script>
-    $(document).ready(function () {   
+    $(document).ready(function () {
         const opinionsIndex = window.opinionsIndex; // Usa la variable global
+
+        // Definir al inicio del script
+        const userLoggedIn = {{ Auth::check() ? 'true' : 'false' }};
 
         // DOM elements
         const galleryInner = $('.gallery-inner');
@@ -284,6 +288,12 @@
         let currentAwardIndex = 0;
         let currentPage = 0;
         const awardsPerPage = 4; // 2x2 grid
+
+        // Inicializar tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
 
         // Fetch awards from Algolia
         function fetchAwards(query = '') {
@@ -373,19 +383,72 @@
             updateGalleryPosition();
         }
 
-        // Update selected award
         function updateSelectedAward(premisIndex) {
             if (premisIndex < 0 || premisIndex >= awards.length) return;
 
             currentAwardIndex = premisIndex;
             const award = awards[currentAwardIndex];
 
+            // Definir awardId aquí para que esté disponible en toda la función
+            let awardId;
+            if (typeof award.id === 'string' && award.id.includes('::')) {
+                awardId = award.id.split('::').pop();
+            } else {
+                awardId = award.id || award.objectID;
+            }
+
             // Animate transition
             $('#selected-award').fadeOut(200, function () {
                 selectedAwardImage.attr('src', award.imatge);
                 selectedAwardName.text(award.nom);
                 selectedAwardDescription.text(award.descripcio);
+
+                // Añadir botón de canje
+                let actionButtonHtml = '';
+
+                if (userLoggedIn) {
+                    const userPoints = {{ Auth::check() ? Auth::user()->punts_actuals : 0 }};
+                    const cost = award.cost || award.punts_requerits;
+
+                    if (userPoints >= cost) {
+                        actionButtonHtml = `
+                            <button type="button" class="btn btn-success w-100 mt-3" id="open-modal-btn-${awardId}">
+                                <i class="fas fa-gift me-2"></i> Bescanviar per ${cost} punts
+                            </button>
+                        `;
+                    } else {
+                        const pointsNeeded = cost - userPoints;
+                        actionButtonHtml = `
+                            <button type="button" class="btn btn-secondary w-100 mt-3" disabled data-bs-toggle="tooltip" 
+                                    title="Necessites ${pointsNeeded} punts més per bescanviar aquest premi">
+                                <i class="fas fa-lock me-2"></i> Necessites ${cost} punts
+                            </button>
+                            <small class="d-block text-muted mt-2 text-center">
+                                Et falten ${pointsNeeded} punts més
+                            </small>
+                        `;
+                    }
+                } else {
+                    actionButtonHtml = `
+                        <a href="{{ route('login') }}" class="btn btn-outline-success w-100 mt-3">
+                            <i class="fas fa-sign-in-alt me-2"></i> Inicia sessió per bescanviar
+                        </a>
+                    `;
+                }
+
+                // Añadir el botón después de la descripción
+                $('#award-action-button-container').html(actionButtonHtml);
+
+                // Mostrar el elemento que estaba oculto
                 $(this).fadeIn(200);
+
+                // Ahora es seguro añadir event listeners porque awardId está en alcance
+                if (userLoggedIn) {
+                    $(`#open-modal-btn-${awardId}`).on('click', function () {
+                        updateCanjeModal(award, awardId);  // Pasar awardId como argumento
+                        $(`#canjeModal-${awardId}`).modal('show');
+                    });
+                }
             });
 
             // Navigate to correct page in gallery
@@ -397,6 +460,153 @@
             // Update selected state in gallery
             $('.award-card').removeClass('selected');
             $(`.award-card[data-index="${currentAwardIndex}"]`).addClass('selected');
+        }
+
+        // Modificar también la función updateCanjeModal para recibir awardId
+        function updateCanjeModal(award, awardId) {
+            // Si no recibimos awardId, lo calculamos
+            if (!awardId) {
+                if (typeof award.id === 'string' && award.id.includes('::')) {
+                    awardId = award.id.split('::').pop();
+                } else {
+                    awardId = award.id || award.objectID;
+                }
+            }
+            console.log('ID limpio para el modal:', awardId);
+
+            // Eliminar modales anteriores de forma segura
+            try {
+                // Eliminar todos los modales existentes
+                $('[id^="canjeModal-"]').each(function () {
+                    $(this).remove();
+                });
+            } catch (error) {
+                console.error('Error al eliminar modales anteriores:', error);
+            }
+
+            // Solo crear modal si el usuario está logeado
+            if (!userLoggedIn) return;
+
+            const userPoints = {{ Auth::check() ? Auth::user()->punts_actuals : 0 }};
+            const cost = award.cost || award.punts_requerits;
+            const remainingPoints = userPoints - cost;
+
+            // Obtener el token CSRF de la página
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            // Crear el modal COMPLETO
+            const modalHtml = `
+                <div class="modal fade" id="canjeModal-${awardId}" tabindex="-1" aria-labelledby="canjeModalLabel-${awardId}" aria-hidden="true" style="z-index: 10001;">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="canjeModalLabel-${awardId}">Confirmar bescanvi</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="d-flex align-items-center mb-4">
+                                    ${award.imatge ?
+                    `<img src="${award.imatge}" alt="${award.nom}" 
+                                                                class="me-3" style="width: 70px; height: 70px; object-fit: cover; border-radius: 8px;">` :
+                    `<div class="bg-light d-flex align-items-center justify-content-center me-3" 
+                                                                style="width: 70px; height: 70px; border-radius: 8px;">
+                                                                <i class="fas fa-gift fa-2x text-secondary"></i>
+                                                            </div>`
+                }
+                                    <div>
+                                        <h6 class="mb-1">${award.nom}</h6>
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-coins me-1"></i> ${cost} punts
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Tens actualment <strong>${userPoints}</strong> punts.
+                                    Després d'aquest bescanvi, et quedaran <strong>${remainingPoints}</strong> punts.
+                                </div>
+                                
+                                <p>Estàs segur que vols bescanviar els teus punts per aquest premi?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
+                                    <form id="canje-form-${awardId}" action="{{ url('/premis') }}/${awardId}/canjear" method="POST">
+                                        <input type="hidden" name="_token" value="${csrfToken}">
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="fas fa-check me-1"></i> Confirmar bescanvi
+                                        </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            $('body').append(modalHtml);
+
+            // AÑADIR ESTA LÍNEA: Mostrar el modal después de crearlo
+            $(`#canjeModal-${awardId}`).modal('show');
+
+            // Verificar que el formulario existe y está configurado correctamente
+            console.log('Formulario en modal:', $(`#canjeModal-${awardId} form`).length > 0 ? 'Encontrado' : 'No encontrado');
+            // Agrega este código para manejar el envío del formulario
+            $(`#canje-form-${awardId}`).on('submit', function (e) {
+                e.preventDefault(); // Prevenir el envío normal del formulario
+
+                // Deshabilitar el botón y mostrar spinner de carga
+                const submitBtn = $(this).find('button[type="submit"]');
+                submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Processant...');
+
+                // Enviar la solicitud usando fetch (más moderno que $.ajax)
+                fetch(this.action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: new URLSearchParams(new FormData(this))
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error en la resposta del servidor');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Cerrar el modal
+                        $(`#canjeModal-${awardId}`).modal('hide');
+
+                        // Mostrar notificación de éxito
+                        showNotification('success', 'Premi bescanviat amb èxit!');
+
+                        if (data.punts_actuals !== undefined) {
+                            // Buscar el elemento que contiene los puntos en el navbar
+                            const userNavElement = document.querySelector('.navbar-nav .dropdown-toggle span');
+                            if (userNavElement) {
+                                // El formato actual es "Nombre (X ECODAMS)"
+                                // Extraer ese texto y reemplazar los puntos manteniendo el formato
+                                const currentText = userNavElement.textContent;
+                                const newText = currentText.replace(/\(\d+/, `(${data.punts_actuals}`);
+                                userNavElement.textContent = newText;
+                            }
+                        }
+
+                        // Recargar los premios
+                        setTimeout(() => {
+                            fetchAwards(); // Recargar la galería para reflejar cambios
+                        }, 500);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('error', 'Error al bescanviar el premi. Torna-ho a intentar més tard.');
+
+                        // Reactivar el botón
+                        submitBtn.prop('disabled', false).html('<i class="fas fa-check me-1"></i> Confirmar bescanvi');
+                    });
+            });
+
         }
 
         // Navigate to previous award
@@ -459,5 +669,27 @@
         // Initialize
         fetchAwards();
         startAutoRotate();
+
+        // Función para mostrar notificaciones
+        function showNotification(type, message) {
+            // Crear el elemento de notificación
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed`;
+            notification.style.top = '20px';
+            notification.style.left = '50%';
+            notification.style.transform = 'translateX(-50%)';
+            notification.style.zIndex = '9999';
+            notification.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+            notification.style.minWidth = '300px';
+            notification.innerHTML = message;
+
+            // Añadir al DOM
+            document.body.appendChild(notification);
+
+            // Eliminar después de 3 segundos
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
     });
 </script>
