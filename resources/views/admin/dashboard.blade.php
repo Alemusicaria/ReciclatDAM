@@ -193,7 +193,7 @@
                                                                                 <div class="activity-user">
                                                                                     <!-- Para la sección de actividad reciente -->
                                                                                     <img src="{{ 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ($activity->user && $activity->user->foto_perfil) ?
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ($activity->user && $activity->user->foto_perfil) ?
                                             (Str::startsWith($activity->user->foto_perfil, ['http://', 'https://']) ?
                                                 $activity->user->foto_perfil :
                                                 (file_exists(public_path('storage/' . $activity->user->foto_perfil)) ?
@@ -202,7 +202,7 @@
                                                 )
                                             ) :
                                             asset('images/default-profile.png') 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }}"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            }}"
                                                                                         alt="Foto perfil" class="activity-avatar">
 
 
@@ -267,7 +267,7 @@
                                         )
                                     ) :
                                     asset('images/default-profile.png')   
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     }}"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             }}"
                                                                     alt="Foto perfil" class="ranking-avatar">
                                                                 <div class="ranking-user-info">
                                                                     <h6 class="ranking-user-name">{{ $user->nom }} {{ $user->cognoms }}</h6>
@@ -1643,11 +1643,11 @@
                             .catch(error => {
                                 console.error('Error cargando contenido:', error);
                                 dynamicContent.innerHTML = `
-                                                                                                                                                                                    <div class="alert alert-danger">
-                                                                                                                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                                                                                                                        Error cargando el contenido: ${error.message}
-                                                                                                                                                                                    </div>
-                                                                                                                                                                                `;
+                                                                                                                                                                                            <div class="alert alert-danger">
+                                                                                                                                                                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                                                                                                Error cargando el contenido: ${error.message}
+                                                                                                                                                                                            </div>
+                                                                                                                                                                                        `;
                                 modalLoader.classList.add('d-none');
                                 dynamicContent.classList.remove('d-none');
                             });
@@ -1790,11 +1790,11 @@
                                 console.error('Error:', error);
                                 modalLoader.classList.add('d-none');
                                 detailContent.innerHTML = `
-                                                                                    <div class="alert alert-danger">
-                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                        Error al cargar los detalles: ${error.message}
-                                                                                    </div>
-                                                                                `;
+                                                                                            <div class="alert alert-danger">
+                                                                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                Error al cargar los detalles: ${error.message}
+                                                                                            </div>
+                                                                                        `;
                                 detailContent.classList.remove('d-none');
                             });
                     });
@@ -2045,11 +2045,11 @@
                                     console.error('Error:', error);
                                     modalLoader.classList.add('d-none');
                                     detailContent.innerHTML = `
-                                                                                                <div class="alert alert-danger">
-                                                                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                                    Error al cargar el formulario: ${error.message}
-                                                                                                </div>
-                                                                                            `;
+                                                                                                        <div class="alert alert-danger">
+                                                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                            Error al cargar el formulario: ${error.message}
+                                                                                                        </div>
+                                                                                                    `;
                                     detailContent.classList.remove('d-none');
                                 });
                         }, 300); // Esperar 300ms
@@ -2396,8 +2396,133 @@
                         }
                     });
                 }
+                if (e.target.closest('.editEventBtn')) {
+                    e.preventDefault();
+                    const btn = e.target.closest('.editEventBtn');
+                    const eventId = btn.getAttribute('data-event-id');
+
+                    console.log('Editando evento:', eventId);
+
+                    // Cerrar el modal dinámico primero si está abierto
+                    const dynamicModal = document.getElementById('dynamicModal');
+                    if (dynamicModal) {
+                        dynamicModal.classList.remove('show');
+                        dynamicModal.style.display = 'none';
+                        document.body.classList.remove('modal-open');
+                        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                    }
+
+                    // Pequeña pausa para asegurar que se completa la animación
+                    setTimeout(() => {
+                        // Configurar y mostrar el modal de detalle
+                        const detailModal = document.getElementById('detailModal');
+                        if (detailModal) {
+                            const modalTitle = document.getElementById('detailModalLabel');
+                            const modalLoader = document.getElementById('detail-modal-loader');
+                            const detailContent = document.getElementById('detail-content');
+
+                            if (modalTitle) modalTitle.textContent = "Editar Event";
+                            if (modalLoader) modalLoader.classList.remove('d-none');
+                            if (detailContent) detailContent.classList.add('d-none');
+
+                            // Limpiar cualquier backdrop residual
+                            document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+
+                            // Mostrar modal
+                            detailModal.classList.add('show');
+                            detailModal.style.display = 'block';
+                            document.body.classList.add('modal-open');
+
+                            // Cargar contenido del formulario de edición
+                            fetch(`/admin/edit-form/event/${eventId}`)
+                                .then(response => {
+                                    if (!response.ok) throw new Error('Error al cargar el formulario');
+                                    return response.text();
+                                })
+                                .then(html => {
+                                    if (modalLoader) modalLoader.classList.add('d-none');
+                                    if (detailContent) {
+                                        detailContent.innerHTML = html;
+                                        detailContent.classList.remove('d-none');
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    if (modalLoader) modalLoader.classList.add('d-none');
+                                    if (detailContent) {
+                                        detailContent.innerHTML = `
+                                        <div class="alert alert-danger">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                            Error al cargar el formulario: ${error.message}
+                                        </div>
+                                    `;
+                                        detailContent.classList.remove('d-none');
+                                    }
+                                });
+                        } else {
+                            console.error('Modal de detalle no encontrado');
+                        }
+                    }, 300); // Esperar 300ms para evitar conflictos de animación
+                }
             });
             console.log('Sistema global de eventos inicializado');
+        });
+    </script>
+    <script>
+        // Variable global para recordar la última vista activa
+        window.lastActiveContentType = 'users'; // Valor predeterminado
+
+        // Función mejorada para cerrar modales
+        window.closeAnyModal = function (modalId) {
+            console.log("Cerrando modal: " + modalId);
+
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                // Método manual de cierre
+                modal.classList.remove('show');
+                modal.style.display = 'none';
+                modal.setAttribute('aria-hidden', 'true');
+                modal.removeAttribute('aria-modal');
+                modal.removeAttribute('role');
+
+                // Limpiar el body
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+
+                // Eliminar todos los backdrops
+                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+
+                // Recargar la última vista activa después de cerrar
+                if (modalId === 'detailModal') {
+                    setTimeout(() => {
+                        console.log("Recargando última vista activa:", window.lastActiveContentType);
+                        const contentBtn = document.querySelector(`[data-content-type="${window.lastActiveContentType}"]`);
+                        if (contentBtn) contentBtn.click();
+                    }, 300);
+                }
+            }
+        };
+
+        // Interceptar los clics en los botones de contenido para recordar la última vista activa
+        document.addEventListener('click', function (e) {
+            const contentTypeBtn = e.target.closest('[data-content-type]');
+            if (contentTypeBtn) {
+                const contentType = contentTypeBtn.getAttribute('data-content-type');
+                if (contentType) {
+                    console.log("Guardando última vista activa:", contentType);
+                    window.lastActiveContentType = contentType;
+                }
+            }
+        });
+
+        // Modificación específica para eventos
+        document.addEventListener('click', function (e) {
+            // Al hacer clic en cualquier botón relacionado con eventos, recordar que estamos en la vista de eventos
+            if (e.target.closest('#newEventBtn') || e.target.closest('.editEventBtn') ||
+                e.target.closest('[data-detail-type="event"]')) {
+                window.lastActiveContentType = 'events';
+            }
         });
     </script>
 @endsection

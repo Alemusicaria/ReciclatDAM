@@ -108,13 +108,11 @@ Route::localizedGroup(function () {
             // Modales dinámicos
             Route::get('/modal-content/{type}', [App\Http\Controllers\AdminController::class, 'getModalContent'])->name('admin.modal-content');
 
-            // Crear nuevo registro
-            Route::get('/create/{type}', [App\Http\Controllers\AdminController::class, 'getCreateForm'])->name('admin.create-form');
-            // En routes/web.php, añade esta ruta específica para crear
-            Route::get('/create-form/{type}', [App\Http\Controllers\AdminController::class, 'getCreateForm'])
-                ->name('admin.create-form');
+            // Formularios
+            Route::get('/create-form/{type}', [App\Http\Controllers\AdminController::class, 'getCreateForm'])->name('admin.create-form');
+
             // Detalles y actualización
-            Route::get('/detail/{type}/{id}', [App\Http\Controllers\AdminController::class, 'getDetails'])->name('admin.details');
+            Route::get('/detail/{type}/{id?}', [App\Http\Controllers\AdminController::class, 'getDetails'])->name('admin.details');
 
             Route::get('/edit-form/{type}/{id}', [App\Http\Controllers\AdminController::class, 'getEditForm'])->name('admin.edit-form');
 
@@ -142,6 +140,7 @@ Route::localizedGroup(function () {
 
             // Gestión de puntos de reciclaje
             Route::resource('punts-reciclatge', App\Http\Controllers\PuntDeRecollidaController::class);
+            Route::post('/admin/events', [App\Http\Controllers\EventsController::class, 'store'])->name('admin.events.store');
         });
 
     });

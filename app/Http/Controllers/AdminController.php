@@ -172,7 +172,11 @@ class AdminController extends Controller
         try {
             switch ($type) {
                 case 'user':
-                    return view('admin.create.user'); // Asegúrate de que esta vista existe
+                    return view('admin.create.user');
+
+                case 'event':
+                    $tipusEvents = TipusEvent::all();
+                    return view('admin.create.event', compact('tipusEvents'));
 
                 default:
                     throw new \Exception('Formulario de creación no soportado');
@@ -188,12 +192,12 @@ class AdminController extends Controller
     public function getDetails($type, $id = null)
     {
         try {
-            // Caso especial para crear usuario (sin ID)
-            if ($type === 'create-user') {
-                \Log::info('Cargando formulario de creación de usuario');
-                $view = view('admin.create.user');
-                \Log::info('Vista cargada correctamente');
-                return $view;
+            // Manejar casos especiales de creación
+            if ($type === 'create-event') {
+                $tipusEvents = TipusEvent::all();
+                return view('admin.create.event', compact('tipusEvents'));
+            } elseif ($type === 'create-user') {
+                return view('admin.create.user');
             }
 
             // Casos regulares con ID
@@ -201,11 +205,42 @@ class AdminController extends Controller
                 case 'user':
                     $user = User::findOrFail($id);
                     return view('admin.details.user', compact('user'));
-                // Otros casos aquí...
+
+                case 'event':
+                    $event = Event::with(['tipus', 'participants'])->findOrFail($id);
+                    return view('admin.details.event', compact('event'));
+
+                default:
+                    throw new \Exception('Tipus de detall no suportat');
             }
         } catch (\Exception $e) {
             \Log::error('Error en getDetails: ' . $e->getMessage());
             return '<div class="alert alert-danger">Error: ' . $e->getMessage() . '</div>';
+        }
+    }
+
+    public function getEditForm($type, $id)
+    {
+        try {
+            switch ($type) {
+                case 'user':
+                    $user = User::findOrFail($id);
+                    return view('admin.edit.user', compact('user'));
+
+                case 'event':
+                    $event = Event::findOrFail($id);
+                    $tipusEvents = TipusEvent::all();
+                    return view('admin.edit.event', compact('event', 'tipusEvents'));
+
+                default:
+                    throw new \Exception('Formulario de edición no soportado');
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error en getEditForm: ' . $e->getMessage());
+            return '<div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Error al cargar el formulario: ' . $e->getMessage() . '
+            </div>';
         }
     }
 
@@ -282,26 +317,7 @@ class AdminController extends Controller
             ], 500);
         }
     }
-    public function getEditForm($type, $id)
-    {
-        try {
-            switch ($type) {
-                case 'user':
-                    $user = User::findOrFail($id);
-                    return view('admin.edit.user', compact('user'));
-
-                default:
-                    throw new \Exception('Formulario de edición no soportado');
-            }
-        } catch (\Exception $e) {
-            \Log::error('Error en getEditForm: ' . $e->getMessage());
-            return '<div class="alert alert-danger">
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            Error al cargar el formulario: ' . $e->getMessage() . '
-        </div>';
-        }
-    }
-
+    // Eliminar detalles de un elemento
     public function destroyDetails($type, $id)
     {
         try {
@@ -309,7 +325,7 @@ class AdminController extends Controller
                 case 'user':
                     $item = User::findOrFail($id);
                     $itemName = $item->nom . ' ' . $item->cognoms;
-                    
+
                     // Eliminar foto de perfil si existe y no es una URL externa
                     if ($item->foto_perfil && !str_starts_with($item->foto_perfil, 'https://')) {
                         if (Storage::disk('public')->exists($item->foto_perfil)) {
@@ -317,29 +333,29 @@ class AdminController extends Controller
                         }
                     }
                     break;
-    
+
                 case 'event':
                     $item = Event::findOrFail($id);
                     $itemName = $item->nom;
                     break;
-    
+
                 case 'premi':
                     $item = Premi::findOrFail($id);
                     $itemName = $item->nom;
                     break;
-    
+
                 case 'punt-reciclatge':
                     $item = PuntDeRecollida::findOrFail($id);
                     $itemName = $item->nom;
                     break;
-    
+
                 default:
                     throw new \Exception('Tipus d\'element no suportat');
             }
-    
+
             // Eliminar el elemento
             $item->delete();
-    
+
             // Registrar actividad
             if (auth()->check()) {
                 Activity::create([
@@ -347,14 +363,14 @@ class AdminController extends Controller
                     'action' => 'Ha eliminat ' . $type . ': ' . $itemName
                 ]);
             }
-    
+
             return response()->json([
                 'success' => true,
                 'message' => 'Element eliminat correctament'
             ]);
         } catch (\Exception $e) {
             \Log::error('Error al eliminar ' . $type . ': ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error: ' . $e->getMessage()

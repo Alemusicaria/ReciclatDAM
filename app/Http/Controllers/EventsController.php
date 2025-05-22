@@ -7,6 +7,8 @@ use App\Models\Event;
 use App\Models\TipusEvent;
 use Carbon\Carbon;
 use Auth;
+use App\Models\Activity;
+use Illuminate\Support\Facades\Storage;
 
 class EventsController extends Controller
 {
@@ -252,5 +254,207 @@ class EventsController extends Controller
                 'time' => $event->data_inici->format('H:i')
             ]
         ]);
+    }
+    /**
+     * Mostrar el formulario para crear un nuevo evento
+     */
+    public function create()
+    {
+        $tipusEvents = TipusEvent::all();
+        return view('events.create', compact('tipusEvents'));
+    }
+
+    /**
+     * Almacenar un nuevo evento
+     */
+    public function store(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'nom' => 'required|string|max:255',
+                'descripcio' => 'nullable|string',
+                'data_inici' => 'required|date',
+                'data_fi' => 'required|date|after_or_equal:data_inici',
+                'lloc' => 'nullable|string|max:255',
+                'tipus_event_id' => 'required|exists:tipus_events,id',
+                'capacitat' => 'nullable|integer|min:0',
+                'punts_disponibles' => 'nullable|integer|min:0',
+                'actiu' => 'nullable|boolean',
+                'imatge' => 'nullable|image|max:2048',
+            ]);
+
+            $event = new Event();
+            $event->nom = $validated['nom'];
+            $event->descripcio = $validated['descripcio'];
+            $event->data_inici = $validated['data_inici'];
+            $event->data_fi = $validated['data_fi'];
+            $event->lloc = $validated['lloc'];
+            $event->tipus_event_id = $validated['tipus_event_id'];
+            $event->capacitat = $validated['capacitat'];
+            $event->punts_disponibles = $validated['punts_disponibles'] ?? 0;
+            $event->actiu = isset($validated['actiu']) ? true : false;
+
+            if ($request->hasFile('imatge')) {
+                $path = $request->file('imatge')->store('events', 'public');
+                $event->imatge = $path;
+            }
+
+            $event->save();
+
+            // Registrar actividad
+            if (auth()->check()) {
+                Activity::create([
+                    'user_id' => auth()->id(),
+                    'action' => 'Ha creat un nou event: ' . $event->nom
+                ]);
+            }
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Event creat correctament',
+                    'event' => $event
+                ]);
+            }
+
+            return redirect()->route('admin.dashboard')->with('success', 'Event creat correctament');
+        } catch (\Exception $e) {
+            \Log::error('Error al crear l\'event: ' . $e->getMessage());
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al crear l\'event: ' . $e->getMessage()
+                ], 422);
+            }
+
+            return back()->withErrors(['error' => 'Error al crear l\'event: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Mostrar el formulario para editar un evento
+     */
+    public function edit(Event $event)
+    {
+        $tipusEvents = TipusEvent::all();
+        return view('events.edit', compact('event', 'tipusEvents'));
+    }
+
+    /**
+     * Actualizar un evento
+     */
+    public function update(Request $request, Event $event)
+    {
+        try {
+            $validated = $request->validate([
+                'nom' => 'required|string|max:255',
+                'descripcio' => 'nullable|string',
+                'data_inici' => 'required|date',
+                'data_fi' => 'required|date|after_or_equal:data_inici',
+                'lloc' => 'nullable|string|max:255',
+                'tipus_event_id' => 'required|exists:tipus_events,id',
+                'capacitat' => 'nullable|integer|min:0',
+                'punts_disponibles' => 'nullable|integer|min:0',
+                'actiu' => 'nullable|boolean',
+                'imatge' => 'nullable|image|max:2048',
+            ]);
+
+            $event->nom = $validated['nom'];
+            $event->descripcio = $validated['descripcio'];
+            $event->data_inici = $validated['data_inici'];
+            $event->data_fi = $validated['data_fi'];
+            $event->lloc = $validated['lloc'];
+            $event->tipus_event_id = $validated['tipus_event_id'];
+            $event->capacitat = $validated['capacitat'];
+            $event->punts_disponibles = $validated['punts_disponibles'] ?? 0;
+            $event->actiu = isset($validated['actiu']) ? true : false;
+
+            if ($request->hasFile('imatge')) {
+                // Eliminar imagen anterior si existe
+                if ($event->imatge) {
+                    Storage::disk('public')->delete($event->imatge);
+                }
+
+                $path = $request->file('imatge')->store('events', 'public');
+                $event->imatge = $path;
+            }
+
+            $event->save();
+
+            // Registrar actividad
+            if (auth()->check()) {
+                Activity::create([
+                    'user_id' => auth()->id(),
+                    'action' => 'Ha actualitzat l\'event: ' . $event->nom
+                ]);
+            }
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Event actualitzat correctament',
+                    'event' => $event
+                ]);
+            }
+
+            return redirect()->route('admin.events.show', $event->id)->with('success', 'Event actualitzat correctament');
+        } catch (\Exception $e) {
+            \Log::error('Error al actualitzar l\'event: ' . $e->getMessage());
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al actualitzar l\'event: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return back()->withErrors(['error' => 'Error al actualitzar l\'event: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Eliminar un evento
+     */
+    public function destroy(Event $event)
+    {
+        try {
+            $eventName = $event->nom; // Guardar el nombre antes de eliminar
+
+            // Eliminar imagen si existe
+            if ($event->imatge) {
+                Storage::disk('public')->delete($event->imatge);
+            }
+
+            $event->delete();
+
+            // Registrar actividad
+            if (auth()->check()) {
+                Activity::create([
+                    'user_id' => auth()->id(),
+                    'action' => 'Ha eliminat l\'event: ' . $eventName
+                ]);
+            }
+
+            if (request()->expectsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Event eliminat correctament'
+                ]);
+            }
+
+            return redirect()->route('admin.dashboard')->with('success', 'Event eliminat correctament');
+        } catch (\Exception $e) {
+            \Log::error('Error al eliminar l\'event: ' . $e->getMessage());
+
+            if (request()->expectsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al eliminar l\'event: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return back()->withErrors(['error' => 'Error al eliminar l\'event: ' . $e->getMessage()]);
+        }
     }
 }
