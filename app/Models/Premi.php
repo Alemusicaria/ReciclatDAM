@@ -13,7 +13,10 @@ class Premi extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'nom', 'descripcio', 'punts_requerits', 'imatge'
+        'nom',
+        'descripcio',
+        'punts_requerits',
+        'imatge'
     ];
 
     /**
@@ -29,4 +32,9 @@ class Premi extends Model
             'imatge' => $this->imatge,
         ];
     }
+    public function premiReclamats()
+    {
+        return $this->hasMany(PremiReclamat::class, 'premi_id');
+    }
+
 }

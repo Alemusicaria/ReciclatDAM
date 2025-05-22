@@ -143,7 +143,7 @@ class AdminController extends Controller
                     $events = Event::with('tipus')->latest()->get();
                     return view('admin.modals.events', compact('events'));
                 case 'premis':
-                    $premis = Premi::latest()->get();
+                    $premis = Premi::with('premiReclamats.user')->orderBy('id', 'desc')->get();
                     return view('admin.modals.premis', compact('premis'));
                 case 'codis':
                     $codis = Codi::with('user')->latest()->get();
@@ -192,8 +192,10 @@ class AdminController extends Controller
     public function getDetails($type, $id = null)
     {
         try {
-            // Manejar casos especiales de creación
-            if ($type === 'create-event') {
+            // Casos especiales para crear
+            if ($type === 'create-premi') {
+                return view('admin.create.premi');
+            } elseif ($type === 'create-event') {
                 $tipusEvents = TipusEvent::all();
                 return view('admin.create.event', compact('tipusEvents'));
             } elseif ($type === 'create-user') {
@@ -209,6 +211,10 @@ class AdminController extends Controller
                 case 'event':
                     $event = Event::with(['tipus', 'participants'])->findOrFail($id);
                     return view('admin.details.event', compact('event'));
+
+                case 'premi':
+                    $premi = Premi::with('premiReclamats.user')->findOrFail($id);
+                    return view('admin.details.premi', compact('premi'));
 
                 default:
                     throw new \Exception('Tipus de detall no suportat');
@@ -232,6 +238,10 @@ class AdminController extends Controller
                     $tipusEvents = TipusEvent::all();
                     return view('admin.edit.event', compact('event', 'tipusEvents'));
 
+                case 'premi':
+                    $premi = Premi::findOrFail($id);
+                    return view('admin.edit.premi', compact('premi'));
+
                 default:
                     throw new \Exception('Formulario de edición no soportado');
             }
@@ -243,7 +253,6 @@ class AdminController extends Controller
             </div>';
         }
     }
-
     // Actualizar detalles de un elemento
     public function updateDetails(Request $request, $type, $id)
     {
