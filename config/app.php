@@ -67,8 +67,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
-
+    'timezone' => 'Europe/Madrid',
     /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration
@@ -134,6 +133,6 @@ return [
     'providers' => ServiceProvider::defaultProviders()->merge([
         // otros proveedores de servicios
     ])->replace([
-        Illuminate\Translation\TranslationServiceProvider::class => LaravelLang\JsonFallback\TranslationServiceProvider::class,
-    ])->toArray(),
+                Illuminate\Translation\TranslationServiceProvider::class => LaravelLang\JsonFallback\TranslationServiceProvider::class,
+            ])->toArray(),
 ];

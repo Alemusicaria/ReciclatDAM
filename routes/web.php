@@ -90,4 +90,59 @@ Route::localizedGroup(function () {
     Route::post('/premis/{id}/canjear', [App\Http\Controllers\PremiController::class, 'canjear'])
         ->name('premis.canjear')
         ->middleware('auth');
+
+    // Rutas para el panel de administración
+    Route::prefix('admin')->middleware(['auth'])->group(function () {
+        // Aplicar validación de administrador a todo el grupo
+        Route::group([
+            'middleware' => function ($request, $next) {
+                if (auth()->user()->rol_id != 1) {
+                    return redirect()->route('home')->with('error', 'No tens permís per accedir al panell d\'administració');
+                }
+                return $next($request);
+            }
+        ], function () {
+            // Aquí todas tus rutas de administrador
+            Route::get('/', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.dashboard');
+
+            // Modales dinámicos
+            Route::get('/modal-content/{type}', [App\Http\Controllers\AdminController::class, 'getModalContent'])->name('admin.modal-content');
+
+            // Crear nuevo registro
+            Route::get('/create/{type}', [App\Http\Controllers\AdminController::class, 'getCreateForm'])->name('admin.create-form');
+            // En routes/web.php, añade esta ruta específica para crear
+            Route::get('/create-form/{type}', [App\Http\Controllers\AdminController::class, 'getCreateForm'])
+                ->name('admin.create-form');
+            // Detalles y actualización
+            Route::get('/detail/{type}/{id}', [App\Http\Controllers\AdminController::class, 'getDetails'])->name('admin.details');
+
+            Route::get('/edit-form/{type}/{id}', [App\Http\Controllers\AdminController::class, 'getEditForm'])->name('admin.edit-form');
+
+            Route::post('/update/{type}/{id}', [App\Http\Controllers\AdminController::class, 'updateDetails'])->name('admin.update');
+
+            // Eliminar registro
+            Route::delete('/destroy/{type}/{id}', [App\Http\Controllers\AdminController::class, 'destroyDetails'])->name('admin.destroy');
+            // Eventos para FullCalendar
+            Route::get('/events-json', [App\Http\Controllers\AdminController::class, 'getEventsJson'])->name('admin.events-json');
+
+            // Gestión de usuarios
+            Route::resource('users', App\Http\Controllers\UserController::class);
+
+            // Gestión de eventos
+            Route::resource('events', App\Http\Controllers\EventsController::class);
+            Route::put('/events/{id}/update-dates', [App\Http\Controllers\EventsController::class, 'updateDates'])->name('events.update-dates');
+
+            // Gestión de premios
+            Route::resource('premis', App\Http\Controllers\PremiController::class);
+
+            // Gestión de premios reclamados
+            Route::resource('premis-reclamats', App\Http\Controllers\PremiReclamatController::class);
+            Route::post('/premis-reclamats/{id}/approve', [App\Http\Controllers\PremiReclamatController::class, 'approve'])->name('premis-reclamats.approve');
+            Route::post('/premis-reclamats/{id}/reject', [App\Http\Controllers\PremiReclamatController::class, 'reject'])->name('premis-reclamats.reject');
+
+            // Gestión de puntos de reciclaje
+            Route::resource('punts-reciclatge', App\Http\Controllers\PuntDeRecollidaController::class);
+        });
+
+    });
 });

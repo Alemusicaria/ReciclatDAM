@@ -28,7 +28,7 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\CheckSocialLogin::class,
         ],
-    
+
         'api' => [
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
@@ -43,6 +43,7 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $routeMiddleware = [
-        // Other route middleware
+        // Altres middlewares...
+        'admin' => \App\Http\Middleware\AdminMiddleware::class,
     ];
 }

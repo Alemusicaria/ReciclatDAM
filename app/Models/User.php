@@ -60,16 +60,14 @@ class User extends Authenticatable
     }
     public function nivell()
     {
-        // Esta función NO actualiza el nivel en la base de datos,
-        // solo lo calcula y lo devuelve para mostrar
         $nivells = \App\Models\Nivell::orderBy('punts_requerits', 'desc')->get();
-        
+
         foreach ($nivells as $nivell) {
             if ($this->punts_totals >= $nivell->punts_requerits) {
                 return $nivell;
             }
         }
-        
+
         // Si por alguna razón no encuentra nivel, devuelve el nivel 1
         return \App\Models\Nivell::where('punts_requerits', 0)->first();
     }

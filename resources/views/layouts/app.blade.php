@@ -12,6 +12,18 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}" />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Añade estas líneas en la sección de head o antes de cerrar el body -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Cargar la biblioteca de gráficos ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.35.3/dist/apexcharts.min.js"></script>
+    <!-- Incluir SweetAlert2 en el head -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
 </head>
 
 <body class="light">
@@ -58,24 +70,13 @@
                 <li class="nav-item">
                     <a class="nav-link" href="#opinions">Opinions</a>
                 </li>
-
-                @can('admin')
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="crudDropdown" role="button" data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">
-                            CRUD
+                @if(Auth::check() && Auth::user()->rol_id == 1)
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url('/admin') }}">
+                            <i class="fas fa-cogs"></i> Administració
                         </a>
-                        <div class="mt-3 d-flex flex-column align-items-center download-buttons">
-                            <a href="#" class="">
-                                <img id="apple-store" src="{{ asset('images/icons/apple_light.png') }}"
-                                    alt="Descarrega a l'Apple Store" style="max-width: 200px;">
-                                <img id="google-play" src="{{ asset('images/icons/google_light.png') }}"
-                                    alt="Descarrega a Google Play" style="max-width: 200px;">
-                            </a>
-                        </div>
                     </li>
-                @endcan
-
+                @endif
             </ul>
             <ul class="navbar-nav ml-auto">
                 @auth
