@@ -19,15 +19,43 @@ class CodiController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'user_id' => 'nullable|exists:users,id',
-            'codi' => 'required|unique:codis',
-            'punts' => 'required|integer',
-            'data_escaneig' => 'required|date',
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'codi' => 'required|string',
+                'user_id' => 'nullable|exists:users,id',
+                'punts' => 'required|integer|min:0',
+                'data_escaneig' => 'required|date',
+            ]);
 
-        Codi::create($request->all());
-        return redirect()->route('codis.index');
+            $codi = new Codi();
+            $codi->codi = $validatedData['codi'];
+            $codi->user_id = $validatedData['user_id'];
+            $codi->punts = $validatedData['punts'];
+            $codi->data_escaneig = $validatedData['data_escaneig'];
+            $codi->save();
+
+            if ($request->expectsJson() || $request->ajax()) {
+                // Para peticiones AJAX/JSON, devolver respuesta simplificada
+                return response()->json([
+                    'success' => true
+                ]);
+            }
+
+            // Para peticiones normales, redirigir
+            return redirect()->route('admin.dashboard')->with('success', 'Codi creat correctament');
+
+        } catch (\Exception $e) {
+            \Log::error('Error al crear codi: ' . $e->getMessage());
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error: ' . $e->getMessage()
+                ], 422);
+            }
+
+            return back()->withErrors(['error' => 'Error al crear el codi: ' . $e->getMessage()]);
+        }
     }
 
     public function show(Codi $codi)

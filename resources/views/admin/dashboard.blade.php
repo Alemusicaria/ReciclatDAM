@@ -93,8 +93,8 @@
 
                 <!-- Para la tarjeta de Reciclaje -->
                 <div class="col-xl-3 col-md-6 mb-3">
-                    <div class="stat-card recycling cursor-pointer" data-bs-toggle="modal" data-bs-target="#dynamicModal"
-                        data-content-type="recycling-detail">
+                    <div class="stat-card codes cursor-pointer" data-bs-toggle="modal" data-bs-target="#dynamicModal"
+                        data-content-type="codis">
                         <div class="stat-card-body">
                             <div class="stat-card-icon">
                                 <i class="fas fa-recycle"></i>
@@ -193,7 +193,7 @@
                                                                                 <div class="activity-user">
                                                                                     <!-- Para la sección de actividad reciente -->
                                                                                     <img src="{{ 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ($activity->user && $activity->user->foto_perfil) ?
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ($activity->user && $activity->user->foto_perfil) ?
                                             (Str::startsWith($activity->user->foto_perfil, ['http://', 'https://']) ?
                                                 $activity->user->foto_perfil :
                                                 (file_exists(public_path('storage/' . $activity->user->foto_perfil)) ?
@@ -202,7 +202,7 @@
                                                 )
                                             ) :
                                             asset('images/default-profile.png') 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        }}"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }}"
                                                                                         alt="Foto perfil" class="activity-avatar">
 
 
@@ -267,7 +267,7 @@
                                         )
                                     ) :
                                     asset('images/default-profile.png')   
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 }}"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     }}"
                                                                     alt="Foto perfil" class="ranking-avatar">
                                                                 <div class="ranking-user-info">
                                                                     <h6 class="ranking-user-name">{{ $user->nom }} {{ $user->cognoms }}</h6>
@@ -1652,11 +1652,11 @@
                             .catch(error => {
                                 console.error('Error cargando contenido:', error);
                                 dynamicContent.innerHTML = `
-                                                                                                                                                                                                        <div class="alert alert-danger">
-                                                                                                                                                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                                                                                                                                            Error cargando el contenido: ${error.message}
-                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                    `;
+                                                                                                                                                                                                                    <div class="alert alert-danger">
+                                                                                                                                                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                                                                                                                        Error cargando el contenido: ${error.message}
+                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                `;
                                 modalLoader.classList.add('d-none');
                                 dynamicContent.classList.remove('d-none');
                             });
@@ -1799,11 +1799,11 @@
                                 console.error('Error:', error);
                                 modalLoader.classList.add('d-none');
                                 detailContent.innerHTML = `
-                                                                                                        <div class="alert alert-danger">
-                                                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                                            Error al cargar los detalles: ${error.message}
-                                                                                                        </div>
-                                                                                                    `;
+                                                                                                                    <div class="alert alert-danger">
+                                                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                        Error al cargar los detalles: ${error.message}
+                                                                                                                    </div>
+                                                                                                                `;
                                 detailContent.classList.remove('d-none');
                             });
                     });
@@ -2054,11 +2054,11 @@
                                     console.error('Error:', error);
                                     modalLoader.classList.add('d-none');
                                     detailContent.innerHTML = `
-                                                                                                                    <div class="alert alert-danger">
-                                                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                                                        Error al cargar el formulario: ${error.message}
-                                                                                                                    </div>
-                                                                                                                `;
+                                                                                                                                <div class="alert alert-danger">
+                                                                                                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                                    Error al cargar el formulario: ${error.message}
+                                                                                                                                </div>
+                                                                                                                            `;
                                     detailContent.classList.remove('d-none');
                                 });
                         }, 300); // Esperar 300ms
@@ -2460,11 +2460,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                    <div class="alert alert-danger">
-                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                        Error al cargar el formulario: ${error.message}
-                                                    </div>
-                                                `;
+                                                                <div class="alert alert-danger">
+                                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                    Error al cargar el formulario: ${error.message}
+                                                                </div>
+                                                            `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2522,11 +2522,72 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                        <div class="alert alert-danger">
-                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                            Error al cargar el formulario: ${error.message}
-                                        </div>
-                                    `;
+                                                    <div class="alert alert-danger">
+                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                        Error al cargar el formulario: ${error.message}
+                                                    </div>
+                                                `;
+                                        detailContent.classList.remove('d-none');
+                                    }
+                                });
+                        }
+                    }, 300);
+                }
+                // Botones editar código
+                if (e.target.closest('.editCodiBtn')) {
+                    e.preventDefault();
+                    const btn = e.target.closest('.editCodiBtn');
+                    const codiId = btn.getAttribute('data-codi-id');
+
+                    console.log('Editando código:', codiId);
+
+                    // Cerrar el modal dinámico primero si está abierto
+                    closeAnyModal('dynamicModal');
+
+                    // Pequeña pausa para asegurar que se completa la animación
+                    setTimeout(() => {
+                        // Configurar y mostrar el modal de detalle
+                        const detailModal = document.getElementById('detailModal');
+                        if (detailModal) {
+                            const modalTitle = document.getElementById('detailModalLabel');
+                            const modalLoader = document.getElementById('detail-modal-loader');
+                            const detailContent = document.getElementById('detail-content');
+
+                            if (modalTitle) modalTitle.textContent = "Editar Codi";
+                            if (modalLoader) modalLoader.classList.remove('d-none');
+                            if (detailContent) detailContent.classList.add('d-none');
+
+                            // Limpiar cualquier backdrop residual
+                            document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+
+                            // Mostrar modal
+                            detailModal.classList.add('show');
+                            detailModal.style.display = 'block';
+                            document.body.classList.add('modal-open');
+
+                            // Cargar contenido del formulario de edición
+                            fetch(`/admin/edit-form/codi/${codiId}`)
+                                .then(response => {
+                                    if (!response.ok) throw new Error('Error al cargar el formulario');
+                                    return response.text();
+                                })
+                                .then(html => {
+                                    if (modalLoader) modalLoader.classList.add('d-none');
+                                    if (detailContent) {
+                                        detailContent.innerHTML = html;
+                                        detailContent.classList.remove('d-none');
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    if (modalLoader) modalLoader.classList.add('d-none');
+                                    if (detailContent) {
+                                        detailContent.innerHTML = `
+                                                        <div class="alert alert-danger">
+                                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                                            Error al cargar el formulario: ${error.message}
+                                                        </div>
+                                                    `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2587,6 +2648,13 @@
 
         // Modificación específica para eventos
         document.addEventListener('click', function (e) {
+
+            // Al hacer clic en cualquier botón relacionado con usuarios, recordar que estamos en la vista de usuarios
+            if (e.target.closest('#newUserBtn') || e.target.closest('.editUserBtn') ||
+                e.target.closest('[data-detail-type="user"]')) {
+                window.lastActiveContentType = 'users';
+            }
+
             // Al hacer clic en cualquier botón relacionado con eventos, recordar que estamos en la vista de eventos
             if (e.target.closest('#newEventBtn') || e.target.closest('.editEventBtn') ||
                 e.target.closest('[data-detail-type="event"]')) {
@@ -2596,6 +2664,11 @@
             if (e.target.closest('#newPremiBtn') || e.target.closest('.editPremiBtn') ||
                 e.target.closest('[data-detail-type="premi"]')) {
                 window.lastActiveContentType = 'premis';
+            }
+            // Al hacer clic en cualquier botón relacionado con códigos, recordar que estamos en la vista de códigos
+            if (e.target.closest('#newCodiBtn') || e.target.closest('.editCodiBtn') ||
+                e.target.closest('[data-detail-type="codi"]')) {
+                window.lastActiveContentType = 'codis';
             }
         });
     </script>

@@ -141,6 +141,8 @@ Route::localizedGroup(function () {
             // Gestión de puntos de reciclaje
             Route::resource('punts-reciclatge', App\Http\Controllers\PuntDeRecollidaController::class);
             Route::post('/admin/events', [App\Http\Controllers\EventsController::class, 'store'])->name('admin.events.store');
+            Route::post('/admin/codis', [App\Http\Controllers\CodiController::class, 'store'])->name('admin.codis.store');
+            Route::put('/admin/codis/{codi}', [App\Http\Controllers\CodiController::class, 'update'])->name('admin.codis.update');
         });
 
     });

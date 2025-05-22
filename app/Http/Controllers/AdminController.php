@@ -146,7 +146,7 @@ class AdminController extends Controller
                     $premis = Premi::with('premiReclamats.user')->orderBy('id', 'desc')->get();
                     return view('admin.modals.premis', compact('premis'));
                 case 'codis':
-                    $codis = Codi::with('user')->latest()->get();
+                    $codis = Codi::with('user')->orderBy('id', 'desc')->get();
                     return view('admin.modals.codis', compact('codis'));
                 case 'punt-reciclatge':
                     $punts = PuntDeRecollida::latest()->get();
@@ -178,6 +178,13 @@ class AdminController extends Controller
                     $tipusEvents = TipusEvent::all();
                     return view('admin.create.event', compact('tipusEvents'));
 
+                case 'premi':
+                    return view('admin.create.premi');
+
+                case 'codi':
+                    $users = User::where('rol_id', 2)->get(); // Solo usuarios regulares
+                    return view('admin.create.codi', compact('users'));
+
                 default:
                     throw new \Exception('Formulario de creación no soportado');
             }
@@ -200,6 +207,9 @@ class AdminController extends Controller
                 return view('admin.create.event', compact('tipusEvents'));
             } elseif ($type === 'create-user') {
                 return view('admin.create.user');
+            } elseif ($type === 'create-codi') {
+                $users = User::where('rol_id', 2)->get(); // Solo usuarios regulares
+                return view('admin.create.codi', compact('users'));
             }
 
             // Casos regulares con ID
@@ -215,6 +225,10 @@ class AdminController extends Controller
                 case 'premi':
                     $premi = Premi::with('premiReclamats.user')->findOrFail($id);
                     return view('admin.details.premi', compact('premi'));
+
+                case 'codi':
+                    $codi = Codi::with('user')->findOrFail($id);
+                    return view('admin.details.codi', compact('codi'));
 
                 default:
                     throw new \Exception('Tipus de detall no suportat');
@@ -241,6 +255,11 @@ class AdminController extends Controller
                 case 'premi':
                     $premi = Premi::findOrFail($id);
                     return view('admin.edit.premi', compact('premi'));
+
+                case 'codi':
+                    $codi = Codi::findOrFail($id);
+                    $users = User::where('rol_id', 2)->get();
+                    return view('admin.edit.codi', compact('codi', 'users'));
 
                 default:
                     throw new \Exception('Formulario de edición no soportado');
@@ -296,6 +315,16 @@ class AdminController extends Controller
                     ]);
                     break;
 
+                case 'codi':
+                    $item = Codi::findOrFail($id);
+                    $validatedData = $request->validate([
+                        'user_id' => 'nullable|exists:users,id',
+                        'codi' => 'required|string|',
+                        'punts' => 'required|integer|min:0',
+                        'data_escaneig' => 'required|date',
+                    ]);
+                    break;
+
                 case 'punt-reciclatge':
                     $item = PuntDeRecollida::findOrFail($id);
                     $validatedData = $request->validate([
@@ -346,6 +375,11 @@ class AdminController extends Controller
                 case 'event':
                     $item = Event::findOrFail($id);
                     $itemName = $item->nom;
+                    break;
+
+                case 'codi':
+                    $item = Codi::findOrFail($id);
+                    $itemName = $item->codi;
                     break;
 
                 case 'premi':

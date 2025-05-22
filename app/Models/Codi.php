@@ -8,6 +8,7 @@ use Laravel\Scout\Searchable;
 class Codi extends Model
 {
     use HasFactory, Searchable;
+    public $timestamps = false;
 
     protected $fillable = [
         'user_id',
@@ -28,7 +29,7 @@ class Codi extends Model
     public function toSearchableArray()
     {
         $array = $this->toArray();
-        
+
         // Añadir datos del usuario si existe
         if ($this->user_id) {
             $user = User::find($this->user_id);
@@ -38,18 +39,18 @@ class Codi extends Model
                 $array['user_email'] = $user->email;
             }
         }
-        
+
         // Formatear la fecha para mejor búsqueda
         if ($this->data_escaneig) {
             $array['data_escaneig_formatted'] = $this->data_escaneig->format('Y-m-d H:i:s');
             $array['data_escaneig_mes'] = $this->data_escaneig->format('m');
             $array['data_escaneig_any'] = $this->data_escaneig->format('Y');
-            
+
             // Añadir nombre del mes en català
             $meses = ['Gen', 'Feb', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Oct', 'Nov', 'Des'];
             $array['data_escaneig_mes_nom'] = $meses[$this->data_escaneig->format('n') - 1];
         }
-        
+
         return $array;
     }
 
