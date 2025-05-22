@@ -217,6 +217,16 @@ class AdminController extends Controller
                 return view('admin.create.codi', compact('users'));
             } elseif ($type === 'create-producte') {
                 return view('admin.create.producte');
+            } elseif ($type === 'create-punt-reciclatge') {
+                return view('admin.create.punt-reciclatge');
+            } elseif ($type === 'create-tipus-event') {
+                return view('admin.create.tipus-event');
+            } elseif ($type === 'create-premi-reclamat') {
+                $premis = Premi::all();
+                $users = User::all();
+                return view('admin.create.premi-reclamat', compact('premis', 'users'));
+            } elseif ($type === 'create-activitat') {
+                return view('admin.create.activitat');
             }
 
             // Casos regulares con ID
@@ -239,6 +249,18 @@ class AdminController extends Controller
                 case 'producte':
                     $producte = Producte::findOrFail($id);
                     return view('admin.details.producte', compact('producte'));
+                case 'punt-reciclatge':
+                    $punt = PuntDeRecollida::findOrFail($id);
+                    return view('admin.details.punt-reciclatge', compact('punt'));
+                case 'tipus-event':
+                    $tipusEvent = TipusEvent::findOrFail($id);
+                    return view('admin.details.tipus-event', compact('tipusEvent'));
+                case 'premi-reclamat':
+                    $premiReclamat = PremiReclamat::with('user', 'premi')->findOrFail($id);
+                    return view('admin.details.premi-reclamat', compact('premiReclamat'));
+                case 'activitat':
+                    $activitat = Activity::with('user')->findOrFail($id);
+                    return view('admin.details.activitat', compact('activitat'));
                 default:
                     throw new \Exception('Tipus de detall no suportat');
             }
@@ -273,6 +295,22 @@ class AdminController extends Controller
                 case 'producte':
                     $producte = Producte::findOrFail($id);
                     return view('admin.edit.producte', compact('producte'));
+
+                case 'punt-reciclatge':
+                    $punt = PuntDeRecollida::findOrFail($id);
+                    return view('admin.edit.punt-reciclatge', compact('punt'));
+
+                case 'tipus-event':
+                    $tipusEvent = TipusEvent::findOrFail($id);
+                    return view('admin.edit.tipus-event', compact('tipusEvent'));
+
+                case 'premi-reclamat':
+                    $premiReclamat = PremiReclamat::findOrFail($id);
+                    return view('admin.edit.premi-reclamat', compact('premiReclamat'));
+                    
+                case 'activitat':
+                    $activitat = Activity::findOrFail($id);
+                    return view('admin.edit.activitat', compact('activitat'));
                 default:
                     throw new \Exception('Formulario de edición no soportado');
             }
