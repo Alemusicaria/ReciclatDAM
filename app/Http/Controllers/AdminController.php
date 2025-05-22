@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Models\TipusEvent;
 use App\Models\PuntDeRecollida;
+use App\Models\Producte;
 
 
 class AdminController extends Controller
@@ -148,6 +149,10 @@ class AdminController extends Controller
                 case 'codis':
                     $codis = Codi::with('user')->orderBy('id', 'desc')->get();
                     return view('admin.modals.codis', compact('codis'));
+                case 'productes':
+                    $productes = Producte::orderBy('id', 'desc')->get();
+                    return view('admin.modals.productes', compact('productes'));
+
                 case 'punt-reciclatge':
                     $punts = PuntDeRecollida::latest()->get();
                     return view('admin.modals.punt-reciclatge', compact('punts'));
@@ -210,6 +215,8 @@ class AdminController extends Controller
             } elseif ($type === 'create-codi') {
                 $users = User::where('rol_id', 2)->get(); // Solo usuarios regulares
                 return view('admin.create.codi', compact('users'));
+            } elseif ($type === 'create-producte') {
+                return view('admin.create.producte');
             }
 
             // Casos regulares con ID
@@ -229,7 +236,9 @@ class AdminController extends Controller
                 case 'codi':
                     $codi = Codi::with('user')->findOrFail($id);
                     return view('admin.details.codi', compact('codi'));
-
+                case 'producte':
+                    $producte = Producte::findOrFail($id);
+                    return view('admin.details.producte', compact('producte'));
                 default:
                     throw new \Exception('Tipus de detall no suportat');
             }
@@ -261,6 +270,9 @@ class AdminController extends Controller
                     $users = User::where('rol_id', 2)->get();
                     return view('admin.edit.codi', compact('codi', 'users'));
 
+                case 'producte':
+                    $producte = Producte::findOrFail($id);
+                    return view('admin.edit.producte', compact('producte'));
                 default:
                     throw new \Exception('Formulario de edición no soportado');
             }
@@ -391,7 +403,15 @@ class AdminController extends Controller
                     $item = PuntDeRecollida::findOrFail($id);
                     $itemName = $item->nom;
                     break;
+                case 'producte':
+                    $item = Producte::findOrFail($id);
+                    $itemName = $item->nom;
 
+                    // Eliminar la imagen asociada si existe
+                    if ($item->imatge && file_exists(public_path($item->imatge))) {
+                        unlink(public_path($item->imatge));
+                    }
+                    break;
                 default:
                     throw new \Exception('Tipus d\'element no suportat');
             }

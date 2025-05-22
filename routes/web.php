@@ -143,6 +143,8 @@ Route::localizedGroup(function () {
             Route::post('/admin/events', [App\Http\Controllers\EventsController::class, 'store'])->name('admin.events.store');
             Route::post('/admin/codis', [App\Http\Controllers\CodiController::class, 'store'])->name('admin.codis.store');
             Route::put('/admin/codis/{codi}', [App\Http\Controllers\CodiController::class, 'update'])->name('admin.codis.update');
+            Route::post('/admin/productes', [App\Http\Controllers\ProducteController::class, 'store'])->name('admin.productes.store');
+            Route::put('/admin/productes/{producte}', [App\Http\Controllers\ProducteController::class, 'update'])->name('admin.productes.update');
         });
 
     });
