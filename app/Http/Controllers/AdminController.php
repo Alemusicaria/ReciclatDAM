@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\TipusEvent;
 use App\Models\PuntDeRecollida;
 use App\Models\Producte;
+use App\Models\Rol;
 
 
 class AdminController extends Controller
@@ -152,7 +153,9 @@ class AdminController extends Controller
                 case 'productes':
                     $productes = Producte::orderBy('id', 'desc')->get();
                     return view('admin.modals.productes', compact('productes'));
-
+                case 'rols':
+                    $rols = Rol::orderBy('id', 'desc')->get();
+                    return view('admin.modals.rols', compact('rols'));
                 case 'punt-reciclatge':
                     $punts = PuntDeRecollida::latest()->get();
                     return view('admin.modals.punt-reciclatge', compact('punts'));
@@ -219,6 +222,8 @@ class AdminController extends Controller
                 return view('admin.create.producte');
             } elseif ($type === 'create-punt-reciclatge') {
                 return view('admin.create.punt-reciclatge');
+            } elseif ($type === 'create-rol') {
+                return view('admin.create.rol');
             } elseif ($type === 'create-tipus-event') {
                 return view('admin.create.tipus-event');
             } elseif ($type === 'create-premi-reclamat') {
@@ -252,6 +257,9 @@ class AdminController extends Controller
                 case 'punt-reciclatge':
                     $punt = PuntDeRecollida::findOrFail($id);
                     return view('admin.details.punt-reciclatge', compact('punt'));
+                case 'rol':
+                    $rol = Rol::findOrFail($id);
+                    return view('admin.details.rol', compact('rol'));
                 case 'tipus-event':
                     $tipusEvent = TipusEvent::findOrFail($id);
                     return view('admin.details.tipus-event', compact('tipusEvent'));
@@ -300,6 +308,10 @@ class AdminController extends Controller
                     $punt = PuntDeRecollida::findOrFail($id);
                     return view('admin.edit.punt-reciclatge', compact('punt'));
 
+                case 'rol':
+                    $rol = Rol::findOrFail($id);
+                    return view('admin.edit.rol', compact('rol'));
+
                 case 'tipus-event':
                     $tipusEvent = TipusEvent::findOrFail($id);
                     return view('admin.edit.tipus-event', compact('tipusEvent'));
@@ -307,7 +319,7 @@ class AdminController extends Controller
                 case 'premi-reclamat':
                     $premiReclamat = PremiReclamat::findOrFail($id);
                     return view('admin.edit.premi-reclamat', compact('premiReclamat'));
-                    
+
                 case 'activitat':
                     $activitat = Activity::findOrFail($id);
                     return view('admin.edit.activitat', compact('activitat'));
@@ -388,6 +400,13 @@ class AdminController extends Controller
                     ]);
                     break;
 
+                case 'rol':
+                    $item = Rol::findOrFail($id);
+                    $validatedData = $request->validate([
+                        'nom' => 'required|string|max:255',
+                    ]);
+                    break;
+
                 default:
                     throw new \Exception('Tipo de detalle no soportado');
             }
@@ -441,6 +460,12 @@ class AdminController extends Controller
                     $item = PuntDeRecollida::findOrFail($id);
                     $itemName = $item->nom;
                     break;
+
+                case 'rol':
+                    $item = Rol::findOrFail($id);
+                    $itemName = $item->nom;
+                    break;
+
                 case 'producte':
                     $item = Producte::findOrFail($id);
                     $itemName = $item->nom;
