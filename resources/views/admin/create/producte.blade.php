@@ -19,8 +19,21 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="categoria" class="form-label">Categoria <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="categoria" name="categoria" required>
+                                <label for="categoria" class="form-label">Categoria <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="categoria" name="categoria" required>
+                                    <option value="">Selecciona una categoria</option>
+                                    <option value="Deixalleria">Deixalleria</option>
+                                    <option value="Envasos">Envasos</option>
+                                    <option value="Especial">Especial</option>
+                                    <option value="Medicaments">Medicaments</option>
+                                    <option value="Organica">Orgànica</option>
+                                    <option value="Paper">Paper</option>
+                                    <option value="Piles">Piles</option>
+                                    <option value="RAEE">RAEE</option>
+                                    <option value="Resta">Resta</option>
+                                    <option value="Vidre">Vidre</option>
+                                </select>
                             </div>
 
                             <div class="mb-3">
@@ -33,7 +46,8 @@
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
-                        <button type="submit" class="btn btn-primary" id="submitCreateProducteForm">Guardar Producte</button>
+                        <button type="submit" class="btn btn-primary" id="submitCreateProducteForm">Guardar
+                            Producte</button>
                     </div>
                 </form>
             </div>
@@ -42,7 +56,7 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const form = document.getElementById('createProducteForm');
         if (form) {
             form.addEventListener('submit', function (e) {
@@ -77,36 +91,36 @@
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Cerrar modal
-                        closeAnyModal('detailModal');
-                        
-                        // Recargar lista de productos
-                        setTimeout(() => {
-                            const productesBtn = document.querySelector('[data-content-type="productes"]');
-                            if (productesBtn) productesBtn.click();
-                        }, 300);
-                    } else {
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Cerrar modal
+                            closeAnyModal('detailModal');
+
+                            // Recargar lista de productos
+                            setTimeout(() => {
+                                const productesBtn = document.querySelector('[data-content-type="productes"]');
+                                if (productesBtn) productesBtn.click();
+                            }, 300);
+                        } else {
+                            // Restaurar botón
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = 'Guardar Producte';
+
+                            // Mostrar error
+                            alert('Error: ' + (data.message || 'No s\'ha pogut crear el producte'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+
                         // Restaurar botón
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = 'Guardar Producte';
 
                         // Mostrar error
-                        alert('Error: ' + (data.message || 'No s\'ha pogut crear el producte'));
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    
-                    // Restaurar botón
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = 'Guardar Producte';
-                    
-                    // Mostrar error
-                    alert('Error al crear el producte: ' + error.message);
-                });
+                        alert('Error al crear el producte: ' + error.message);
+                    });
             });
         }
     });

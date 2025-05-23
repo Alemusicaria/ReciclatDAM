@@ -16,12 +16,34 @@
                         <div class="card-body">
                             <div class="mb-3">
                                 <label for="nom" class="form-label">Nom <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="nom" name="nom" value="{{ $producte->nom }}" required>
+                                <input type="text" class="form-control" id="nom" name="nom" value="{{ $producte->nom }}"
+                                    required>
                             </div>
 
                             <div class="mb-3">
-                                <label for="categoria" class="form-label">Categoria <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="categoria" name="categoria" value="{{ $producte->categoria }}" required>
+                                <label for="categoria" class="form-label">Categoria <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="categoria" name="categoria" required>
+                                    <option value="">Selecciona una categoria</option>
+                                    <option value="Deixalleria" {{ $producte->categoria == 'Deixalleria' ? 'selected' : '' }}>Deixalleria</option>
+                                    <option value="Envasos" {{ $producte->categoria == 'Envasos' ? 'selected' : '' }}>
+                                        Envasos</option>
+                                    <option value="Especial" {{ $producte->categoria == 'Especial' ? 'selected' : '' }}>
+                                        Especial</option>
+                                    <option value="Medicaments" {{ $producte->categoria == 'Medicaments' ? 'selected' : '' }}>Medicaments</option>
+                                    <option value="Organica" {{ $producte->categoria == 'Organica' ? 'selected' : '' }}>
+                                        Orgànica</option>
+                                    <option value="Paper" {{ $producte->categoria == 'Paper' ? 'selected' : '' }}>Paper
+                                    </option>
+                                    <option value="Piles" {{ $producte->categoria == 'Piles' ? 'selected' : '' }}>Piles
+                                    </option>
+                                    <option value="RAEE" {{ $producte->categoria == 'RAEE' ? 'selected' : '' }}>RAEE
+                                    </option>
+                                    <option value="Resta" {{ $producte->categoria == 'Resta' ? 'selected' : '' }}>Resta
+                                    </option>
+                                    <option value="Vidre" {{ $producte->categoria == 'Vidre' ? 'selected' : '' }}>Vidre
+                                    </option>
+                                </select>
                             </div>
 
                             <div class="mb-3">
@@ -33,7 +55,8 @@
                                     <div class="mt-2">
                                         <label>Imatge actual:</label>
                                         <div>
-                                            <img src="{{ asset($producte->imatge) }}" class="rounded" width="100" alt="Imatge del producte">
+                                            <img src="{{ asset($producte->imatge) }}" class="rounded" width="100"
+                                                alt="Imatge del producte">
                                         </div>
                                     </div>
                                 @endif
@@ -42,8 +65,10 @@
                     </div>
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancelEditBtn">Cancel·lar</button>
-                        <button type="submit" class="btn btn-primary" id="updateProducteBtn">Actualitzar Producte</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            id="cancelEditBtn">Cancel·lar</button>
+                        <button type="submit" class="btn btn-primary" id="updateProducteBtn">Actualitzar
+                            Producte</button>
                     </div>
                 </form>
             </div>
@@ -52,7 +77,7 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const form = document.getElementById('editProducteForm');
         if (form) {
             form.addEventListener('submit', function (e) {
@@ -88,37 +113,37 @@
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Cerrar modal
-                        closeAnyModal('detailModal');
-                        
-                        // Recargar lista de productos
-                        setTimeout(() => {
-                            const productesBtn = document.querySelector('[data-content-type="productes"]');
-                            if (productesBtn) productesBtn.click();
-                        }, 300);
-                    } else {
-                        // Restaurar botón
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Cerrar modal
+                            closeAnyModal('detailModal');
+
+                            // Recargar lista de productos
+                            setTimeout(() => {
+                                const productesBtn = document.querySelector('[data-content-type="productes"]');
+                                if (productesBtn) productesBtn.click();
+                            }, 300);
+                        } else {
+                            // Restaurar botón
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = 'Actualitzar Producte';
+                            alert('Error: ' + (data.message || 'No s\'ha pogut actualitzar el producte'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = 'Actualitzar Producte';
-                        alert('Error: ' + (data.message || 'No s\'ha pogut actualitzar el producte'));
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = 'Actualitzar Producte';
-                    alert('Error al actualitzar el producte: ' + error.message);
-                });
+                        alert('Error al actualitzar el producte: ' + error.message);
+                    });
             });
         }
 
         // Botón cancelar
         const cancelBtn = document.getElementById('cancelEditBtn');
         if (cancelBtn) {
-            cancelBtn.addEventListener('click', function() {
+            cancelBtn.addEventListener('click', function () {
                 closeAnyModal('detailModal');
             });
         }

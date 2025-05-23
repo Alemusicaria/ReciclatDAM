@@ -23,10 +23,10 @@
                     <td>
                         <div class="d-flex align-items-center">
                             @if($producte->imatge)
-                                <img src="{{ asset($producte->imatge) }}" class="rounded me-2" width="40"
-                                    height="40" alt="Producte" style="object-fit: cover; margin-right: 10px;">
+                                <img src="{{ asset($producte->imatge) }}" class="rounded me-2" width="40" height="40"
+                                    alt="Producte" style="object-fit: cover; margin-right: 10px;">
                             @else
-                                <div class="product-icon-placeholder rounded me-2 d-flex align-items-center justify-content-center" 
+                                <div class="product-icon-placeholder rounded me-2 d-flex align-items-center justify-content-center"
                                     style="width: 40px; height: 40px; background-color: #4caf50;">
                                     <i class="fas fa-box text-white"></i>
                                 </div>
@@ -35,7 +35,31 @@
                         </div>
                     </td>
                     <td>
-                        <span class="badge bg-primary">{{ $producte->categoria }}</span>
+                        <span class="badge" style="
+                    @if($producte->categoria == 'Paper')
+                        background-color: #2859bc; /* Blau */
+                    @elseif($producte->categoria == 'Envasos')
+                        background-color: #fddd19; color: #000; /* Groc */
+                    @elseif($producte->categoria == 'Organica')
+                        background-color: #9e6831; /* Marró */
+                    @elseif($producte->categoria == 'Vidre')
+                        background-color: #3fd055; /* Verd */
+                    @elseif($producte->categoria == 'Resta')
+                        background-color: #6d7878; /* Gris */
+                    @elseif($producte->categoria == 'Deixalleria')
+                        background-color: #d62c2d; /* Vermell */
+                    @elseif($producte->categoria == 'Medicaments')
+                        background-color: #b7e53b; color: #000; /* Verd clar */
+                    @elseif($producte->categoria == 'Piles')
+                        background-color: #fca614; /* Taronja */
+                    @elseif($producte->categoria == 'Especial')
+                        background-color: #2f3939; /* Gris fosc */
+                    @elseif($producte->categoria == 'RAEE')
+                        background-color: #006f3f; /* Verd fosc */
+                    @else
+                        background-color: #3f51b5; /* Color por defecto */
+                    @endif
+                ">{{ $producte->categoria }}</span>
                     </td>
                     <td>
                         <div class="btn-group">
@@ -47,10 +71,8 @@
                                 title="Editar">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn btn-danger btn-sm deleteBtn" 
-                                data-item-id="{{ $producte->id }}" 
-                                data-item-name="{{ $producte->nom }}"
-                                data-item-type="producte">
+                            <button class="btn btn-danger btn-sm deleteBtn" data-item-id="{{ $producte->id }}"
+                                data-item-name="{{ $producte->nom }}" data-item-type="producte">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>

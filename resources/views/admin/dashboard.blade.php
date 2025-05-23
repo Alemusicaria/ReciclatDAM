@@ -570,7 +570,6 @@
 
         /* Estils generals */
         .admin-dashboard {
-            background-color: var(--admin-bg);
             min-height: 100vh;
             padding-top: 60px;
         }
@@ -987,7 +986,6 @@
 
         /* Asegura que los contenedores principales tengan altura adecuada */
         .admin-dashboard {
-            background-color: var(--admin-bg);
             min-height: 100vh;
             padding-top: 60px;
             overflow-x: hidden;
