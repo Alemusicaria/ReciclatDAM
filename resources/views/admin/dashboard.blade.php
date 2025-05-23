@@ -320,7 +320,8 @@
                                                 )
                                             ) :
                                             asset('images/default-profile.png') 
-                                                                                            }}" alt="Foto perfil" class="activity-avatar">
+                                                                                                                                }}" alt="Foto perfil"
+                                                                                        class="activity-avatar">
 
                                                                                     <div class="activity-user-info">
                                                                                         <h6 class="activity-user-name">
@@ -385,7 +386,7 @@
                                         )
                                     ) :
                                     asset('images/default-profile.png')   
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         }}"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     }}"
                                                                     alt="Foto perfil" class="ranking-avatar">
                                                                 <div class="ranking-user-info">
                                                                     <h6 class="ranking-user-name">{{ $user->nom }} {{ $user->cognoms }}</h6>
@@ -472,8 +473,8 @@
             </div>
         </div>
         <!-- Al final del dashboard pero antes de los scripts, añade este modal genérico -->
-        <div class="modal fade" id="dynamicModal" tabindex="-1" aria-labelledby="dynamicModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
+        <div class="modal fade" id="dynamicModal" tabindex="-1" aria-labelledby="dynamicModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+        <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="dynamicModalLabel">Cargando ...</h5>
@@ -492,8 +493,8 @@
             </div>
         </div>
         <!-- Modal para detalles -->
-        <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
+        <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+        <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="detailModalLabel">Detalls</h5>
@@ -1768,11 +1769,11 @@
                             .catch(error => {
                                 console.error('Error cargando contenido:', error);
                                 dynamicContent.innerHTML = `
-                                        <div class="alert alert-danger">
-                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                            Error cargando el contenido: ${error.message}
-                                        </div>
-                                    `;
+                                            <div class="alert alert-danger">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                Error cargando el contenido: ${error.message}
+                                            </div>
+                                        `;
                                 modalLoader.classList.add('d-none');
                                 dynamicContent.classList.remove('d-none');
                             });
@@ -1915,11 +1916,11 @@
                                 console.error('Error:', error);
                                 modalLoader.classList.add('d-none');
                                 detailContent.innerHTML = `
-                                        <div class="alert alert-danger">
-                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                            Error al cargar los detalles: ${error.message}
-                                        </div>
-                                    `;
+                                            <div class="alert alert-danger">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                Error al cargar los detalles: ${error.message}
+                                            </div>
+                                        `;
                                 detailContent.classList.remove('d-none');
                             });
                     });
@@ -2170,11 +2171,11 @@
                                     console.error('Error:', error);
                                     modalLoader.classList.add('d-none');
                                     detailContent.innerHTML = `
-                                            <div class="alert alert-danger">
-                                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                                Error al cargar el formulario: ${error.message}
-                                            </div>
-                                        `;
+                                                <div class="alert alert-danger">
+                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                    Error al cargar el formulario: ${error.message}
+                                                </div>
+                                            `;
                                     detailContent.classList.remove('d-none');
                                 });
                         }, 300); // Esperar 300ms
@@ -2576,11 +2577,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                <div class="alert alert-danger">
-                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                    Error al cargar el formulario: ${error.message}
-                                                </div>
-                                            `;
+                                                    <div class="alert alert-danger">
+                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                        Error al cargar el formulario: ${error.message}
+                                                    </div>
+                                                `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2638,11 +2639,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                <div class="alert alert-danger">
-                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                    Error al cargar el formulario: ${error.message}
-                                                </div>
-                                            `;
+                                                    <div class="alert alert-danger">
+                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                        Error al cargar el formulario: ${error.message}
+                                                    </div>
+                                                `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2699,11 +2700,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                <div class="alert alert-danger">
-                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                    Error al cargar el formulario: ${error.message}
-                                                </div>
-                                            `;
+                                                    <div class="alert alert-danger">
+                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                        Error al cargar el formulario: ${error.message}
+                                                    </div>
+                                                `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2750,11 +2751,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                <div class="alert alert-danger">
-                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                    Error al cargar el formulario: ${error.message}
-                                                </div>
-                                            `;
+                                                    <div class="alert alert-danger">
+                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                        Error al cargar el formulario: ${error.message}
+                                                    </div>
+                                                `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2801,11 +2802,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                <div class="alert alert-danger">
-                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                    Error al cargar el formulario: ${error.message}
-                                                </div>
-                                            `;
+                                                    <div class="alert alert-danger">
+                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                        Error al cargar el formulario: ${error.message}
+                                                    </div>
+                                                `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2852,11 +2853,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                <div class="alert alert-danger">
-                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                    Error al cargar el formulario: ${error.message}
-                                                </div>
-                                            `;
+                                                    <div class="alert alert-danger">
+                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                        Error al cargar el formulario: ${error.message}
+                                                    </div>
+                                                `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2905,11 +2906,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                <div class="alert alert-danger">
-                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                    Error al cargar el formulario: ${error.message}
-                                                </div>
-                                            `;
+                                                    <div class="alert alert-danger">
+                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                        Error al cargar el formulario: ${error.message}
+                                                    </div>
+                                                `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2956,11 +2957,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                <div class="alert alert-danger">
-                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                    Error al cargar el formulario: ${error.message}
-                                                </div>
-                                            `;
+                                                    <div class="alert alert-danger">
+                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                        Error al cargar el formulario: ${error.message}
+                                                    </div>
+                                                `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -3007,11 +3008,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                <div class="alert alert-danger">
-                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                    Error al cargar el formulario: ${error.message}
-                                                </div>
-                                            `;
+                                                    <div class="alert alert-danger">
+                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                        Error al cargar el formulario: ${error.message}
+                                                    </div>
+                                                `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -3135,11 +3136,11 @@
                                 if (modalLoader) modalLoader.classList.add('d-none');
                                 if (modalContent) {
                                     modalContent.innerHTML = `
-                                            <div class="alert alert-danger">
-                                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                                Error al cargar el historial: ${error.message}
-                                            </div>
-                                        `;
+                                                <div class="alert alert-danger">
+                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                    Error al cargar el historial: ${error.message}
+                                                </div>
+                                            `;
                                     modalContent.classList.remove('d-none');
                                 }
                             });
@@ -3183,17 +3184,57 @@
                                 if (modalLoader) modalLoader.classList.add('d-none');
                                 if (detailContent) {
                                     detailContent.innerHTML = `
-                                            <div class="alert alert-danger">
-                                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                                Error al cargar los detalles: ${error.message}
-                                            </div>
-                                        `;
+                                                <div class="alert alert-danger">
+                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                    Error al cargar los detalles: ${error.message}
+                                                </div>
+                                            `;
                                     detailContent.classList.remove('d-none');
                                 }
                             });
                     }
                 });
             });
+        });
+    </script>
+    <script>
+        // Inicializar todos los modales con las opciones correctas
+        document.addEventListener('DOMContentLoaded', function () {
+            // Configurar todos los modales para cerrarse al hacer clic fuera
+            var modals = document.querySelectorAll('.modal');
+            modals.forEach(function (modal) {
+                var modalInstance = new bootstrap.Modal(modal, {
+                    backdrop: true,
+                    keyboard: true
+                });
+
+                // Añadir atributo de backdrop si no existe
+                if (!modal.hasAttribute('data-bs-backdrop')) {
+                    modal.setAttribute('data-bs-backdrop', 'true');
+                }
+            });
+
+            // Para modal dinámico
+            const dynamicModal = document.getElementById('dynamicModal');
+            if (dynamicModal) {
+                // Añadir manejo para cerrar al hacer clic fuera
+                dynamicModal.addEventListener('click', function (e) {
+                    if (e.target === dynamicModal) {
+                        closeAnyModal('dynamicModal');
+                    }
+                });
+            }
+
+            // Para modal de detalles
+            const detailModal = document.getElementById('detailModal');
+            if (detailModal) {
+                // Añadir manejo para cerrar al hacer clic fuera
+                detailModal.addEventListener('click', function (e) {
+                    if (e.target === detailModal) {
+                        closeAnyModal('detailModal');
+                    }
+                });
+            }
         });
     </script>
 @endsection
