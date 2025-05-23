@@ -18,6 +18,7 @@ use App\Models\Rol;
 use App\Models\TipusAlerta;
 use App\Models\AlertaPuntDeRecollida;
 use App\Models\Opinions;
+use App\Models\NavigatorInfo;
 
 
 class AdminController extends Controller
@@ -588,5 +589,203 @@ class AdminController extends Controller
                 'message' => 'Error: ' . $e->getMessage()
             ], 500);
         }
+    }
+    public function navigatorStats()
+    {
+        // Usar límites, agregación y muestreo para grandes conjuntos de datos
+        $totalRecords = NavigatorInfo::count();
+
+        // Si hay más de 10,000 registros, hacemos muestreo
+        $limit = $totalRecords > 10000 ? 10000 : $totalRecords;
+        $samplingPercentage = $totalRecords > 0 ? round(($limit / $totalRecords) * 100, 1) : 100;
+
+        // Extraer datos de plataforma con límite para evitar sobrecarga
+        $platformData = NavigatorInfo::select('platform')
+            ->whereNotNull('platform')
+            ->limit($limit)
+            ->get()
+            ->groupBy('platform')
+            ->map(function ($items) {
+                return count($items);
+            });
+
+        // Para navegadores, extraer información desde user_agent
+        $browserData = NavigatorInfo::select('user_agent', 'app_name')
+            ->limit($limit)
+            ->get()
+            ->map(function ($item) {
+                $ua = strtolower($item->user_agent ?? '');
+                if (strpos($ua, 'chrome') !== false && strpos($ua, 'edg/') === false)
+                    return 'Chrome';
+                if (strpos($ua, 'firefox') !== false)
+                    return 'Firefox';
+                if (strpos($ua, 'safari') !== false && strpos($ua, 'chrome') === false)
+                    return 'Safari';
+                if (strpos($ua, 'edg') !== false)
+                    return 'Edge';
+                if (strpos($ua, 'opera') !== false || strpos($ua, 'opr/') !== false)
+                    return 'Opera';
+                if (strpos($ua, 'trident') !== false || strpos($ua, 'msie') !== false)
+                    return 'Internet Explorer';
+                return 'Otro';
+            })
+            ->countBy();
+
+        // Dispositivos móviles vs desktop
+        $deviceData = NavigatorInfo::select('user_agent')
+            ->limit($limit)
+            ->get()
+            ->map(function ($item) {
+                $ua = strtolower($item->user_agent ?? '');
+                if (
+                    strpos($ua, 'mobile') !== false ||
+                    strpos($ua, 'android') !== false ||
+                    strpos($ua, 'iphone') !== false ||
+                    strpos($ua, 'ipad') !== false
+                ) {
+                    return 'Mobile';
+                }
+                return 'Desktop';
+            })
+            ->countBy();
+
+        // Resoluciones de pantalla más comunes
+        $resolutionData = NavigatorInfo::selectRaw('CONCAT(screen_width, "x", screen_height) as resolution')
+            ->whereNotNull('screen_width')
+            ->whereNotNull('screen_height')
+            ->limit($limit)
+            ->get()
+            ->countBy('resolution')
+            ->sortDesc()
+            ->take(10);
+
+        // Idiomas
+        $languageData = NavigatorInfo::select('language')
+            ->whereNotNull('language')
+            ->limit($limit)
+            ->get()
+            ->countBy('language')
+            ->sortDesc()
+            ->take(10);
+
+        // Soporte para cookies (estadística)
+        $cookiesEnabled = NavigatorInfo::where('cookie_enabled', true)->count();
+        $cookiesDisabled = NavigatorInfo::where('cookie_enabled', false)->count();
+
+        // Promedio de núcleos de CPU (hardware_concurrency)
+        $avgConcurrency = NavigatorInfo::whereNotNull('hardware_concurrency')
+            ->avg('hardware_concurrency');
+
+        // Distribuir los datos para la vista
+        return view('admin.navigator-stats', compact(
+            'totalRecords',
+            'limit',
+            'samplingPercentage',
+            'platformData',
+            'browserData',
+            'deviceData',
+            'resolutionData',
+            'languageData',
+            'cookiesEnabled',
+            'cookiesDisabled',
+            'avgConcurrency'
+        ));
+    }
+    public function navigatorStatsData()
+    {
+        // Usar límites para evitar carga excesiva en el servidor
+        $totalRecords = NavigatorInfo::count();
+        $limit = $totalRecords > 10000 ? 10000 : $totalRecords;
+        $samplingPercentage = $totalRecords > 0 ? round(($limit / $totalRecords) * 100, 1) : 100;
+
+        // Extraer datos básicos (mismo código que en navigatorStats pero adaptado para JSON)
+        $platformData = NavigatorInfo::select('platform')
+            ->whereNotNull('platform')
+            ->limit($limit)
+            ->get()
+            ->groupBy('platform')
+            ->map(function ($items) {
+                return count($items);
+            });
+
+        $browserData = NavigatorInfo::select('user_agent', 'app_name')
+            ->limit($limit)
+            ->get()
+            ->map(function ($item) {
+                $ua = strtolower($item->user_agent ?? '');
+                if (strpos($ua, 'chrome') !== false && strpos($ua, 'edg/') === false)
+                    return 'Chrome';
+                if (strpos($ua, 'firefox') !== false)
+                    return 'Firefox';
+                if (strpos($ua, 'safari') !== false && strpos($ua, 'chrome') === false)
+                    return 'Safari';
+                if (strpos($ua, 'edg') !== false)
+                    return 'Edge';
+                if (strpos($ua, 'opera') !== false || strpos($ua, 'opr/') !== false)
+                    return 'Opera';
+                if (strpos($ua, 'trident') !== false || strpos($ua, 'msie') !== false)
+                    return 'Internet Explorer';
+                return 'Otro';
+            })
+            ->countBy();
+
+        $deviceData = NavigatorInfo::select('user_agent')
+            ->limit($limit)
+            ->get()
+            ->map(function ($item) {
+                $ua = strtolower($item->user_agent ?? '');
+                if (
+                    strpos($ua, 'mobile') !== false ||
+                    strpos($ua, 'android') !== false ||
+                    strpos($ua, 'iphone') !== false ||
+                    strpos($ua, 'ipad') !== false
+                ) {
+                    return 'Mobile';
+                }
+                return 'Desktop';
+            })
+            ->countBy();
+
+        $resolutionData = NavigatorInfo::selectRaw('CONCAT(screen_width, "x", screen_height) as resolution')
+            ->whereNotNull('screen_width')
+            ->whereNotNull('screen_height')
+            ->limit($limit)
+            ->get()
+            ->countBy('resolution')
+            ->sortDesc()
+            ->take(10);
+
+        $languageData = NavigatorInfo::select('language')
+            ->whereNotNull('language')
+            ->limit($limit)
+            ->get()
+            ->countBy('language')
+            ->sortDesc()
+            ->take(10);
+
+        $cookiesEnabled = NavigatorInfo::where('cookie_enabled', true)->count();
+        $cookiesDisabled = NavigatorInfo::where('cookie_enabled', false)->count();
+
+        $avgConcurrency = NavigatorInfo::whereNotNull('hardware_concurrency')
+            ->avg('hardware_concurrency');
+
+        // Preparar datos para JSON
+        return response()->json([
+            'totalRecords' => $totalRecords,
+            'limit' => $limit,
+            'samplingPercentage' => $samplingPercentage,
+            'platformLabels' => $platformData->keys(),
+            'platformData' => $platformData->values(),
+            'browserLabels' => $browserData->keys(),
+            'browserData' => $browserData->values(),
+            'deviceLabels' => $deviceData->keys(),
+            'deviceData' => $deviceData->toArray(),
+            'resolutionData' => $resolutionData->toArray(),
+            'languageLabels' => $languageData->keys(),
+            'languageData' => $languageData->values(),
+            'cookiesEnabled' => $cookiesEnabled,
+            'cookiesDisabled' => $cookiesDisabled,
+            'avgConcurrency' => $avgConcurrency,
+        ]);
     }
 }

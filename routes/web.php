@@ -160,9 +160,12 @@ Route::localizedGroup(function () {
 
             Route::post('/admin/alertes-punts', [App\Http\Controllers\AlertaPuntDeRecollidaController::class, 'store'])->name('admin.alertes-punts.store');
             Route::put('/admin/alertes-punts/{alertaPuntDeRecollida}', [App\Http\Controllers\AlertaPuntDeRecollidaController::class, 'update'])->name('admin.alertes-punts.update');
-            
+
             Route::post('/admin/tipus-events', [App\Http\Controllers\TipusEventController::class, 'store'])->name('admin.tipus-events.store');
             Route::put('/admin/tipus-events/{tipusEvent}', [App\Http\Controllers\TipusEventController::class, 'update'])->name('admin.tipus-events.update');
+
+            Route::get('/admin/navigator-stats', [App\Http\Controllers\AdminController::class, 'navigatorStats'])->name('admin.navigator-stats');
+            Route::get('/admin/navigator-stats-data', [App\Http\Controllers\AdminController::class, 'navigatorStatsData'])->name('admin.navigator-stats-data');
         });
     });
 });
