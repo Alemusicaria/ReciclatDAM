@@ -16,6 +16,7 @@ use App\Models\PuntDeRecollida;
 use App\Models\Producte;
 use App\Models\Rol;
 use App\Models\TipusAlerta;
+use App\Models\AlertaPuntDeRecollida;
 
 
 class AdminController extends Controller
@@ -160,6 +161,9 @@ class AdminController extends Controller
                 case 'rols':
                     $rols = Rol::orderBy('id', 'desc')->get();
                     return view('admin.modals.rols', compact('rols'));
+                case 'alertes-punts':
+                    $alertes = AlertaPuntDeRecollida::with('puntDeRecollida', 'tipus')->latest()->get();
+                    return view('admin.modals.alertes-punts', compact('alertes'));
                 case 'tipus-alertes':
                     $tipusAlertes = TipusAlerta::with('alertes')->latest()->get();
                     return view('admin.modals.tipus-alertes', compact('tipusAlertes'));
@@ -228,6 +232,10 @@ class AdminController extends Controller
                 return view('admin.create.punt-reciclatge');
             } elseif ($type === 'create-rol') {
                 return view('admin.create.rol');
+            } elseif ($type === 'create-alerta-punt') {
+                $puntsDeRecollida = PuntDeRecollida::all();
+                $tipusAlertes = TipusAlerta::all();
+                return view('admin.create.alerta-punt', compact('puntsDeRecollida', 'tipusAlertes'));
             } elseif ($type === 'create-tipus-alerta') {
                 return view('admin.create.tipus-alerta');
             } elseif ($type === 'create-tipus-event') {
@@ -266,6 +274,9 @@ class AdminController extends Controller
                 case 'rol':
                     $rol = Rol::findOrFail($id);
                     return view('admin.details.rol', compact('rol'));
+                case 'alerta-punt':
+                    $alerta = AlertaPuntDeRecollida::with('puntDeRecollida', 'tipus')->findOrFail($id);
+                    return view('admin.details.alerta-punt', compact('alerta'));
                 case 'tipus-alerta':
                     $tipusAlerta = TipusAlerta::findOrFail($id);
                     return view('admin.details.tipus-alerta', compact('tipusAlerta'));
@@ -320,6 +331,12 @@ class AdminController extends Controller
                 case 'rol':
                     $rol = Rol::findOrFail($id);
                     return view('admin.edit.rol', compact('rol'));
+
+                case 'alerta-punt':
+                    $alerta = AlertaPuntDeRecollida::findOrFail($id);
+                    $puntsDeRecollida = PuntDeRecollida::all();
+                    $tipusAlertes = TipusAlerta::all();
+                    return view('admin.edit.alerta-punt', compact('alerta', 'puntsDeRecollida', 'tipusAlertes'));
 
                 case 'tipus-alerta':
                     $tipusAlerta = TipusAlerta::findOrFail($id);
@@ -420,6 +437,15 @@ class AdminController extends Controller
                     ]);
                     break;
 
+                case 'alerta-punt':
+                    $item = AlertaPuntDeRecollida::findOrFail($id);
+                    $validatedData = $request->validate([
+                        'punt_de_recollida_id' => 'required|exists:punts_de_recollida,id',
+                        'tipus_alerta_id' => 'required|exists:tipus_alertes,id',
+                        'descripció' => 'required|string',
+                    ]);
+                    break;
+
                 case 'tipus-alerta':
                     $item = TipusAlerta::findOrFail($id);
                     $validatedData = $request->validate([
@@ -485,7 +511,17 @@ class AdminController extends Controller
                     $item = Rol::findOrFail($id);
                     $itemName = $item->nom;
                     break;
-                    
+
+                case 'alerta-punt':
+                    $item = AlertaPuntDeRecollida::findOrFail($id);
+                    $itemName = 'Alerta #' . $item->id;
+
+                    // Eliminar la imagen si existe
+                    if ($item->imatge && file_exists(public_path($item->imatge))) {
+                        unlink(public_path($item->imatge));
+                    }
+                    break;
+
                 case 'tipus-alerta':
                     $item = TipusAlerta::findOrFail($id);
                     $itemName = $item->nom;

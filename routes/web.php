@@ -157,6 +157,9 @@ Route::localizedGroup(function () {
 
             Route::post('/admin/tipus-alertes', [App\Http\Controllers\TipusAlertaController::class, 'store'])->name('admin.tipus-alertes.store');
             Route::put('/admin/tipus-alertes/{tipusAlerta}', [App\Http\Controllers\TipusAlertaController::class, 'update'])->name('admin.tipus-alertes.update');
+
+            Route::post('/admin/alertes-punts', [App\Http\Controllers\AlertaPuntDeRecollidaController::class, 'store'])->name('admin.alertes-punts.store');
+            Route::put('/admin/alertes-punts/{alertaPuntDeRecollida}', [App\Http\Controllers\AlertaPuntDeRecollidaController::class, 'update'])->name('admin.alertes-punts.update');
         });
     });
 });
