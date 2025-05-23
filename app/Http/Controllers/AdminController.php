@@ -53,11 +53,7 @@ class AdminController extends Controller
         // Premis pendents
         $pendingRewards = PremiReclamat::where('estat', 'pendent')->count();
 
-        // Millors usuaris - SIN USAR with('nivell')
-        $topUsers = User::where('rol_id', 2)
-            ->orderBy('punts_totals', 'desc')
-            ->take(5)
-            ->get();
+        $topUsers = User::orderBy('punts_actuals', 'desc')->get();
 
         // Activitat recent
         $recentActivities = Activity::with('user')
@@ -176,6 +172,9 @@ class AdminController extends Controller
                 case 'activitats':
                     $activitats = Activity::with('user')->latest()->get();
                     return view('admin.modals.activitats', compact('activitats'));
+                case 'users-ranking':
+                    $users = User::orderBy('punts_totals', 'desc')->get();
+                    return view('admin.modals.users-ranking', compact('users'));
                 default:
                     throw new \Exception('Modal no suportada');
             }
