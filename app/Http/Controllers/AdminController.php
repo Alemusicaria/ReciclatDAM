@@ -453,6 +453,15 @@ class AdminController extends Controller
                     ]);
                     break;
 
+                case 'tipus-event':
+                    $item = TipusEvent::findOrFail($id);
+                    $validatedData = $request->validate([
+                        'nom' => 'required|string|max:255',
+                        'descripcio' => 'nullable|string',
+                        'color' => 'required|string|max:7',
+                    ]);
+                    break;
+
                 default:
                     throw new \Exception('Tipo de detalle no soportado');
             }
@@ -525,6 +534,16 @@ class AdminController extends Controller
                 case 'tipus-alerta':
                     $item = TipusAlerta::findOrFail($id);
                     $itemName = $item->nom;
+                    break;
+
+                case 'tipus-event':
+                    $item = TipusEvent::findOrFail($id);
+                    $itemName = $item->nom;
+
+                    // Verificar si hay eventos que usan este tipo
+                    if ($item->events()->count() > 0) {
+                        throw new \Exception('No es pot eliminar aquest tipus d\'event perquè hi ha events que l\'utilitzen.');
+                    }
                     break;
 
                 case 'producte':
