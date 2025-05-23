@@ -287,7 +287,7 @@ class AdminController extends Controller
                     $premiReclamat = PremiReclamat::with('user', 'premi')->findOrFail($id);
                     return view('admin.details.premi-reclamat', compact('premiReclamat'));
                 case 'activitat':
-                    $activitat = Activity::with('user')->findOrFail($id);
+                    $activitat = Activity::with('user.rol')->findOrFail($id);
                     return view('admin.details.activitat', compact('activitat'));
                 default:
                     throw new \Exception('Tipus de detall no suportat');
