@@ -169,6 +169,26 @@
                         </div>
                     </div>
                 </div>
+                <!-- Tarjeta para Tipos de Alertas -->
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="stat-card alerts cursor-pointer" data-bs-toggle="modal" data-bs-target="#dynamicModal"
+                        data-content-type="tipus-alertes">
+                        <div class="stat-card-body">
+                            <div class="stat-card-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div class="stat-card-info">
+                                <h3 class="stat-card-number">{{ \App\Models\TipusAlerta::count() }}</h3>
+                                <p class="stat-card-title">Tipus d'Alertes</p>
+                                <div class="stat-card-badge">
+                                    <span class="badge">
+                                        Gestió d'alertes
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Gràfics i Distribució -->
@@ -251,7 +271,7 @@
                                                                                 <div class="activity-user">
                                                                                     <!-- Para la sección de actividad reciente -->
                                                                                     <img src="{{ 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ($activity->user && $activity->user->foto_perfil) ?
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ($activity->user && $activity->user->foto_perfil) ?
                                             (Str::startsWith($activity->user->foto_perfil, ['http://', 'https://']) ?
                                                 $activity->user->foto_perfil :
                                                 (file_exists(public_path('storage/' . $activity->user->foto_perfil)) ?
@@ -260,7 +280,7 @@
                                                 )
                                             ) :
                                             asset('images/default-profile.png') 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }}"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }}"
                                                                                         alt="Foto perfil" class="activity-avatar">
 
 
@@ -325,7 +345,7 @@
                                         )
                                     ) :
                                     asset('images/default-profile.png')   
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         }}"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             }}"
                                                                     alt="Foto perfil" class="ranking-avatar">
                                                                 <div class="ranking-user-info">
                                                                     <h6 class="ranking-user-name">{{ $user->nom }} {{ $user->cognoms }}</h6>
@@ -1710,11 +1730,11 @@
                             .catch(error => {
                                 console.error('Error cargando contenido:', error);
                                 dynamicContent.innerHTML = `
-                                                                                                                                                                                                                                                <div class="alert alert-danger">
-                                                                                                                                                                                                                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                                                                                                                                                                                    Error cargando el contenido: ${error.message}
-                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                            `;
+                                                                                                                                                                                                                                                        <div class="alert alert-danger">
+                                                                                                                                                                                                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                                                                                                                                                            Error cargando el contenido: ${error.message}
+                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                    `;
                                 modalLoader.classList.add('d-none');
                                 dynamicContent.classList.remove('d-none');
                             });
@@ -1857,11 +1877,11 @@
                                 console.error('Error:', error);
                                 modalLoader.classList.add('d-none');
                                 detailContent.innerHTML = `
-                                                                                                                                                <div class="alert alert-danger">
-                                                                                                                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                                                                                    Error al cargar los detalles: ${error.message}
-                                                                                                                                                </div>
-                                                                                                                                            `;
+                                                                                                                                                        <div class="alert alert-danger">
+                                                                                                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                                                            Error al cargar los detalles: ${error.message}
+                                                                                                                                                        </div>
+                                                                                                                                                    `;
                                 detailContent.classList.remove('d-none');
                             });
                     });
@@ -2112,11 +2132,11 @@
                                     console.error('Error:', error);
                                     modalLoader.classList.add('d-none');
                                     detailContent.innerHTML = `
-                                                                                                                                                            <div class="alert alert-danger">
-                                                                                                                                                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                                                                                                Error al cargar el formulario: ${error.message}
-                                                                                                                                                            </div>
-                                                                                                                                                        `;
+                                                                                                                                                                    <div class="alert alert-danger">
+                                                                                                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                                                                        Error al cargar el formulario: ${error.message}
+                                                                                                                                                                    </div>
+                                                                                                                                                                `;
                                     detailContent.classList.remove('d-none');
                                 });
                         }, 300); // Esperar 300ms
@@ -2518,11 +2538,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                                            <div class="alert alert-danger">
-                                                                                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                                Error al cargar el formulario: ${error.message}
-                                                                                            </div>
-                                                                                        `;
+                                                                                                    <div class="alert alert-danger">
+                                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                        Error al cargar el formulario: ${error.message}
+                                                                                                    </div>
+                                                                                                `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2580,11 +2600,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                                <div class="alert alert-danger">
-                                                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                    Error al cargar el formulario: ${error.message}
-                                                                                </div>
-                                                                            `;
+                                                                                        <div class="alert alert-danger">
+                                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                            Error al cargar el formulario: ${error.message}
+                                                                                        </div>
+                                                                                    `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2641,11 +2661,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                                    <div class="alert alert-danger">
-                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                        Error al cargar el formulario: ${error.message}
-                                                                                    </div>
-                                                                                `;
+                                                                                            <div class="alert alert-danger">
+                                                                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                Error al cargar el formulario: ${error.message}
+                                                                                            </div>
+                                                                                        `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2692,11 +2712,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                <div class="alert alert-danger">
-                                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                    Error al cargar el formulario: ${error.message}
-                                                                </div>
-                                                            `;
+                                                                        <div class="alert alert-danger">
+                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                            Error al cargar el formulario: ${error.message}
+                                                                        </div>
+                                                                    `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2743,11 +2763,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                        <div class="alert alert-danger">
-                                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                                            Error al cargar el formulario: ${error.message}
-                                                        </div>
-                                                    `;
+                                                                <div class="alert alert-danger">
+                                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                    Error al cargar el formulario: ${error.message}
+                                                                </div>
+                                                            `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2794,11 +2814,64 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                    <div class="alert alert-danger">
-                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                        Error al cargar el formulario: ${error.message}
-                                                    </div>
-                                                `;
+                                                            <div class="alert alert-danger">
+                                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                Error al cargar el formulario: ${error.message}
+                                                            </div>
+                                                        `;
+                                        detailContent.classList.remove('d-none');
+                                    }
+                                });
+                        }
+                    }, 300);
+                }
+                // Botones editar tipo de alerta
+                if (e.target.closest('.editTipusAlertaBtn')) {
+                    e.preventDefault();
+                    const btn = e.target.closest('.editTipusAlertaBtn');
+                    const tipusAlertaId = btn.getAttribute('data-tipus-alerta-id');
+
+                    console.log('Editando tipo de alerta:', tipusAlertaId);
+
+                    closeAnyModal('dynamicModal');
+
+                    setTimeout(() => {
+                        const detailModal = document.getElementById('detailModal');
+                        if (detailModal) {
+                            const modalTitle = document.getElementById('detailModalLabel');
+                            const modalLoader = document.getElementById('detail-modal-loader');
+                            const detailContent = document.getElementById('detail-content');
+
+                            if (modalTitle) modalTitle.textContent = "Editar Tipus d'Alerta";
+                            if (modalLoader) modalLoader.classList.remove('d-none');
+                            if (detailContent) detailContent.classList.add('d-none');
+
+                            detailModal.classList.add('show');
+                            detailModal.style.display = 'block';
+                            document.body.classList.add('modal-open');
+
+                            fetch(`/admin/edit-form/tipus-alerta/${tipusAlertaId}`)
+                                .then(response => {
+                                    if (!response.ok) throw new Error('Error al cargar el formulario');
+                                    return response.text();
+                                })
+                                .then(html => {
+                                    if (modalLoader) modalLoader.classList.add('d-none');
+                                    if (detailContent) {
+                                        detailContent.innerHTML = html;
+                                        detailContent.classList.remove('d-none');
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    if (modalLoader) modalLoader.classList.add('d-none');
+                                    if (detailContent) {
+                                        detailContent.innerHTML = `
+                                                <div class="alert alert-danger">
+                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                    Error al cargar el formulario: ${error.message}
+                                                </div>
+                                            `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });

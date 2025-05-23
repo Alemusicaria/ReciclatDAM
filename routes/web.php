@@ -155,6 +155,8 @@ Route::localizedGroup(function () {
             Route::post('/admin/rols', [App\Http\Controllers\RolController::class, 'store'])->name('admin.rols.store');
             Route::put('/admin/rols/{rol}', [App\Http\Controllers\RolController::class, 'update'])->name('admin.rols.update');
 
+            Route::post('/admin/tipus-alertes', [App\Http\Controllers\TipusAlertaController::class, 'store'])->name('admin.tipus-alertes.store');
+            Route::put('/admin/tipus-alertes/{tipusAlerta}', [App\Http\Controllers\TipusAlertaController::class, 'update'])->name('admin.tipus-alertes.update');
         });
     });
 });

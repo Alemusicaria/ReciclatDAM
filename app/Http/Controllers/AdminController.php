@@ -15,6 +15,7 @@ use App\Models\TipusEvent;
 use App\Models\PuntDeRecollida;
 use App\Models\Producte;
 use App\Models\Rol;
+use App\Models\TipusAlerta;
 
 
 class AdminController extends Controller
@@ -153,12 +154,15 @@ class AdminController extends Controller
                 case 'productes':
                     $productes = Producte::orderBy('id', 'desc')->get();
                     return view('admin.modals.productes', compact('productes'));
-                case 'rols':
-                    $rols = Rol::orderBy('id', 'desc')->get();
-                    return view('admin.modals.rols', compact('rols'));
                 case 'punt-reciclatge':
                     $punts = PuntDeRecollida::latest()->get();
                     return view('admin.modals.punt-reciclatge', compact('punts'));
+                case 'rols':
+                    $rols = Rol::orderBy('id', 'desc')->get();
+                    return view('admin.modals.rols', compact('rols'));
+                case 'tipus-alertes':
+                    $tipusAlertes = TipusAlerta::with('alertes')->latest()->get();
+                    return view('admin.modals.tipus-alertes', compact('tipusAlertes'));
                 case 'tipus-events':
                     $tipusEvents = TipusEvent::latest()->get();
                     return view('admin.modals.tipus-events', compact('tipusEvents'));
@@ -224,6 +228,8 @@ class AdminController extends Controller
                 return view('admin.create.punt-reciclatge');
             } elseif ($type === 'create-rol') {
                 return view('admin.create.rol');
+            } elseif ($type === 'create-tipus-alerta') {
+                return view('admin.create.tipus-alerta');
             } elseif ($type === 'create-tipus-event') {
                 return view('admin.create.tipus-event');
             } elseif ($type === 'create-premi-reclamat') {
@@ -260,6 +266,9 @@ class AdminController extends Controller
                 case 'rol':
                     $rol = Rol::findOrFail($id);
                     return view('admin.details.rol', compact('rol'));
+                case 'tipus-alerta':
+                    $tipusAlerta = TipusAlerta::findOrFail($id);
+                    return view('admin.details.tipus-alerta', compact('tipusAlerta'));
                 case 'tipus-event':
                     $tipusEvent = TipusEvent::findOrFail($id);
                     return view('admin.details.tipus-event', compact('tipusEvent'));
@@ -311,6 +320,10 @@ class AdminController extends Controller
                 case 'rol':
                     $rol = Rol::findOrFail($id);
                     return view('admin.edit.rol', compact('rol'));
+
+                case 'tipus-alerta':
+                    $tipusAlerta = TipusAlerta::findOrFail($id);
+                    return view('admin.edit.tipus-alerta', compact('tipusAlerta'));
 
                 case 'tipus-event':
                     $tipusEvent = TipusEvent::findOrFail($id);
@@ -407,6 +420,13 @@ class AdminController extends Controller
                     ]);
                     break;
 
+                case 'tipus-alerta':
+                    $item = TipusAlerta::findOrFail($id);
+                    $validatedData = $request->validate([
+                        'nom' => 'required|string|max:255',
+                    ]);
+                    break;
+
                 default:
                     throw new \Exception('Tipo de detalle no soportado');
             }
@@ -463,6 +483,11 @@ class AdminController extends Controller
 
                 case 'rol':
                     $item = Rol::findOrFail($id);
+                    $itemName = $item->nom;
+                    break;
+                    
+                case 'tipus-alerta':
+                    $item = TipusAlerta::findOrFail($id);
                     $itemName = $item->nom;
                     break;
 
