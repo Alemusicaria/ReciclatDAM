@@ -17,6 +17,7 @@ use App\Models\Producte;
 use App\Models\Rol;
 use App\Models\TipusAlerta;
 use App\Models\AlertaPuntDeRecollida;
+use App\Models\Opinions;
 
 
 class AdminController extends Controller
@@ -175,6 +176,9 @@ class AdminController extends Controller
                 case 'users-ranking':
                     $users = User::orderBy('punts_totals', 'desc')->get();
                     return view('admin.modals.users-ranking', compact('users'));
+                case 'opinions':
+                    $opinions = Opinions::latest()->get();
+                    return view('admin.modals.opinions', compact('opinions'));
                 default:
                     throw new \Exception('Modal no suportada');
             }
@@ -282,6 +286,9 @@ class AdminController extends Controller
                 case 'tipus-event':
                     $tipusEvent = TipusEvent::findOrFail($id);
                     return view('admin.details.tipus-event', compact('tipusEvent'));
+                case 'opinio':
+                    $opinio = Opinions::findOrFail($id);
+                    return view('admin.details.opinio', compact('opinio'));
                 case 'premi-reclamat':
                     $premiReclamat = PremiReclamat::with('user', 'premi')->findOrFail($id);
                     return view('admin.details.premi-reclamat', compact('premiReclamat'));
