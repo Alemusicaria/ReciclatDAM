@@ -35,33 +35,45 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <!-- Enlaces de navegación a la izquierda -->
+                <!-- Enlaces de navegación a la izquierda -->
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    @php $isHomePage = request()->path() === '/' || request()->path() === app()->getLocale(); @endphp
+
                     <li class="nav-item">
-                        <a class="nav-link" href="#inici" data-section="inici">Inici</a>
+                        <a class="nav-link" href="{{ $isHomePage ? '#inici' : url('/#inici') }}"
+                            data-section="inici">Inici</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#funcionament" data-section="funcionament">Com funciona</a>
+                        <a class="nav-link" href="{{ $isHomePage ? '#funcionament' : url('/#funcionament') }}"
+                            data-section="funcionament">Com funciona</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#sponsors" data-section="sponsors">Sponsors</a>
+                        <a class="nav-link" href="{{ $isHomePage ? '#sponsors' : url('/#sponsors') }}"
+                            data-section="sponsors">Sponsors</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#qui_som" data-section="qui_som">Qui som</a>
+                        <a class="nav-link" href="{{ $isHomePage ? '#qui_som' : url('/#qui_som') }}"
+                            data-section="qui_som">Qui som</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#reciclatge" data-section="reciclatge">Reciclatge</a>
+                        <a class="nav-link" href="{{ $isHomePage ? '#reciclatge' : url('/#reciclatge') }}"
+                            data-section="reciclatge">Reciclatge</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#mapa" data-section="mapa">Mapa</a>
+                        <a class="nav-link" href="{{ $isHomePage ? '#mapa' : url('/#mapa') }}"
+                            data-section="mapa">Mapa</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#events" data-section="events">Events</a>
+                        <a class="nav-link" href="{{ $isHomePage ? '#events' : url('/#events') }}"
+                            data-section="events">Events</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#premis" data-section="premis">Premis</a>
+                        <a class="nav-link" href="{{ $isHomePage ? '#premis' : url('/#premis') }}"
+                            data-section="premis">Premis</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#opinions" data-section="opinions">Opinions</a>
+                        <a class="nav-link" href="{{ $isHomePage ? '#opinions' : url('/#opinions') }}"
+                            data-section="opinions">Opinions</a>
                     </li>
                     @if(Auth::check() && Auth::user()->rol_id == 1)
                         <li class="nav-item">
@@ -415,9 +427,51 @@
                     }, 300);
                 }
             }
+            // Si hay un hash en la URL al cargar una página que no es el dashboard,
+            // guardarlo en localStorage y redirigir al dashboard
+            if (window.location.hash && window.location.pathname !== '/') {
+                const targetSection = window.location.hash.substring(1);
+                localStorage.setItem('scrollToSection', targetSection);
+                window.location.href = "/";
+            }
 
+            // Al cargar el dashboard, verificar si hay una sección a la que navegar
+            if (window.location.pathname === '/' || window.location.pathname === '/ca' ||
+                window.location.pathname === '/es' || window.location.pathname === '/en') {
+                const scrollToSection = localStorage.getItem('scrollToSection');
+
+                if (scrollToSection) {
+                    // Limpiar localStorage
+                    localStorage.removeItem('scrollToSection');
+
+                    // Pequeño retraso para asegurar que el DOM está completamente cargado
+                    setTimeout(() => {
+                        const targetElement = document.getElementById(scrollToSection);
+                        if (targetElement) {
+                            const navbarHeight = document.querySelector('.navbar').offsetHeight;
+                            const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY - navbarHeight;
+
+                            window.scrollTo({
+                                top: targetPosition,
+                                behavior: 'smooth'
+                            });
+
+                            // Actualizar enlace activo
+                            const targetLink = document.querySelector(`.navbar-nav .nav-link[href="#${scrollToSection}"]`);
+                            if (targetLink) {
+                                document.querySelectorAll('.navbar-nav .nav-link').forEach(l => l.classList.remove('active'));
+                                targetLink.classList.add('active');
+                                if (typeof applyActiveStyles === 'function') {
+                                    applyActiveStyles();
+                                }
+                            }
+                        }
+                    }, 500);
+                }
+            }
             // Aplicar estilos iniciales
             applyActiveStyles();
+
         });
     </script>
 </body>
