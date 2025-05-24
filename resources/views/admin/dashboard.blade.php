@@ -462,66 +462,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Gestió ràpida -->
-            <div class="row">
-                <div class="col-12 mb-4">
-                    <div class="content-card">
-                        <div class="content-card-header">
-                            <h4 class="content-card-title">
-                                <i class="fas fa-tools me-2" style="margin-right: 10px;"></i>Gestió Ràpida
-                            </h4>
-                        </div>
-                        <div class="content-card-body">
-                            <div class="row management-options">
-                                <div class="col-md-3 col-sm-6 mb-4">
-                                    <a href="#" class="management-card" data-bs-toggle="modal"
-                                        data-bs-target="#dynamicModal" data-content-type="users">
-                                        <div class="management-icon">
-                                            <i class="fas fa-users"></i>
-                                        </div>
-                                        <h5 class="management-title">Gestió d'Usuaris</h5>
-                                        <p class="management-subtitle">Administra els usuaris de la plataforma</p>
-                                    </a>
-                                </div>
-
-                                <div class="col-md-3 col-sm-6 mb-4">
-                                    <a href="#" class="management-card" data-bs-toggle="modal"
-                                        data-bs-target="#dynamicModal" data-content-type="events">
-                                        <div class="management-icon">
-                                            <i class="fas fa-calendar-alt"></i>
-                                        </div>
-                                        <h5 class="management-title">Gestió d'Events</h5>
-                                        <p class="management-subtitle">Administra els events i participants</p>
-                                    </a>
-                                </div>
-
-                                <div class="col-md-3 col-sm-6 mb-4">
-                                    <a href="#" class="management-card" data-bs-toggle="modal"
-                                        data-bs-target="#dynamicModal" data-content-type="premis">
-                                        <div class="management-icon">
-                                            <i class="fas fa-gift"></i>
-                                        </div>
-                                        <h5 class="management-title">Gestió de Premis</h5>
-                                        <p class="management-subtitle">Administra els premis disponibles</p>
-                                    </a>
-                                </div>
-
-                                <div class="col-md-3 col-sm-6 mb-4">
-                                    <a href="#" class="management-card" data-bs-toggle="modal"
-                                        data-bs-target="#dynamicModal" data-content-type="premis-pendents">
-                                        <div class="management-icon">
-                                            <i class="fas fa-tasks"></i>
-                                        </div>
-                                        <h5 class="management-title">Premis Pendents</h5>
-                                        <p class="management-subtitle">Gestiona les sol·licituds de premis</p>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
         <!-- Al final del dashboard pero antes de los scripts, añade este modal genérico -->
         <div class="modal fade" id="dynamicModal" tabindex="-1" aria-labelledby="dynamicModalLabel" aria-hidden="true"
