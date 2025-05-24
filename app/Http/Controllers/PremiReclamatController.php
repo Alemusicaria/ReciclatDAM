@@ -7,6 +7,7 @@ use App\Models\Premi;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Activity;
 
 class PremiReclamatController extends Controller
 {
@@ -37,7 +38,7 @@ class PremiReclamatController extends Controller
         // Verificar si el usuario tiene suficientes puntos
         $user = User::findOrFail($request->user_id);
         $premi = Premi::findOrFail($request->premi_id);
-        
+
         if ($user->punts_actuals < $request->punts_gastats) {
             return back()->with('error', 'L\'usuari no té suficients punts per reclamar aquest premi.');
         }
@@ -59,25 +60,62 @@ class PremiReclamatController extends Controller
         return view('premis_reclamats.show', compact('premiReclamat'));
     }
 
-    public function edit(PremiReclamat $premiReclamat)
+    public function edit($id)
     {
-        $premis = Premi::all();
-        $users = User::all();
-        return view('premis_reclamats.edit', compact('premiReclamat', 'premis', 'users'));
+        $premiReclamat = PremiReclamat::findOrFail($id);
+        return view('admin.edit.premi-reclamat', compact('premiReclamat'));
     }
 
-    public function update(Request $request, PremiReclamat $premiReclamat)
+    public function update(Request $request, $id)
     {
-        $request->validate([
-            'estat' => 'required|in:pendent,procesant,entregat,cancelat',
-            'codi_seguiment' => 'nullable|string',
-            'comentaris' => 'nullable|string',
-        ]);
+        try {
+            $request->validate([
+                'estat' => 'required|in:pendent,procesant,entregat,cancelat',
+                'codi_seguiment' => 'nullable|string',
+                'comentaris' => 'nullable|string',
+            ]);
 
-        $premiReclamat->update($request->only(['estat', 'codi_seguiment', 'comentaris']));
+            $premiReclamat = PremiReclamat::findOrFail($id);
 
-        return redirect()->route('premis_reclamats.index')
-            ->with('success', 'Informació del premi reclamat actualitzada.');
+            // Generar código de seguimiento si está vacío y estado es procesant
+            if ($request->estat == 'procesant' && empty($request->codi_seguiment)) {
+                $codiSeguiment = $this->generarCodiSeguimentUnic();
+                $premiReclamat->codi_seguiment = $codiSeguiment;
+            } else {
+                $premiReclamat->codi_seguiment = $request->codi_seguiment;
+            }
+
+            $premiReclamat->estat = $request->estat;
+            $premiReclamat->comentaris = $request->comentaris;
+            $premiReclamat->save();
+
+            // Registrar actividad
+            if (auth()->check()) {
+                Activity::create([
+                    'user_id' => auth()->id(),
+                    'action' => 'Ha actualitzat l\'estat del premi reclamat #' . $id . ' a ' . $request->estat
+                ]);
+            }
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Estat del premi reclamat actualitzat correctament'
+                ]);
+            }
+
+            return redirect()->route('admin.dashboard')
+                ->with('success', 'Estat del premi reclamat actualitzat correctament.');
+        } catch (\Exception $e) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error: ' . $e->getMessage()
+                ], 422);
+            }
+
+            return back()->withErrors(['error' => 'Error: ' . $e->getMessage()]);
+        }
     }
 
     public function destroy(PremiReclamat $premiReclamat)
@@ -95,12 +133,89 @@ class PremiReclamatController extends Controller
         return redirect()->route('premis_reclamats.index')
             ->with('success', 'Premi reclamat eliminat correctament.');
     }
-    
+
     public function userClaims($userId)
     {
         $user = User::findOrFail($userId);
         $premisReclamats = $user->premisReclamats()->with('premi')->get();
-        
+
         return response()->json($premisReclamats);
+    }
+    public function approve($id)
+    {
+        $premiReclamat = PremiReclamat::findOrFail($id);
+        $premiReclamat->estat = 'procesant';
+
+        // Generar código de seguimiento único
+        $codiSeguiment = $this->generarCodiSeguimentUnic();
+        $premiReclamat->codi_seguiment = $codiSeguiment;
+        $premiReclamat->comentaris = ($premiReclamat->comentaris ? $premiReclamat->comentaris . "\n" : '') .
+            'Sol·licitud acceptada el ' . now()->format('d/m/Y H:i') . ' per ' . auth()->user()->nom;
+        $premiReclamat->save();
+
+        // Registrar actividad
+        if (auth()->check()) {
+            Activity::create([
+                'user_id' => auth()->id(),
+                'action' => 'Ha aprovat la sol·licitud de premi #' . $premiReclamat->id . ' per a ' .
+                    ($premiReclamat->user ? $premiReclamat->user->nom : 'usuari desconegut') .
+                    ' amb codi de seguiment: ' . $codiSeguiment
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Sol·licitud aprovada amb codi de seguiment: ' . $codiSeguiment
+        ]);
+    }
+
+    /**
+     * Generar un código de seguimiento único
+     */
+    private function generarCodiSeguimentUnic()
+    {
+        $prefix = 'TRK';
+        $codiExists = true;
+        $codi = '';
+
+        // Generar códigos hasta encontrar uno único
+        while ($codiExists) {
+            // Generar un código alfanumérico aleatorio
+            $randomPart = strtoupper(substr(md5(uniqid(mt_rand(), true)), 0, 8));
+            $codi = $prefix . '-' . $randomPart;
+
+            // Verificar que no exista ya
+            $codiExists = PremiReclamat::where('codi_seguiment', $codi)->exists();
+        }
+
+        return $codi;
+    }
+
+    public function reject($id)
+    {
+        $premiReclamat = PremiReclamat::findOrFail($id);
+
+        // Si se rechaza, devolver puntos al usuario
+        $user = $premiReclamat->user;
+        if ($user) {
+            $user->punts_actuals += $premiReclamat->punts_gastats;
+            $user->punts_gastats -= $premiReclamat->punts_gastats;
+            $user->save();
+        }
+
+        $premiReclamat->estat = 'cancelat';
+        $premiReclamat->comentaris = ($premiReclamat->comentaris ? $premiReclamat->comentaris . "\n" : '') .
+            'Sol·licitud rebutjada el ' . now()->format('d/m/Y H:i') . ' per ' . auth()->user()->nom;
+        $premiReclamat->save();
+
+        // Registrar actividad
+        if (auth()->check()) {
+            Activity::create([
+                'user_id' => auth()->id(),
+                'action' => 'Ha rebutjat la sol·licitud de premi #' . $premiReclamat->id . ' per a ' . $premiReclamat->user->nom
+            ]);
+        }
+
+        return response()->json(['success' => true]);
     }
 }

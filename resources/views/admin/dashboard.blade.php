@@ -260,6 +260,27 @@
                         <p class="management-subtitle">Anàlisi de dispositius i comportament dels usuaris</p>
                     </a>
                 </div>
+
+                <!-- Tarjeta para Premios Reclamados en dashboard.blade.php -->
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="stat-card claimed-prizes cursor-pointer" data-bs-toggle="modal"
+                        data-bs-target="#dynamicModal" data-content-type="premis-reclamats">
+                        <div class="stat-card-body">
+                            <div class="stat-card-icon">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <div class="stat-card-info">
+                                <h3 class="stat-card-number">{{ \App\Models\PremiReclamat::count() }}</h3>
+                                <p class="stat-card-title">Premis Reclamats</p>
+                                <div class="stat-card-badge">
+                                    <span class="badge">
+                                        {{ \App\Models\PremiReclamat::where('estat', 'pendent')->count() }} pendents
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Gràfics i Distribució -->
@@ -350,7 +371,7 @@
                                                 )
                                             ) :
                                             asset('images/default-profile.png') 
-                                                                                                                                                                                                                                                                                                                    }}"
+                                                                                                                                                                                                                                                                                                                                                                                                                                }}"
                                                                                         alt="Foto perfil" class="activity-avatar">
 
                                                                                     <div class="activity-user-info">
@@ -416,7 +437,7 @@
                                         )
                                     ) :
                                     asset('images/default-profile.png') 
-                                                                                                                                }}"
+                                                                                                                                                                                                                    }}"
                                                                     alt="Foto perfil" class="ranking-avatar">
                                                                 <div class="ranking-user-info">
                                                                     <h6 class="ranking-user-name">{{ $user->nom }} {{ $user->cognoms }}</h6>
@@ -1801,11 +1822,11 @@
                             .catch(error => {
                                 console.error('Error cargando contenido:', error);
                                 dynamicContent.innerHTML = `
-                                                                <div class="alert alert-danger">
-                                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                    Error cargando el contenido: ${error.message}
-                                                                </div>
-                                                            `;
+                                                                            <div class="alert alert-danger">
+                                                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                Error cargando el contenido: ${error.message}
+                                                                            </div>
+                                                                        `;
                                 modalLoader.classList.add('d-none');
                                 dynamicContent.classList.remove('d-none');
                             });
@@ -1948,11 +1969,11 @@
                                 console.error('Error:', error);
                                 modalLoader.classList.add('d-none');
                                 detailContent.innerHTML = `
-                                                                <div class="alert alert-danger">
-                                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                    Error al cargar los detalles: ${error.message}
-                                                                </div>
-                                                            `;
+                                                                            <div class="alert alert-danger">
+                                                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                Error al cargar los detalles: ${error.message}
+                                                                            </div>
+                                                                        `;
                                 detailContent.classList.remove('d-none');
                             });
                     });
@@ -2203,11 +2224,11 @@
                                     console.error('Error:', error);
                                     modalLoader.classList.add('d-none');
                                     detailContent.innerHTML = `
-                                                                    <div class="alert alert-danger">
-                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                        Error al cargar el formulario: ${error.message}
-                                                                    </div>
-                                                                `;
+                                                                                <div class="alert alert-danger">
+                                                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                    Error al cargar el formulario: ${error.message}
+                                                                                </div>
+                                                                            `;
                                     detailContent.classList.remove('d-none');
                                 });
                         }, 300); // Esperar 300ms
@@ -2609,11 +2630,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                        <div class="alert alert-danger">
-                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                            Error al cargar el formulario: ${error.message}
-                                                                        </div>
-                                                                    `;
+                                                                                    <div class="alert alert-danger">
+                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                        Error al cargar el formulario: ${error.message}
+                                                                                    </div>
+                                                                                `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2671,11 +2692,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                        <div class="alert alert-danger">
-                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                            Error al cargar el formulario: ${error.message}
-                                                                        </div>
-                                                                    `;
+                                                                                    <div class="alert alert-danger">
+                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                        Error al cargar el formulario: ${error.message}
+                                                                                    </div>
+                                                                                `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2732,11 +2753,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                        <div class="alert alert-danger">
-                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                            Error al cargar el formulario: ${error.message}
-                                                                        </div>
-                                                                    `;
+                                                                                    <div class="alert alert-danger">
+                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                        Error al cargar el formulario: ${error.message}
+                                                                                    </div>
+                                                                                `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2783,11 +2804,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                        <div class="alert alert-danger">
-                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                            Error al cargar el formulario: ${error.message}
-                                                                        </div>
-                                                                    `;
+                                                                                    <div class="alert alert-danger">
+                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                        Error al cargar el formulario: ${error.message}
+                                                                                    </div>
+                                                                                `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2834,11 +2855,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                        <div class="alert alert-danger">
-                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                            Error al cargar el formulario: ${error.message}
-                                                                        </div>
-                                                                    `;
+                                                                                    <div class="alert alert-danger">
+                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                        Error al cargar el formulario: ${error.message}
+                                                                                    </div>
+                                                                                `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2885,11 +2906,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                        <div class="alert alert-danger">
-                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                            Error al cargar el formulario: ${error.message}
-                                                                        </div>
-                                                                    `;
+                                                                                    <div class="alert alert-danger">
+                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                        Error al cargar el formulario: ${error.message}
+                                                                                    </div>
+                                                                                `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2938,11 +2959,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                        <div class="alert alert-danger">
-                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                            Error al cargar el formulario: ${error.message}
-                                                                        </div>
-                                                                    `;
+                                                                                    <div class="alert alert-danger">
+                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                        Error al cargar el formulario: ${error.message}
+                                                                                    </div>
+                                                                                `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2989,11 +3010,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                        <div class="alert alert-danger">
-                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                            Error al cargar el formulario: ${error.message}
-                                                                        </div>
-                                                                    `;
+                                                                                    <div class="alert alert-danger">
+                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                        Error al cargar el formulario: ${error.message}
+                                                                                    </div>
+                                                                                `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -3040,11 +3061,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                        <div class="alert alert-danger">
-                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                            Error al cargar el formulario: ${error.message}
-                                                                        </div>
-                                                                    `;
+                                                                                    <div class="alert alert-danger">
+                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                        Error al cargar el formulario: ${error.message}
+                                                                                    </div>
+                                                                                `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -3168,11 +3189,11 @@
                                 if (modalLoader) modalLoader.classList.add('d-none');
                                 if (modalContent) {
                                     modalContent.innerHTML = `
-                                                                    <div class="alert alert-danger">
-                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                        Error al cargar el historial: ${error.message}
-                                                                    </div>
-                                                                `;
+                                                                                <div class="alert alert-danger">
+                                                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                    Error al cargar el historial: ${error.message}
+                                                                                </div>
+                                                                            `;
                                     modalContent.classList.remove('d-none');
                                 }
                             });
@@ -3216,11 +3237,11 @@
                                 if (modalLoader) modalLoader.classList.add('d-none');
                                 if (detailContent) {
                                     detailContent.innerHTML = `
-                                                                    <div class="alert alert-danger">
-                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                        Error al cargar los detalles: ${error.message}
-                                                                    </div>
-                                                                `;
+                                                                                <div class="alert alert-danger">
+                                                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                    Error al cargar los detalles: ${error.message}
+                                                                                </div>
+                                                                            `;
                                     detailContent.classList.remove('d-none');
                                 }
                             });
@@ -3324,15 +3345,153 @@
                         if (modalLoader) modalLoader.classList.add('d-none');
                         if (modalContent) {
                             modalContent.innerHTML = `
-                                                <div class="alert alert-danger">
-                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                    Error al cargar el ranking: ${error.message}
-                                                </div>
-                                            `;
+                                                            <div class="alert alert-danger">
+                                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                Error al cargar el ranking: ${error.message}
+                                                            </div>
+                                                        `;
+                            modalContent.classList.remove('d-none');
+                        }
+                    });
+            }
+        });
+        // Manejador para botones de acción en premios reclamados
+        document.addEventListener('click', function (e) {
+            if (e.target.closest('.actionBtn')) {
+                e.preventDefault();
+
+                const btn = e.target.closest('.actionBtn');
+                const itemId = btn.getAttribute('data-item-id');
+                const itemName = btn.getAttribute('data-item-name');
+                const itemType = btn.getAttribute('data-item-type');
+                const action = btn.getAttribute('data-action');
+
+                // Crear mensajes personalizados según la acción
+                let confirmMessage = '¿Estás segur?';
+                let successMessage = 'Operació completada amb èxit';
+                let route = '';
+
+                if (action === 'approve') {
+                    confirmMessage = `Estàs segur que vols aprovar la sol·licitud de "${itemName}"?`;
+                    successMessage = 'Sol·licitud aprovada correctament';
+                    route = `/admin/premis-reclamats/${itemId}/approve`;
+                } else if (action === 'reject') {
+                    confirmMessage = `Estàs segur que vols rebutjar la sol·licitud de "${itemName}"?`;
+                    successMessage = 'Sol·licitud rebutjada correctament';
+                    route = `/admin/premis-reclamats/${itemId}/reject`;
+                }
+
+                if (confirm(confirmMessage)) {
+                    // Mostrar indicador de carga
+                    btn.disabled = true;
+                    const originalHtml = btn.innerHTML;
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+
+                    // Realizar la acción mediante AJAX
+                    fetch(route, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                        .then(response => {
+                            if (!response.ok) throw new Error('Error en la respuesta del servidor');
+                            return response.json();
+                        })
+                        .then(data => {
+                            // Mostrar mensaje de éxito
+                            alert(successMessage);
+
+                            // Recargar contenido
+                            if (detailModal && detailModal.classList.contains('show')) {
+                                // Si estamos en detalle, cerrar modal y recargar lista
+                                closeAnyModal('detailModal');
+                            }
+
+                            // Recargar lista de premios reclamados
+                            setTimeout(() => {
+                                const premisReclamatsBtn = document.querySelector('[data-content-type="premis-reclamats"]');
+                                if (premisReclamatsBtn) {
+                                    premisReclamatsBtn.click();
+                                } else {
+                                    window.location.reload();
+                                }
+                            }, 300);
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Error al processar la sol·licitud: ' + error.message);
+                            btn.disabled = false;
+                            btn.innerHTML = originalHtml;
+                        });
+                }
+            }
+        });
+        // Botones para editar premios reclamados
+        document.addEventListener('click', function (e) {
+            const editBtn = e.target.closest('.editStatusBtn, .editPremiReclamatBtn');
+            if (editBtn) {
+                e.preventDefault();
+                const premiId = editBtn.getAttribute('data-id');
+
+                // Cerrar modal dinámico si está abierto
+                closeAnyModal('dynamicModal');
+
+                // Configurar y abrir modal de detalles para edición
+                const detailModal = document.getElementById('detailModal');
+                const modalTitle = document.getElementById('detailModalLabel');
+                const modalLoader = document.getElementById('detail-modal-loader');
+                const modalContent = document.getElementById('detail-content');
+
+                if (modalTitle) modalTitle.textContent = "Actualitzar Premi Reclamat";
+                if (modalLoader) modalLoader.classList.remove('d-none');
+                if (modalContent) modalContent.classList.add('d-none');
+
+                // Mostrar modal
+                if (detailModal) {
+                    detailModal.classList.add('show');
+                    detailModal.style.display = 'block';
+                    document.body.classList.add('modal-open');
+
+                    // Crear backdrop si no existe
+                    if (!document.querySelector('.modal-backdrop')) {
+                        const backdrop = document.createElement('div');
+                        backdrop.className = 'modal-backdrop fade show';
+                        document.body.appendChild(backdrop);
+                    }
+                }
+
+                // Cargar contenido mediante AJAX
+                fetch(`/admin/edit-form/premi-reclamat/${premiId}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Error al cargar el formulario');
+                        return response.text();
+                    })
+                    .then(html => {
+                        if (modalLoader) modalLoader.classList.add('d-none');
+                        if (modalContent) {
+                            modalContent.innerHTML = html;
+                            modalContent.classList.remove('d-none');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        if (modalLoader) modalLoader.classList.add('d-none');
+                        if (modalContent) {
+                            modalContent.innerHTML = `
+                                    <div class="alert alert-danger">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        Error al cargar el formulario: ${error.message}
+                                    </div>
+                                `;
                             modalContent.classList.remove('d-none');
                         }
                     });
             }
         });
     </script>
+
 @endsection

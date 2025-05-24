@@ -166,6 +166,10 @@ Route::localizedGroup(function () {
 
             Route::get('/admin/navigator-stats', [App\Http\Controllers\AdminController::class, 'navigatorStats'])->name('admin.navigator-stats');
             Route::get('/admin/navigator-stats-data', [App\Http\Controllers\AdminController::class, 'navigatorStatsData'])->name('admin.navigator-stats-data');
+            Route::post('/admin/premis-reclamats/{id}/approve', [App\Http\Controllers\PremiReclamatController::class, 'approve'])->name('admin.premis-reclamats.approve');
+            Route::post('/admin/premis-reclamats/{id}/reject', [App\Http\Controllers\PremiReclamatController::class, 'reject'])->name('admin.premis-reclamats.reject');
+            Route::put('/admin/premis-reclamats/{id}', [App\Http\Controllers\PremiReclamatController::class, 'update'])->name('admin.premis-reclamats.update');
+            Route::get('/admin/edit-form/premi-reclamat/{id}', [App\Http\Controllers\AdminController::class, 'getEditForm'])->name('admin.edit-form.premi-reclamat');
         });
     });
 });

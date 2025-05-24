@@ -169,7 +169,7 @@ class AdminController extends Controller
                     $tipusEvents = TipusEvent::latest()->get();
                     return view('admin.modals.tipus-events', compact('tipusEvents'));
                 case 'premis-reclamats':
-                    $premisReclamats = PremiReclamat::with('user', 'premi')->latest()->get();
+                    $premisReclamats = PremiReclamat::with(['user', 'premi'])->latest()->get();
                     return view('admin.modals.premis-reclamats', compact('premisReclamats'));
                 case 'activitats':
                     $activitats = Activity::with('user')->latest()->get();
@@ -291,7 +291,7 @@ class AdminController extends Controller
                     $opinio = Opinions::findOrFail($id);
                     return view('admin.details.opinio', compact('opinio'));
                 case 'premi-reclamat':
-                    $premiReclamat = PremiReclamat::with('user', 'premi')->findOrFail($id);
+                    $premiReclamat = PremiReclamat::with(['user', 'premi'])->findOrFail($id);
                     return view('admin.details.premi-reclamat', compact('premiReclamat'));
                 case 'activitat':
                     $activitat = Activity::with('user.rol')->findOrFail($id);
