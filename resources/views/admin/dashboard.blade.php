@@ -408,7 +408,7 @@
                                                 )
                                             ) :
                                             asset('images/default-profile.png') 
-                                                                                                                                                                                                                                        }}"
+                                                                                                                                                                                                                                                                            }}"
                                                                                         alt="Foto perfil" class="activity-avatar">
 
                                                                                     <div class="activity-user-info">
@@ -475,7 +475,7 @@
                                         )
                                     ) :
                                     asset('images/default-profile.png') 
-                                                                                                                                                                                    }}"
+                                                                                                                                                                                                                }}"
                                                                     alt="Foto perfil" class="ranking-avatar">
                                                                 <div class="ranking-user-info">
                                                                     <h6 class="ranking-user-name">{{ $user->nom }} {{ $user->cognoms }}</h6>
@@ -832,7 +832,6 @@
                     // Exponer función global para inicializar componentes dinámicos
                     window.initDynamicComponents = this.initDynamicComponents.bind(this);
 
-                    console.log('Sistema de modales inicializado');
                 },
 
                 // -----------------------------------------
@@ -912,11 +911,11 @@
                             .catch(error => {
                                 console.error('Error cargando contenido:', error);
                                 dynamicContent.innerHTML = `
-                                                                                                            <div class="alert alert-danger">
-                                                                                                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                                                Error cargando el contenido: ${error.message}
-                                                                                                            </div>
-                                                                                                        `;
+                                                                                                                <div class="alert alert-danger">
+                                                                                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                    Error cargando el contenido: ${error.message}
+                                                                                                                </div>
+                                                                                                            `;
                                 modalLoader.classList.add('d-none');
                                 dynamicContent.classList.remove('d-none');
                             });
@@ -1059,11 +1058,11 @@
                                 console.error('Error:', error);
                                 modalLoader.classList.add('d-none');
                                 detailContent.innerHTML = `
-                                                                                                            <div class="alert alert-danger">
-                                                                                                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                                                Error al cargar los detalles: ${error.message}
-                                                                                                            </div>
-                                                                                                        `;
+                                                                                                                <div class="alert alert-danger">
+                                                                                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                    Error al cargar los detalles: ${error.message}
+                                                                                                                </div>
+                                                                                                            `;
                                 detailContent.classList.remove('d-none');
                             });
                     });
@@ -1260,7 +1259,6 @@
                         return originalShow.apply(tempInstance, args);
                     };
 
-                    console.log('Se ha modificado el comportamiento de Modal para prevenir errores de recursión');
                 }
             });
             // Delegación de eventos para manejar clics en botones
@@ -1314,11 +1312,11 @@
                                     console.error('Error:', error);
                                     modalLoader.classList.add('d-none');
                                     detailContent.innerHTML = `
-                                                                                                                <div class="alert alert-danger">
-                                                                                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                                                    Error al cargar el formulario: ${error.message}
-                                                                                                                </div>
-                                                                                                            `;
+                                                                                                                    <div class="alert alert-danger">
+                                                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                        Error al cargar el formulario: ${error.message}
+                                                                                                                    </div>
+                                                                                                                `;
                                     detailContent.classList.remove('d-none');
                                 });
                         }, 300); // Esperar 300ms
@@ -1451,40 +1449,58 @@
                 }
             }
         });
-        // Añadir evento al botón cancelar
-        document.getElementById('cancelEditBtn').addEventListener('click', function () {
-            // Cerrar modal de forma segura
-            const detailModalEl = document.getElementById('detailModal');
+        // Añadir evento al botón cancelar - Con verificación de existencia
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        if (cancelEditBtn) {
+            cancelEditBtn.addEventListener('click', function () {
+                // Cerrar modal de forma segura
+                const detailModalEl = document.getElementById('detailModal');
 
-            try {
-                // Método compatible para cerrar el modal
-                if (typeof bootstrap !== 'undefined') {
-                    try {
-                        const modal = new bootstrap.Modal(detailModalEl);
-                        modal.hide();
-                    } catch (e) {
-                        console.error('Error al cerrar modal:', e);
-                        // Método alternativo
-                        detailModalEl.classList.remove('show');
-                        detailModalEl.style.display = 'none';
-                        document.body.classList.remove('modal-open');
-                    }
+                if (!detailModalEl) {
+                    console.warn('Modal element not found');
+                    return;
                 }
 
-                // Eliminar backdrops manualmente
-                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-                document.body.style.overflow = '';
-                document.body.style.paddingRight = '';
+                try {
+                    // Método compatible para cerrar el modal
+                    if (typeof bootstrap !== 'undefined') {
+                        try {
+                            const modal = bootstrap.Modal.getInstance(detailModalEl) || new bootstrap.Modal(detailModalEl);
+                            modal.hide();
+                        } catch (e) {
+                            console.error('Error al cerrar modal:', e);
+                            // Método alternativo
+                            detailModalEl.classList.remove('show');
+                            detailModalEl.style.display = 'none';
+                            document.body.classList.remove('modal-open');
+                        }
+                    }
 
-                // Recargar lista de usuarios después de cerrar
-                setTimeout(() => {
-                    const userListBtn = document.querySelector('[data-bs-toggle="modal"][data-bs-target="#dynamicModal"][data-content-type="users"]');
-                    if (userListBtn) userListBtn.click();
-                }, 300);
-            } catch (e) {
-                console.error('Error al cerrar el modal:', e);
-            }
-        });
+                    // Eliminar backdrops manualmente
+                    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                    document.body.style.overflow = '';
+                    document.body.style.paddingRight = '';
+
+                    // Recargar lista de usuarios después de cerrar
+                    setTimeout(() => {
+                        const userListBtn = document.querySelector('[data-bs-toggle="modal"][data-bs-target="#dynamicModal"][data-content-type="users"]');
+                        if (userListBtn) userListBtn.click();
+                    }, 300);
+                } catch (e) {
+                    console.error('Error al cerrar el modal:', e);
+                }
+            });
+        } else {
+
+            // Opción alternativa: delegación de eventos si el botón se crea dinámicamente
+            document.addEventListener('click', function (event) {
+                if (event.target && event.target.id === 'cancelEditBtn') {
+                    // Código del manejador de eventos aquí (puedes copiar el mismo código de arriba)
+                    console.log('Cancel button clicked through delegation');
+                    // ...
+                }
+            });
+        }
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -1720,11 +1736,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                                                                    <div class="alert alert-danger">
-                                                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                                                        Error al cargar el formulario: ${error.message}
-                                                                                                                    </div>
-                                                                                                                `;
+                                                                                                                        <div class="alert alert-danger">
+                                                                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                            Error al cargar el formulario: ${error.message}
+                                                                                                                        </div>
+                                                                                                                    `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -1782,11 +1798,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                                                                    <div class="alert alert-danger">
-                                                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                                                        Error al cargar el formulario: ${error.message}
-                                                                                                                    </div>
-                                                                                                                `;
+                                                                                                                        <div class="alert alert-danger">
+                                                                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                            Error al cargar el formulario: ${error.message}
+                                                                                                                        </div>
+                                                                                                                    `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -1843,11 +1859,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                                                                    <div class="alert alert-danger">
-                                                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                                                        Error al cargar el formulario: ${error.message}
-                                                                                                                    </div>
-                                                                                                                `;
+                                                                                                                        <div class="alert alert-danger">
+                                                                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                            Error al cargar el formulario: ${error.message}
+                                                                                                                        </div>
+                                                                                                                    `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -1894,11 +1910,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                                                                    <div class="alert alert-danger">
-                                                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                                                        Error al cargar el formulario: ${error.message}
-                                                                                                                    </div>
-                                                                                                                `;
+                                                                                                                        <div class="alert alert-danger">
+                                                                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                            Error al cargar el formulario: ${error.message}
+                                                                                                                        </div>
+                                                                                                                    `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -1945,11 +1961,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                                                                    <div class="alert alert-danger">
-                                                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                                                        Error al cargar el formulario: ${error.message}
-                                                                                                                    </div>
-                                                                                                                `;
+                                                                                                                        <div class="alert alert-danger">
+                                                                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                            Error al cargar el formulario: ${error.message}
+                                                                                                                        </div>
+                                                                                                                    `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -1996,11 +2012,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                                                                    <div class="alert alert-danger">
-                                                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                                                        Error al cargar el formulario: ${error.message}
-                                                                                                                    </div>
-                                                                                                                `;
+                                                                                                                        <div class="alert alert-danger">
+                                                                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                            Error al cargar el formulario: ${error.message}
+                                                                                                                        </div>
+                                                                                                                    `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2049,11 +2065,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                                                                    <div class="alert alert-danger">
-                                                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                                                        Error al cargar el formulario: ${error.message}
-                                                                                                                    </div>
-                                                                                                                `;
+                                                                                                                        <div class="alert alert-danger">
+                                                                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                            Error al cargar el formulario: ${error.message}
+                                                                                                                        </div>
+                                                                                                                    `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2100,11 +2116,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                                                                    <div class="alert alert-danger">
-                                                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                                                        Error al cargar el formulario: ${error.message}
-                                                                                                                    </div>
-                                                                                                                `;
+                                                                                                                        <div class="alert alert-danger">
+                                                                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                            Error al cargar el formulario: ${error.message}
+                                                                                                                        </div>
+                                                                                                                    `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2151,11 +2167,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                                                                    <div class="alert alert-danger">
-                                                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                                                        Error al cargar el formulario: ${error.message}
-                                                                                                                    </div>
-                                                                                                                `;
+                                                                                                                        <div class="alert alert-danger">
+                                                                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                            Error al cargar el formulario: ${error.message}
+                                                                                                                        </div>
+                                                                                                                    `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2163,7 +2179,6 @@
                     }, 300);
                 }
             });
-            console.log('Sistema global de eventos inicializado');
         });
     </script>
     <script>
@@ -2279,11 +2294,11 @@
                                 if (modalLoader) modalLoader.classList.add('d-none');
                                 if (modalContent) {
                                     modalContent.innerHTML = `
-                                                <div class="alert alert-danger">
-                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                    Error al cargar el historial: ${error.message}
-                                                </div>
-                                            `;
+                                                    <div class="alert alert-danger">
+                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                        Error al cargar el historial: ${error.message}
+                                                    </div>
+                                                `;
                                     modalContent.classList.remove('d-none');
                                 }
                             });
@@ -2327,11 +2342,11 @@
                                 if (modalLoader) modalLoader.classList.add('d-none');
                                 if (detailContent) {
                                     detailContent.innerHTML = `
-                                                <div class="alert alert-danger">
-                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                    Error al cargar los detalles: ${error.message}
-                                                </div>
-                                            `;
+                                                    <div class="alert alert-danger">
+                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                        Error al cargar los detalles: ${error.message}
+                                                    </div>
+                                                `;
                                     detailContent.classList.remove('d-none');
                                 }
                             });
@@ -2435,11 +2450,11 @@
                         if (modalLoader) modalLoader.classList.add('d-none');
                         if (modalContent) {
                             modalContent.innerHTML = `
-                                                                                            <div class="alert alert-danger">
-                                                                                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                                Error al cargar el ranking: ${error.message}
-                                                                                            </div>
-                                                                                        `;
+                                                                                                <div class="alert alert-danger">
+                                                                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                    Error al cargar el ranking: ${error.message}
+                                                                                                </div>
+                                                                                            `;
                             modalContent.classList.remove('d-none');
                         }
                     });
@@ -2572,11 +2587,11 @@
                         if (modalLoader) modalLoader.classList.add('d-none');
                         if (modalContent) {
                             modalContent.innerHTML = `
-                                                                    <div class="alert alert-danger">
-                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                        Error al cargar el formulario: ${error.message}
-                                                                    </div>
-                                                                `;
+                                                                        <div class="alert alert-danger">
+                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                            Error al cargar el formulario: ${error.message}
+                                                                        </div>
+                                                                    `;
                             modalContent.classList.remove('d-none');
                         }
                     });

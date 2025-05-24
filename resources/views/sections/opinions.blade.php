@@ -8,7 +8,7 @@
             </button>
 
             <!-- Carrusel d'opinions -->
-            <div id="opinion-carousel " class="opinion-card text-center p-3 shadow-sm container" style="width: 40%;">
+            <div id="opinion-carousel" class="opinion-card text-center p-3 shadow-sm container">
                 <p id="opinion-text" class="mb-2">{{ __('messages.opinions.loading') }}</p>
                 <div id="opinion-stars" class="mb-2">
                     <!-- Estrelles es generaran aquí -->
@@ -23,87 +23,6 @@
         </div>
     </div>
 </section>
-
-<style>
-    .section-title {
-        font-weight: 700;
-        margin-bottom: 2rem;
-        color: #212529;
-        position: relative;
-        display: inline-block;
-    }
-
-    .section-title:after {
-        content: '';
-        display: block;
-        width: 50px;
-        height: 3px;
-        background-color: #2e7d32;
-        /* Verd */
-        margin: 12px auto 0;
-    }
-
-    #opinion-carousel {
-        width: 40%;
-        max-width: 400px;
-        background-color: #fff;
-        border-radius: 12px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease, opacity 0.3s ease;
-    }
-
-    .opinion-arrow {
-        width: 40px;
-        height: 40px;
-        background-color: #2e7d32;
-        /* Blau professional */
-        color: #fff;
-        border: none;
-        border-radius: 50%;
-        /* Forma rodona */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        /* Ombra */
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s ease;
-    }
-
-    .opinion-arrow:hover {
-        background-color: #215924;
-        /* Blau més fosc al passar el ratolí */
-        transform: scale(1.1);
-        /* Augment lleuger al passar el ratolí */
-    }
-
-    .opinion-arrow:focus {
-        outline: none;
-        box-shadow: 0 0 0 0.2rem rgba(46, 125, 50, 0.5) !important;
-    }
-
-    .opinion-arrow i {
-        font-size: 16px;
-        /* Mida de la icona */
-    }
-
-    .star {
-        font-size: 20px;
-        color: #ffc107;
-        /* Color groc per a les estrelles */
-    }
-
-    .star.empty {
-        color: #e4e5e9;
-        /* Color gris per a les estrelles buides */
-    }
-
-    .star.half {
-        background: linear-gradient(90deg, #ffc107 50%, #e4e5e9 50%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-</style>
 
 <script>
     $(document).ready(function () {

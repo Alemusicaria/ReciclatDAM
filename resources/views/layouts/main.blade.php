@@ -37,12 +37,12 @@
     <script src="{{ asset('js/theme.js') }}" defer></script>
     <script src="{{ asset('js/language.js') }}" defer></script>
     <script>
-                document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function () {
             // Detectar el mode de color del sistema
             const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
             const currentTheme = localStorage.getItem('theme') || (prefersDarkScheme ? 'dark' : 'light');
             document.body.classList.add(currentTheme);
-        
+
             // Obtenir informació del navigator i window
             const info = {
                 appCodeName: navigator.appCodeName,
@@ -66,9 +66,9 @@
                 screenColorDepth: window.screen.colorDepth,
                 screenPixelDepth: window.screen.pixelDepth
             };
-        
+
             console.log('Navigator and Window Info:', info);
-        
+
             // Enviar les dades al servidor
             fetch('/save-navigator-info', {
                 method: 'POST',
@@ -82,9 +82,14 @@
                     throw new Error('Network response was not ok');
                 }
                 return response.json();
-            }).then(data => console.log('Success:', data))
-              .catch((error) => console.error('Error:', error));
-        
+            }).then(data => {/* Datos recibidos correctamente */ })
+                .catch((error) => {
+                    // Manejo silencioso de errores o usa un log solo en desarrollo
+                    if (process.env.NODE_ENV === 'development') {
+                        console.error('Error:', error);
+                    }
+                });
+
             // Adaptar el disseny segons la mida de la pantalla
             if (info.screenWidth < 768) {
                 document.body.classList.add('mobile');

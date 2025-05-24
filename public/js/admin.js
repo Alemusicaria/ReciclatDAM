@@ -1000,7 +1000,6 @@ const AdminDashboard = {
         init: function () {
             // Verificar si DataTables está disponible
             if (typeof $.fn.DataTable === 'undefined') {
-                console.warn('DataTables no está disponible.');
                 return;
             }
 
@@ -1379,7 +1378,6 @@ const AdminDashboard = {
      * Inicialización general del dashboard
      */
     init: function () {
-        console.log("Admin Dashboard initialized");
 
         // Inicializar módulos según el contenido de la página
         if (document.getElementById('createCodiForm') || document.getElementById('editCodiForm')) {

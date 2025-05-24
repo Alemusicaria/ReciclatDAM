@@ -3,7 +3,7 @@
         <h1 class="mb-3 fs-3">{{ __('Calendari d\'Events') }}</h1>
 
         <div class="row">
-            <div class="col-md-8 mx-auto"> <!-- Cambiar de col-md-10 a col-md-8 para reducir el ancho -->
+            <div class="col-md-8 mx-auto">
                 <!-- Calendario -->
                 <div class="calendar-container">
                     <div id="calendar-loader" class="calendar-loader">
@@ -16,8 +16,7 @@
     </div>
 
     <!-- Modal para detalles del evento -->
-    <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true"
-        style="z-index: 10001;">
+    <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-md">
             <div class="modal-content" id="event-modal">
                 <!-- Asegurar que el botón de cerrar funcione correctamente en el modal -->
@@ -40,238 +39,6 @@
 </section>
 
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css' rel='stylesheet' />
-<style>
-    /* Estilos para el contenedor del calendario */
-    .calendar-container {
-        background-color: white;
-        border-radius: 8px;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-        padding: 15px;
-        margin-bottom: 20px;
-    }
-
-    body.dark .calendar-container {
-        background-color: #2d3748;
-        color: #e2e8f0;
-    }
-
-    /* Estilos para eventos en el calendario */
-    .fc-event {
-        cursor: pointer;
-        border-radius: 4px;
-        padding: 2px;
-    }
-        /* Estilo específico para el botón "avui" (today) más pequeño */
-    .fc-today-button {
-        padding: 2px 8px !important;
-        margin-left: 5px !important; /* Espacio pequeño después de los botones prev/next */
-        width: 8vh !important; /* Dejar que el ancho se ajuste al contenido */
-        height: 4.3vh !important;
-        min-width: 50px !important; /* Establecer un ancho mínimo */
-    }
-    
-    /* Ajustar el contenedor de botones a la izquierda para que estén juntos */
-    .fc-header-toolbar .fc-left {
-        display: flex !important;
-        align-items: center !important;
-        gap: 1px !important; /* Espacio mínimo entre botones */
-    }
-        
-    /* Asegurar que los botones estén en línea */
-    .fc-button-group {
-        display: inline-flex !important;
-        margin-right: 0 !important;
-    }
-
-    /* Estilos para el modal */
-
-    #event-modal {
-        width: 100%;
-        margin-top: 20vh;
-    }
-
-    .event-img {
-        width: 100%;
-        height: 150px;
-        object-fit: cover;
-        border-radius: 4px;
-    }
-
-    .event-details-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .event-details-list li {
-        padding: 5px 0;
-        border-bottom: 1px solid #f0f0f0;
-        font-size: 0.9rem;
-    }
-
-    body.dark .event-details-list li {
-        border-bottom-color: #4a5568;
-    }
-
-    .event-details-list i {
-        width: 20px;
-        text-align: center;
-        margin-right: 8px;
-        color: #2e7d32;
-    }
-
-    body.dark .event-details-list i {
-        color: #48bb78;
-    }
-
-    /* Loader para el calendario */
-    .calendar-loader {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 200px;
-    }
-
-    .calendar-spinner {
-        width: 30px;
-        height: 30px;
-        border: 3px solid rgba(0, 0, 0, 0.1);
-        border-radius: 50%;
-        border-left-color: #2e7d32;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        0% {
-            transform: rotate(0deg);
-        }
-
-        100% {
-            transform: rotate(360deg);
-        }
-    }
-        /* Estilos mejorados para el modo oscuro del calendario */
-    body.dark .calendar-container {
-        background-color: #1a202c;
-        color: #e2e8f0;
-        border: 1px solid #2d3748;
-    }
-    
-    /* Encabezado y controles en modo oscuro */
-    body.dark .fc-toolbar {
-        color: #e2e8f0;
-    }
-    
-    body.dark .fc-button-primary {
-        background-color: #2d3748 !important;
-        border-color: #4a5568 !important;
-        color: #e2e8f0 !important;
-    }
-    
-    body.dark .fc-button-primary:hover {
-        background-color: #4a5568 !important;
-        border-color: #4a5568 !important;
-    }
-    
-    body.dark .fc-button-primary:disabled {
-        background-color: #2d3748 !important;
-        border-color: #4a5568 !important;
-        opacity: 0.7;
-    }
-    
-    body.dark .fc-button-active {
-        background-color: #38a169 !important;
-        border-color: #38a169 !important;
-        color: white !important;
-    }
-    
-    /* Celdas del calendario en modo oscuro */
-    body.dark .fc-daygrid-day {
-        background-color: #1a202c !important;
-        border-color: #2d3748 !important;
-    }
-    
-    body.dark .fc-col-header-cell {
-        background-color: #2d3748 !important;
-        border-color: #4a5568 !important;
-        color: #e2e8f0;
-    }
-    
-    body.dark .fc-day-today {
-        background-color: rgba(56, 161, 105, 0.1) !important;
-    }
-    
-    body.dark .fc-day-past {
-        opacity: 0.7;
-    }
-    
-    /* Números de día en modo oscuro */
-    body.dark .fc-daygrid-day-number {
-        color: #e2e8f0;
-    }
-    
-    /* Eventos en modo oscuro */
-    body.dark .fc-event {
-        border: none !important;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    }
-    
-    body.dark .fc-event-title {
-        font-weight: 500;
-    }
-    
-    body.dark .fc-list-day-cushion {
-        background-color: #2d3748 !important;
-    }
-    
-    body.dark .fc-list-event:hover td {
-        background-color: #4a5568 !important;
-    }
-    
-    body.dark .fc-list-event-title {
-        color: #e2e8f0;
-    }
-    
-    /* Texto "No hay eventos" en modo oscuro */
-    body.dark .fc-list-empty {
-        background-color: #1a202c !important;
-        color: #a0aec0;
-    }
-    
-    /* Otros elementos como popover */
-    body.dark .fc-popover {
-        background-color: #2d3748 !important;
-        border-color: #4a5568 !important;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-    }
-    
-    body.dark .fc-popover-header {
-        background-color: #4a5568 !important;
-        color: #e2e8f0;
-    }
-    
-    /* Para la semana y vista de tiempo */
-    body.dark .fc-timegrid-slot {
-        background-color: #1a202c !important;
-        border-color: #2d3748 !important;
-    }
-    
-    body.dark .fc-timegrid-axis {
-        background-color: #2d3748 !important;
-        color: #a0aec0;
-    }
-    
-    body.dark .fc-timegrid-event {
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    }
-    
-    /* Spinner del loader en modo oscuro */
-    body.dark .calendar-spinner {
-        border-color: rgba(255, 255, 255, 0.1);
-        border-left-color: #48bb78;
-    }
-</style>
-
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js'></script>
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/locales-all.min.js'></script>
 
@@ -334,8 +101,6 @@
                 throw error;
             }
         }
-
-
 
         // Inicializar el calendario
         function initCalendar() {
@@ -495,8 +260,8 @@
         // Función para registrarse en un evento
         function registerForEvent(eventId) {
             @auth
-                            // Mostrar indicador de carga
-                            const registerButton = document.getElementById('register-event-btn');
+                // Mostrar indicador de carga
+                const registerButton = document.getElementById('register-event-btn');
                 registerButton.textContent = 'Registrant...';
                 registerButton.disabled = true;
 
@@ -537,11 +302,6 @@
                                     calEvent.extendedProps.userRegistered = true;
                                 }
                             });
-
-                            // Opcional: recargar la página después de 2 segundos
-                            setTimeout(() => {
-                                // location.reload();
-                            }, 2000);
                         }
                     })
                     .catch(error => {
@@ -580,6 +340,7 @@
             const options = { hour: '2-digit', minute: '2-digit' };
             return date.toLocaleTimeString('ca-ES', options);
         }
+        
         // Reemplazar el manejo de cierre del modal
         document.querySelector('#eventModal .btn-close').addEventListener('click', function () {
             closeEventModal();
@@ -658,7 +419,6 @@
                 $('.modal-backdrop').remove();
             }
 
-            // 6. Crear un mensaje en la consola para confirmación
             console.log('Modal y backdrop eliminados manualmente');
         }
     });
