@@ -164,7 +164,6 @@
             </ul>
         </div>
     </div>
-
     <!-- Scripts JS (optimizados, sin duplicados) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
@@ -181,6 +180,32 @@
     @endif
 
     <script>
+        // Inicializar cliente Algolia primero
+        try {
+            window.algoliaClient = algoliasearch("4JU9PG98CF", "d37ffd358dca40447584fb2ffdc28e03", {
+                _useRequestCache: true,
+                logLevel: 'error'
+            });
+
+            // Inicializar índices para uso en toda la aplicación
+            window.productIndex = window.algoliaClient.initIndex('productes');
+            window.puntsIndex = window.algoliaClient.initIndex('punts_de_recollida');
+            window.opinionsIndex = window.algoliaClient.initIndex('opinions');
+            window.premisIndex = window.algoliaClient.initIndex('premis');
+            window.eventsIndex = window.algoliaClient.initIndex('events');
+            window.tipusEventsIndex = window.algoliaClient.initIndex('tipus_events');
+            window.codisIndex = window.algoliaClient.initIndex('codis');
+
+            // Señal de que Algolia está listo
+            window.algoliaReady = true;
+
+            // Disparar evento personalizado para notificar que Algolia está listo
+            document.dispatchEvent(new Event('algoliaReady'));
+        } catch (e) {
+            console.error("Error inicializando Algolia:", e);
+            window.algoliaReady = false;
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             // Inicialización del tema
             const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -235,46 +260,53 @@
                 localStorage.setItem('theme', newTheme);
                 updateImagesBasedOnTheme();
                 updateThemeIcon(newTheme);
+                applyActiveStyles(); // Actualizar estilos activos cuando cambia el tema
             });
 
-            const navigatorInfo = {
-                appCodeName: navigator.appCodeName,
-                appName: navigator.appName,
-                appVersion: navigator.appVersion,
-                cookieEnabled: navigator.cookieEnabled,
-                hardwareConcurrency: navigator.hardwareConcurrency || 0,
-                language: navigator.language,
-                languages: navigator.languages ? Array.from(navigator.languages) : [],
-                maxTouchPoints: navigator.maxTouchPoints || 0,
-                platform: navigator.platform,
-                product: navigator.product,
-                productSub: navigator.productSub,
-                userAgent: navigator.userAgent,
-                vendor: navigator.vendor,
-                vendorSub: navigator.vendorSub,
-                screenWidth: window.innerWidth,
-                screenHeight: window.innerHeight,
-                screenAvailWidth: window.screen.availWidth,
-                screenAvailHeight: window.screen.availHeight,
-                screenColorDepth: window.screen.colorDepth,
-                screenPixelDepth: window.screen.pixelDepth
-            };
+            // Manejo de enlace activo en la navegación
+            function applyActiveStyles() {
+                // Obtener todos los enlaces de navegación
+                const navLinks = document.querySelectorAll('.navbar-nav .nav-link[href^="#"]');
 
-            // Enviar los datos al servidor
-            fetch('/save-navigator-info', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify(navigatorInfo)
-            }).then(response => {
-                return response.json();
-            }).catch(error => {
-                // Manejo de error silencioso
-                console.error("Error al guardar información del navegador:", error);
-            });
-            // Añadir listener a cada enlace
+                // Eliminar cualquier línea existente y limpiar estilos
+                navLinks.forEach(link => {
+                    const existingLine = link.querySelector('.nav-underline');
+                    if (existingLine) {
+                        existingLine.remove();
+                    }
+                    link.style.fontWeight = '';
+                    link.style.position = '';
+                    link.style.transform = '';
+                });
+
+                // Encontrar el enlace activo
+                const activeLink = document.querySelector('.navbar-nav .nav-link.active');
+                if (!activeLink) return;
+
+                // Aplicar estilos directamente al enlace activo
+                activeLink.style.fontWeight = '600';
+                activeLink.style.position = 'relative';
+                activeLink.style.transform = 'scale(1.05)';
+
+                // Crear un elemento para el subrayado
+                const line = document.createElement('span');
+                line.className = 'nav-underline';
+
+                // Aplicar estilos al subrayado
+                line.style.position = 'absolute';
+                line.style.bottom = '5px';
+                line.style.left = '25%';
+                line.style.width = '50%';
+                line.style.height = '3px';
+                line.style.backgroundColor = document.body.classList.contains('dark') ? '#66bb6a' : '#000';
+                line.style.borderRadius = '4px';
+                line.style.display = 'block';
+
+                // Añadir el subrayado al enlace activo
+                activeLink.appendChild(line);
+            }
+
+            // Navegación entre secciones
             navLinks.forEach(link => {
                 link.addEventListener('click', function (e) {
                     e.preventDefault();
@@ -282,86 +314,111 @@
 
                     if (targetId === '') return;
 
+                    console.log('Navegando a sección:', targetId);
+
                     const targetElement = document.getElementById(targetId);
 
                     if (targetElement) {
-                        // Usar scrollIntoView en lugar de window.scrollTo
+                        // Quitar active de todos los enlaces
+                        navLinks.forEach(l => l.classList.remove('active'));
+
+                        // Añadir active al enlace clickeado
+                        this.classList.add('active');
+
+                        // Aplicar estilos al enlace activo
+                        applyActiveStyles();
+
+                        // MÉTODO ALTERNATIVO: Usar scrollIntoView
                         targetElement.scrollIntoView({
                             behavior: 'smooth',
                             block: 'start'
                         });
 
-                        // Ajuste para la altura del navbar
+                        // Ajustar por la altura del navbar después del scroll
                         const navbarHeight = document.querySelector('.navbar').offsetHeight;
-                        window.scrollBy(0, -navbarHeight);
+                        setTimeout(() => {
+                            window.scrollBy(0, -navbarHeight);
+                        }, 10);
                     } else {
                         console.warn(`La sección con ID "${targetId}" no se encontró en el documento.`);
                     }
                 });
             });
 
-            // Si hay un hash en la URL al cargar la página, desplazarse a la sección correspondiente
+            // Detectar sección visible al hacer scroll
+            function updateActiveNavLink() {
+                const sections = document.querySelectorAll('section[id]');
+                if (sections.length === 0) return;
+
+                const navbarHeight = document.querySelector('.navbar').offsetHeight;
+                const scrollPosition = window.scrollY + navbarHeight + 50;
+
+                let currentSection = null;
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.offsetHeight;
+                    const sectionBottom = sectionTop + sectionHeight;
+
+                    if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
+                        currentSection = section;
+                    }
+                });
+
+                // Si no encontramos sección y estamos cerca del inicio, usar la primera
+                if (!currentSection && window.scrollY < sections[0].offsetTop) {
+                    currentSection = sections[0];
+                }
+
+                if (currentSection) {
+                    const sectionId = currentSection.getAttribute('id');
+
+                    // Actualizar enlaces activos
+                    navLinks.forEach(link => {
+                        link.classList.remove('active');
+                        const linkHref = link.getAttribute('href');
+
+                        if (linkHref === `#${sectionId}`) {
+                            link.classList.add('active');
+                        }
+                    });
+
+                    // Aplicar estilos al enlace activo
+                    applyActiveStyles();
+                }
+            }
+
+            // Inicializar estado activo
+            updateActiveNavLink();
+
+            // Actualizar al hacer scroll
+            window.addEventListener('scroll', updateActiveNavLink);
+
+            // Si hay un hash en la URL al cargar
             if (window.location.hash) {
                 const targetId = window.location.hash.substring(1);
                 const targetElement = document.getElementById(targetId);
+                const targetLink = document.querySelector(`.navbar-nav .nav-link[href="#${targetId}"]`);
 
-                if (targetElement) {
+                if (targetElement && targetLink) {
                     setTimeout(() => {
+                        navLinks.forEach(l => l.classList.remove('active'));
+                        targetLink.classList.add('active');
+                        applyActiveStyles();
+
                         const navbarHeight = document.querySelector('.navbar').offsetHeight;
-                        const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
+                        const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY - navbarHeight;
 
                         window.scrollTo({
                             top: targetPosition,
                             behavior: 'smooth'
                         });
-                    }, 300); // Pequeño retraso para asegurar que todo está cargado
+                    }, 300);
                 }
             }
 
-            // Función unificada para resaltar enlaces de navegación activos
-            function updateActiveNavLink() {
-                const sections = document.querySelectorAll('section[id]');
-                const navbarHeight = document.querySelector('.navbar').offsetHeight;
-                let currentSectionId = '';
-
-                sections.forEach(section => {
-                    const sectionTop = section.offsetTop - navbarHeight - 50;
-                    const sectionBottom = sectionTop + section.offsetHeight;
-
-                    if (window.scrollY >= sectionTop && window.scrollY < sectionBottom) {
-                        currentSectionId = section.getAttribute('id');
-                    }
-                });
-
-                navLinks.forEach(link => {
-                    link.classList.remove('active');
-                    const linkSection = link.getAttribute('href').substring(1);
-
-                    if (linkSection === currentSectionId) {
-                        link.classList.add('active');
-                    }
-                });
-            }
-
-            // Ejecutar al cargar y al hacer scroll
-            updateActiveNavLink();
-            window.addEventListener('scroll', updateActiveNavLink);
+            // Aplicar estilos iniciales
+            applyActiveStyles();
         });
-
-        // Inicializar cliente Algolia una vez para toda la aplicación
-        window.algoliaClient = algoliasearch("4JU9PG98CF", "d37ffd358dca40447584fb2ffdc28e03", {
-            _useRequestCache: true,
-            logLevel: 'error'
-        });
-
-        // Inicializar índices para uso en toda la aplicación
-        window.productIndex = window.algoliaClient.initIndex('productes');
-        window.puntsIndex = window.algoliaClient.initIndex('punts_de_recollida');
-        window.opinionsIndex = window.algoliaClient.initIndex('opinions');
-        window.premisIndex = window.algoliaClient.initIndex('premis');
-        window.eventsIndex = window.algoliaClient.initIndex('events');
-        window.tipusEventsIndex = window.algoliaClient.initIndex('tipus_events');
-        window.codisIndex = window.algoliaClient.initIndex('codis');
     </script>
 </body>
 

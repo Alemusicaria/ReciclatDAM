@@ -4844,3 +4844,31 @@ body.dark-mode .btn-primary:hover {
     /* Canvi de color en passar el ratolí */
     border-color: #777;
 }
+
+/* Forzar estilo para enlaces activos */
+.navbar-nav .nav-link.active {
+    font-weight: 600 !important;
+    position: relative !important;
+    transform: scale(1.05) !important;
+}
+
+.navbar-nav .nav-link.active::after {
+    content: '' !important;
+    position: absolute !important;
+    bottom: 5px !important;
+    left: 25% !important;
+    width: 50% !important;
+    height: 3px !important;
+    background-color: #000 !important;
+    border-radius: 4px !important;
+    transition: all 0.3s ease !important;
+    display: block !important;
+}
+
+body.dark .navbar-nav .nav-link.active {
+    color: #66bb6a !important;
+}
+
+body.dark .navbar-nav .nav-link.active::after {
+    background-color: #66bb6a !important;
+}
