@@ -30,7 +30,6 @@ Route::localizedGroup(function () {
 
 
     Route::post('/save-navigator-info', [NavigatorInfoController::class, 'store']);
-
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::post('/clear-session', function () {
