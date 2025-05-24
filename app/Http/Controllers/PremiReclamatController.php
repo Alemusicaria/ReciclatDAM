@@ -120,18 +120,51 @@ class PremiReclamatController extends Controller
 
     public function destroy(PremiReclamat $premiReclamat)
     {
-        // Si el premio no ha sido entregado, devolver puntos al usuario
-        if ($premiReclamat->estat != 'entregat') {
-            $user = $premiReclamat->user;
-            $user->punts_actuals += $premiReclamat->punts_gastats;
-            $user->punts_gastats -= $premiReclamat->punts_gastats;
-            $user->save();
+        try {
+            // Si el premio no ha sido entregado, devolver puntos al usuario
+            if ($premiReclamat->estat != 'entregat' && $premiReclamat->user) {
+                $user = $premiReclamat->user;
+                $user->punts_actuals += $premiReclamat->punts_gastats;
+                $user->punts_gastats -= $premiReclamat->punts_gastats;
+                $user->save();
+            }
+
+            // Guardar información antes de eliminar
+            $premiId = $premiReclamat->id;
+            $premiNom = $premiReclamat->premi ? $premiReclamat->premi->nom : 'Premi #' . $premiId;
+            $userName = $premiReclamat->user ? $premiReclamat->user->nom : 'usuari desconegut';
+
+            $premiReclamat->delete();
+
+            // Registrar actividad
+            if (auth()->check()) {
+                Activity::create([
+                    'user_id' => auth()->id(),
+                    'action' => 'Ha eliminat el premi reclamat #' . $premiId . ' (' . $premiNom . ') per a ' . $userName
+                ]);
+            }
+
+            if (request()->expectsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Premi reclamat eliminat correctament'
+                ]);
+            }
+
+            return redirect()->route('admin.dashboard')
+                ->with('success', 'Premi reclamat eliminat correctament.');
+        } catch (\Exception $e) {
+            \Log::error('Error al eliminar premi reclamat: ' . $e->getMessage());
+
+            if (request()->expectsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return back()->withErrors(['error' => 'Error: ' . $e->getMessage()]);
         }
-
-        $premiReclamat->delete();
-
-        return redirect()->route('premis_reclamats.index')
-            ->with('success', 'Premi reclamat eliminat correctament.');
     }
 
     public function userClaims($userId)
@@ -143,30 +176,45 @@ class PremiReclamatController extends Controller
     }
     public function approve($id)
     {
-        $premiReclamat = PremiReclamat::findOrFail($id);
-        $premiReclamat->estat = 'procesant';
+        try {
+            $premiReclamat = PremiReclamat::findOrFail($id);
+            $premiReclamat->estat = 'procesant';
 
-        // Generar código de seguimiento único
-        $codiSeguiment = $this->generarCodiSeguimentUnic();
-        $premiReclamat->codi_seguiment = $codiSeguiment;
-        $premiReclamat->comentaris = ($premiReclamat->comentaris ? $premiReclamat->comentaris . "\n" : '') .
-            'Sol·licitud acceptada el ' . now()->format('d/m/Y H:i') . ' per ' . auth()->user()->nom;
-        $premiReclamat->save();
+            // Generar código de seguimiento único
+            $codiSeguiment = $this->generarCodiSeguimentUnic();
+            $premiReclamat->codi_seguiment = $codiSeguiment;
 
-        // Registrar actividad
-        if (auth()->check()) {
-            Activity::create([
-                'user_id' => auth()->id(),
-                'action' => 'Ha aprovat la sol·licitud de premi #' . $premiReclamat->id . ' per a ' .
-                    ($premiReclamat->user ? $premiReclamat->user->nom : 'usuari desconegut') .
-                    ' amb codi de seguiment: ' . $codiSeguiment
-            ]);
+            $premiReclamat->save();
+
+            // Registrar actividad
+            if (auth()->check()) {
+                Activity::create([
+                    'user_id' => auth()->id(),
+                    'action' => 'Ha aprovat la sol·licitud de premi #' . $premiReclamat->id . ' per a ' .
+                        ($premiReclamat->user ? $premiReclamat->user->nom : 'usuari desconegut')
+                ]);
+            }
+
+            if (request()->expectsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Sol·licitud aprovada correctament'
+                ]);
+            }
+
+            return redirect()->back()->with('success', 'Sol·licitud aprovada correctament');
+        } catch (\Exception $e) {
+            \Log::error('Error al aprovar premi reclamat: ' . $e->getMessage());
+
+            if (request()->expectsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return back()->withErrors(['error' => 'Error: ' . $e->getMessage()]);
         }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Sol·licitud aprovada amb codi de seguiment: ' . $codiSeguiment
-        ]);
     }
 
     /**
