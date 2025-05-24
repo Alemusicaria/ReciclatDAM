@@ -56,7 +56,23 @@ class AdminController extends Controller
         $pendingRewards = PremiReclamat::where('estat', 'pendent')->count();
 
         $topUsers = User::orderBy('punts_actuals', 'desc')->get();
+        $usersByLevel = DB::table('users')
+            ->join('nivells', 'users.nivell_id', '=', 'nivells.id')
+            ->select('nivells.nom', DB::raw('count(*) as total'))
+            ->groupBy('nivells.nom')
+            ->pluck('total', 'nom');
 
+        // Colores para el gráfico de niveles
+        $levelColors = [
+            '#4CAF50',
+            '#2196F3',
+            '#FF9800',
+            '#F44336',
+            '#9C27B0',
+            '#673AB7',
+            '#3F51B5',
+            '#009688'
+        ];
         // Activitat recent
         $recentActivities = Activity::with('user')
             ->orderBy('created_at', 'desc')
@@ -67,6 +83,11 @@ class AdminController extends Controller
         $totalActivePoints = User::sum('punts_actuals');
         $totalSpentPoints = User::sum('punts_gastats');
         $totalEventPoints = DB::table('event_user')->sum('punts');
+        // Calcular porcentaje de nuevos eventos
+        $eventsLastMonth = Event::where('created_at', '<', $lastMonth)->count();
+        $newEventsPercent = $eventsLastMonth > 0
+            ? round((Event::whereBetween('created_at', [$lastMonth, Carbon::now()])->count() / $eventsLastMonth) * 100)
+            : 100;
 
         // Dades per a gràfics - últims 6 mesos
         $months = collect([]);
@@ -102,6 +123,7 @@ class AdminController extends Controller
             'totalPremis',
             'totalCodis',
             'newUsersPercent',
+            'newEventsPercent',
             'newCodisPercent',
             'activeEvents',
             'pendingRewards',
@@ -113,7 +135,9 @@ class AdminController extends Controller
             'activityChartLabels',
             'newUsersData',
             'codisScannedData',
-            'premisClaimedData'
+            'premisClaimedData',
+            'usersByLevel',
+            'levelColors'
         ));
     }
     // Obtener eventos en formato JSON para FullCalendar

@@ -3,7 +3,7 @@
 @section('content')
     <div class="admin-dashboard py-4">
         <div class="container-fluid" style="margin-top: 13vh;">
-            <!-- Encabezado -->
+            <!-- Sección 1: Encabezado -->
             <div class="header-card mb-4">
                 <div class="row g-0 align-items-center">
                     <div class="col-lg-8">
@@ -30,9 +30,15 @@
                     </div>
                 </div>
             </div>
-            <!-- Targetes d'estadística -->
+
+            <!-- Sección 2: Métricas Principales -->
+            <div class="section-header mb-3">
+                <h2 class="section-title"><i class="fas fa-chart-pie me-2"></i>Mètriques Principals</h2>
+                <hr class="section-divider">
+            </div>
+
             <div class="row stats-cards mb-4">
-                <!-- Para la tarjeta de Usuarios -->
+                <!-- Tarjetas de usuarios, eventos, premios y códigos -->
                 <div class="col-xl-3 col-md-6 mb-3">
                     <div class="stat-card users cursor-pointer" data-bs-toggle="modal" data-bs-target="#dynamicModal"
                         data-content-type="users">
@@ -53,7 +59,6 @@
                     </div>
                 </div>
 
-                <!-- Para la tarjeta de Eventos -->
                 <div class="col-xl-3 col-md-6 mb-3">
                     <div class="stat-card events cursor-pointer" data-bs-toggle="modal" data-bs-target="#dynamicModal"
                         data-content-type="events">
@@ -72,7 +77,6 @@
                     </div>
                 </div>
 
-                <!-- Para la tarjeta de Premios -->
                 <div class="col-xl-3 col-md-6 mb-3">
                     <div class="stat-card prizes cursor-pointer" data-bs-toggle="modal" data-bs-target="#dynamicModal"
                         data-content-type="premis">
@@ -91,7 +95,6 @@
                     </div>
                 </div>
 
-                <!-- Para la tarjeta de Reciclaje -->
                 <div class="col-xl-3 col-md-6 mb-3">
                     <div class="stat-card codes cursor-pointer" data-bs-toggle="modal" data-bs-target="#dynamicModal"
                         data-content-type="codis">
@@ -111,179 +114,14 @@
                         </div>
                     </div>
                 </div>
-                <!-- Tarjeta para Productos en dashboard.blade.php -->
-                <div class="col-xl-3 col-md-6 mb-3">
-                    <div class="stat-card products cursor-pointer" data-bs-toggle="modal" data-bs-target="#dynamicModal"
-                        data-content-type="productes">
-                        <div class="stat-card-body">
-                            <div class="stat-card-icon">
-                                <i class="fas fa-box"></i>
-                            </div>
-                            <div class="stat-card-info">
-                                <h3 class="stat-card-number">{{ \App\Models\Producte::count() }}</h3>
-                                <p class="stat-card-title">Productes</p>
-                                <div class="stat-card-badge">
-                                    <span class="badge">Gestió de productes</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Tarjeta para Puntos de Recogida -->
-                <div class="col-xl-3 col-md-6 mb-3">
-                    <div class="stat-card recycling-points cursor-pointer" data-bs-toggle="modal"
-                        data-bs-target="#dynamicModal" data-content-type="punt-reciclatge">
-                        <div class="stat-card-body">
-                            <div class="stat-card-icon">
-                                <i class="fas fa-dumpster"></i>
-                            </div>
-                            <div class="stat-card-info">
-                                <h3 class="stat-card-number">{{ \App\Models\PuntDeRecollida::count() }}</h3>
-                                <p class="stat-card-title">Punts de Recollida</p>
-                                <div class="stat-card-badge">
-                                    <span class="badge">
-                                        {{ \App\Models\PuntDeRecollida::where('disponible', 1)->count() }} disponibles
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Añade este div en dashboard.blade.php junto a las demás tarjetas -->
-                <div class="col-xl-3 col-md-6 mb-3">
-                    <div class="stat-card roles cursor-pointer" data-bs-toggle="modal" data-bs-target="#dynamicModal"
-                        data-content-type="rols">
-                        <div class="stat-card-body">
-                            <div class="stat-card-icon">
-                                <i class="fas fa-user-tag"></i>
-                            </div>
-                            <div class="stat-card-info">
-                                <h3 class="stat-card-number">{{ \App\Models\Rol::count() }}</h3>
-                                <p class="stat-card-title">Rols</p>
-                                <div class="stat-card-badge">
-                                    <span class="badge">
-                                        Gestió de rols i permisos
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Tarjeta para Tipos de Alertas -->
-                <div class="col-xl-3 col-md-6 mb-3">
-                    <div class="stat-card alerts cursor-pointer" data-bs-toggle="modal" data-bs-target="#dynamicModal"
-                        data-content-type="tipus-alertes">
-                        <div class="stat-card-body">
-                            <div class="stat-card-icon">
-                                <i class="fas fa-bell"></i>
-                            </div>
-                            <div class="stat-card-info">
-                                <h3 class="stat-card-number">{{ \App\Models\TipusAlerta::count() }}</h3>
-                                <p class="stat-card-title">Tipus d'Alertes</p>
-                                <div class="stat-card-badge">
-                                    <span class="badge">
-                                        Gestió d'alertes
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Tarjeta para Alertas de Puntos de Recogida -->
-                <div class="col-xl-3 col-md-6 mb-3">
-                    <div class="stat-card collection-alerts cursor-pointer" data-bs-toggle="modal"
-                        data-bs-target="#dynamicModal" data-content-type="alertes-punts">
-                        <div class="stat-card-body">
-                            <div class="stat-card-icon">
-                                <i class="fas fa-exclamation-triangle"></i>
-                            </div>
-                            <div class="stat-card-info">
-                                <h3 class="stat-card-number">{{ \App\Models\AlertaPuntDeRecollida::count() }}</h3>
-                                <p class="stat-card-title">Alertes Punts</p>
-                                <div class="stat-card-badge">
-                                    <span class="badge">
-                                        {{ \App\Models\AlertaPuntDeRecollida::where('created_at', '>=', \Carbon\Carbon::now()->subDays(7))->count() }}
-                                        noves aquesta setmana
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Tarjeta para Tipos de Eventos -->
-                <div class="col-xl-3 col-md-6 mb-3">
-                    <div class="stat-card event-types cursor-pointer" data-bs-toggle="modal" data-bs-target="#dynamicModal"
-                        data-content-type="tipus-events">
-                        <div class="stat-card-body">
-                            <div class="stat-card-icon">
-                                <i class="fas fa-tags"></i>
-                            </div>
-                            <div class="stat-card-info">
-                                <h3 class="stat-card-number">{{ \App\Models\TipusEvent::count() }}</h3>
-                                <p class="stat-card-title">Tipus d'Events</p>
-                                <div class="stat-card-badge">
-                                    <span class="badge">
-                                        Gestió de categories
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Tarjeta para Opiniones -->
-                <div class="col-xl-3 col-md-6 mb-3">
-                    <div class="stat-card opinions cursor-pointer" data-bs-toggle="modal" data-bs-target="#dynamicModal"
-                        data-content-type="opinions">
-                        <div class="stat-card-body">
-                            <div class="stat-card-icon">
-                                <i class="fas fa-comment-dots"></i>
-                            </div>
-                            <div class="stat-card-info">
-                                <h3 class="stat-card-number">{{ \App\Models\Opinions::count() }}</h3>
-                                <p class="stat-card-title">Opinions</p>
-                                <div class="stat-card-badge">
-                                    <span class="badge">
-                                        {{ \App\Models\Opinions::where('created_at', '>=', \Carbon\Carbon::now()->subDays(30))->count() }}
-                                        noves aquest mes
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6 mb-4">
-                    <a href="{{ route('admin.navigator-stats') }}" class="management-card">
-                        <div class="management-icon">
-                            <i class="fas fa-chart-bar"></i>
-                        </div>
-                        <h5 class="management-title">Estadístiques de Navegació</h5>
-                        <p class="management-subtitle">Anàlisi de dispositius i comportament dels usuaris</p>
-                    </a>
-                </div>
-
-                <!-- Tarjeta para Premios Reclamados en dashboard.blade.php -->
-                <div class="col-xl-3 col-md-6 mb-3">
-                    <div class="stat-card claimed-prizes cursor-pointer" data-bs-toggle="modal"
-                        data-bs-target="#dynamicModal" data-content-type="premis-reclamats">
-                        <div class="stat-card-body">
-                            <div class="stat-card-icon">
-                                <i class="fas fa-trophy"></i>
-                            </div>
-                            <div class="stat-card-info">
-                                <h3 class="stat-card-number">{{ \App\Models\PremiReclamat::count() }}</h3>
-                                <p class="stat-card-title">Premis Reclamats</p>
-                                <div class="stat-card-badge">
-                                    <span class="badge">
-                                        {{ \App\Models\PremiReclamat::where('estat', 'pendent')->count() }} pendents
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
-            <!-- Gràfics i Distribució -->
+            <!-- Sección 3: Análisis y Gráficos -->
+            <div class="section-header mb-3">
+                <h2 class="section-title"><i class="fas fa-chart-line me-2"></i>Anàlisi i Gràfics</h2>
+                <hr class="section-divider">
+            </div>
+
             <div class="row charts-row mb-4">
                 <!-- Gràfic d'activitat -->
                 <div class="col-xl-8 col-lg-7 mb-4">
@@ -334,9 +172,208 @@
                 </div>
             </div>
 
-            <!-- Activitat recent i Top usuaris -->
+            <!-- Sección 4: Gestión del Sistema -->
+            <div class="section-header mb-3">
+                <h2 class="section-title"><i class="fas fa-cogs me-2"></i>Gestió del Sistema</h2>
+                <hr class="section-divider">
+            </div>
+
+            <div class="row stats-cards mb-4">
+                <!-- Tarjetas de administración -->
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="stat-card products cursor-pointer" data-bs-toggle="modal" data-bs-target="#dynamicModal"
+                        data-content-type="productes">
+                        <div class="stat-card-body">
+                            <div class="stat-card-icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="stat-card-info">
+                                <h3 class="stat-card-number">{{ \App\Models\Producte::count() }}</h3>
+                                <p class="stat-card-title">Productes</p>
+                                <div class="stat-card-badge">
+                                    <span class="badge">Gestió de productes</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="stat-card recycling-points cursor-pointer" data-bs-toggle="modal"
+                        data-bs-target="#dynamicModal" data-content-type="punt-reciclatge">
+                        <div class="stat-card-body">
+                            <div class="stat-card-icon">
+                                <i class="fas fa-dumpster"></i>
+                            </div>
+                            <div class="stat-card-info">
+                                <h3 class="stat-card-number">{{ \App\Models\PuntDeRecollida::count() }}</h3>
+                                <p class="stat-card-title">Punts de Recollida</p>
+                                <div class="stat-card-badge">
+                                    <span class="badge">
+                                        {{ \App\Models\PuntDeRecollida::where('disponible', 1)->count() }} disponibles
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="stat-card roles cursor-pointer" data-bs-toggle="modal" data-bs-target="#dynamicModal"
+                        data-content-type="rols">
+                        <div class="stat-card-body">
+                            <div class="stat-card-icon">
+                                <i class="fas fa-user-tag"></i>
+                            </div>
+                            <div class="stat-card-info">
+                                <h3 class="stat-card-number">{{ \App\Models\Rol::count() }}</h3>
+                                <p class="stat-card-title">Rols</p>
+                                <div class="stat-card-badge">
+                                    <span class="badge">
+                                        Gestió de rols i permisos
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="stat-card alerts cursor-pointer" data-bs-toggle="modal" data-bs-target="#dynamicModal"
+                        data-content-type="tipus-alertes">
+                        <div class="stat-card-body">
+                            <div class="stat-card-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div class="stat-card-info">
+                                <h3 class="stat-card-number">{{ \App\Models\TipusAlerta::count() }}</h3>
+                                <p class="stat-card-title">Tipus d'Alertes</p>
+                                <div class="stat-card-badge">
+                                    <span class="badge">
+                                        Gestió d'alertes
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row stats-cards mb-4">
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="stat-card collection-alerts cursor-pointer" data-bs-toggle="modal"
+                        data-bs-target="#dynamicModal" data-content-type="alertes-punts">
+                        <div class="stat-card-body">
+                            <div class="stat-card-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="stat-card-info">
+                                <h3 class="stat-card-number">{{ \App\Models\AlertaPuntDeRecollida::count() }}</h3>
+                                <p class="stat-card-title">Alertes Punts</p>
+                                <div class="stat-card-badge">
+                                    <span class="badge">
+                                        {{ \App\Models\AlertaPuntDeRecollida::where('created_at', '>=', \Carbon\Carbon::now()->subDays(7))->count() }}
+                                        noves aquesta setmana
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="stat-card event-types cursor-pointer" data-bs-toggle="modal" data-bs-target="#dynamicModal"
+                        data-content-type="tipus-events">
+                        <div class="stat-card-body">
+                            <div class="stat-card-icon">
+                                <i class="fas fa-tags"></i>
+                            </div>
+                            <div class="stat-card-info">
+                                <h3 class="stat-card-number">{{ \App\Models\TipusEvent::count() }}</h3>
+                                <p class="stat-card-title">Tipus d'Events</p>
+                                <div class="stat-card-badge">
+                                    <span class="badge">
+                                        Gestió de categories
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="stat-card opinions cursor-pointer" data-bs-toggle="modal" data-bs-target="#dynamicModal"
+                        data-content-type="opinions">
+                        <div class="stat-card-body">
+                            <div class="stat-card-icon">
+                                <i class="fas fa-comment-dots"></i>
+                            </div>
+                            <div class="stat-card-info">
+                                <h3 class="stat-card-number">{{ \App\Models\Opinions::count() }}</h3>
+                                <p class="stat-card-title">Opinions</p>
+                                <div class="stat-card-badge">
+                                    <span class="badge">
+                                        {{ \App\Models\Opinions::where('created_at', '>=', \Carbon\Carbon::now()->subDays(30))->count() }}
+                                        noves aquest mes
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="stat-card claimed-prizes cursor-pointer" data-bs-toggle="modal"
+                        data-bs-target="#dynamicModal" data-content-type="premis-reclamats">
+                        <div class="stat-card-body">
+                            <div class="stat-card-icon">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <div class="stat-card-info">
+                                <h3 class="stat-card-number">{{ \App\Models\PremiReclamat::count() }}</h3>
+                                <p class="stat-card-title">Premis Reclamats</p>
+                                <div class="stat-card-badge">
+                                    <span class="badge">
+                                        {{ \App\Models\PremiReclamat::where('estat', 'pendent')->count() }} pendents
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 5: Estadísticas Avanzadas -->
+            <div class="section-header mb-3">
+                <h2 class="section-title"><i class="fas fa-chart-bar me-2"></i>Estadístiques Avançades</h2>
+                <hr class="section-divider">
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <a href="{{ route('admin.navigator-stats') }}" class="stat-card-link">
+                        <div class="stat-card advanced-stats">
+                            <div class="stat-card-body">
+                                <div class="stat-card-icon">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <div class="stat-card-info">
+                                    <h3 class="stat-card-number">Estadístiques de Navegació</h3>
+                                    <p class="stat-card-title">Anàlisi de dispositius i comportament dels usuaris</p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Sección 6: Actividad y Ranking -->
+            <div class="section-header mb-3">
+                <h2 class="section-title"><i class="fas fa-history me-2"></i>Activitat i Rànking</h2>
+                <hr class="section-divider">
+            </div>
+
             <div class="row content-row mb-4">
-                <!-- Activitat recent -->
                 <!-- Activitat recent -->
                 <div class="col-xl-8 col-lg-7 mb-4">
                     <div class="content-card h-100">
@@ -371,7 +408,7 @@
                                                 )
                                             ) :
                                             asset('images/default-profile.png') 
-                                                                                                                                                                                                                                                                                                                                                                                                                                }}"
+                                                                                                                                                                }}"
                                                                                         alt="Foto perfil" class="activity-avatar">
 
                                                                                     <div class="activity-user-info">
@@ -437,8 +474,8 @@
                                         )
                                     ) :
                                     asset('images/default-profile.png') 
-                                                                                                                                                                                                                    }}"
-                                                                    alt="Foto perfil" class="ranking-avatar">
+                                                                                                                            }}" alt="Foto perfil"
+                                                                    class="ranking-avatar">
                                                                 <div class="ranking-user-info">
                                                                     <h6 class="ranking-user-name">{{ $user->nom }} {{ $user->cognoms }}</h6>
                                                                     <span
@@ -463,1022 +500,134 @@
                 </div>
             </div>
         </div>
-        <!-- Al final del dashboard pero antes de los scripts, añade este modal genérico -->
-        <div class="modal fade" id="dynamicModal" tabindex="-1" aria-labelledby="dynamicModalLabel" aria-hidden="true"
-            data-bs-backdrop="true" data-bs-keyboard="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="dynamicModalLabel">Cargando ...</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="text-center py-5" id="modal-loader">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden"></span>
-                            </div>
-                            <p class="mt-2">Cargando contenido...</p>
+    </div>
+    <!-- Al final del dashboard pero antes de los scripts, añade este modal genérico -->
+    <div class="modal fade" id="dynamicModal" tabindex="-1" aria-labelledby="dynamicModalLabel" aria-hidden="true"
+        data-bs-backdrop="true" data-bs-keyboard="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="dynamicModalLabel">Cargando ...</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center py-5" id="modal-loader">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden"></span>
                         </div>
-                        <div id="dynamic-content" class="d-none"></div>
+                        <p class="mt-2">Cargando contenido...</p>
                     </div>
+                    <div id="dynamic-content" class="d-none"></div>
                 </div>
             </div>
         </div>
-        <!-- Modal para detalles -->
-        <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true"
-            data-bs-backdrop="true" data-bs-keyboard="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="detailModalLabel">Detalls</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="text-center py-3" id="detail-modal-loader">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden"></span>
-                            </div>
-                            <p class="mt-2">Carregant informació...</p>
+    </div>
+    <!-- Modal para detalles -->
+    <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true"
+        data-bs-backdrop="true" data-bs-keyboard="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailModalLabel">Detalls</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center py-3" id="detail-modal-loader">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden"></span>
                         </div>
-                        <div id="detail-content" class="d-none">
-                            <!-- El contenido se cargará dinámicamente aquí -->
-                        </div>
+                        <p class="mt-2">Carregant informació...</p>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary d-none" id="toggleEditBtn">Editar</button>
-                        <button type="button" class="btn btn-success d-none" id="saveChangesBtn">Guardar</button>
+                    <div id="detail-content" class="d-none">
+                        <!-- El contenido se cargará dinámicamente aquí -->
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Mini modal de confirmación para eliminar -->
-        <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-sm">
-                <div class="modal-content">
-                    <div class="modal-header bg-danger text-white">
-                        <h5 class="modal-title">Confirmar eliminació</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p id="confirmDeleteText">Estàs segur que vols eliminar aquest element?</p>
-                        <input type="hidden" id="deleteItemId">
-                        <input type="hidden" id="deleteItemType">
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
-                        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
-                            <i class="fas fa-trash me-1"></i> Eliminar
-                        </button>
-                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary d-none" id="toggleEditBtn">Editar</button>
+                    <button type="button" class="btn btn-success d-none" id="saveChangesBtn">Guardar</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <style>
-        /* Variables per a mode clar/fosc */
-        :root {
-            --admin-bg: #f5f7fa;
-            --card-bg: #fff;
-            --card-border: rgba(0, 0, 0, 0.05);
-            --card-shadow: rgba(0, 0, 0, 0.05);
-            --text-primary: #2d3748;
-            --text-secondary: #718096;
-            --border-color: #e2e8f0;
-            --icon-bg: #f7fafc;
-        }
-
-        body.dark {
-            --admin-bg: #1a202c;
-            --card-bg: #2d3748;
-            --card-border: rgba(255, 255, 255, 0.05);
-            --card-shadow: rgba(0, 0, 0, 0.2);
-            --text-primary: #f7fafc;
-            --text-secondary: #a0aec0;
-            --border-color: #4a5568;
-            --icon-bg: #4a5568;
-        }
-
-        /* Estils generals */
-        .admin-dashboard {
-            min-height: 100vh;
-            padding-top: 60px;
-        }
-
-        .header-card,
-        .stat-card,
-        .chart-card,
-        .content-card,
-        .management-card {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 4px 16px var(--card-shadow);
-            border: 1px solid var(--card-border);
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .admin-title {
-            color: var(--text-primary);
-            font-size: 1.8rem;
-            font-weight: 700;
-        }
-
-        .admin-subtitle,
-        .admin-date {
-            color: var(--text-secondary);
-            font-size: 1rem;
-        }
-
-        /* Targetes d'estadística */
-        .stat-card {
-            height: 100%;
-            position: relative;
-        }
-
-        .stat-card-body {
-            padding: 20px;
-            display: flex;
-            align-items: center;
-        }
-
-        .stat-card-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            margin-right: 16px;
-            background-color: var(--icon-bg);
-        }
-
-        .stat-card.users .stat-card-icon {
-            color: #3182ce;
-        }
-
-        .stat-card.events .stat-card-icon {
-            color: #38a169;
-        }
-
-        .stat-card.prizes .stat-card-icon {
-            color: #d69e2e;
-        }
-
-        .stat-card.recycling .stat-card-icon {
-            color: #3182ce;
-        }
-
-        .stat-card-number {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 0;
-            color: var(--text-primary);
-        }
-
-        .stat-card-title {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-        }
-
-        .stat-card-percent {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-
-        .stat-card-badge .badge {
-            background-color: rgba(56, 161, 105, 0.1);
-            color: #38a169;
-            font-weight: 500;
-            font-size: 0.8rem;
-            padding: 5px 10px;
-            border-radius: 20px;
-        }
-
-        /* Targetes de gràfics */
-        .chart-card-header,
-        .content-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .chart-card-title,
-        .content-card-title {
-            margin: 0;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .chart-card-body,
-        .content-card-body {
-            padding: 20px;
-        }
-
-        .chart-legend {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .chart-legend-item {
-            display: flex;
-            align-items: center;
-            margin-right: 15px;
-        }
-
-        .legend-color {
-            width: 12px;
-            height: 12px;
-            border-radius: 2px;
-            margin-right: 5px;
-        }
-
-        .legend-text {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-
-        /* Taula d'activitat */
-        .table-activity {
-            margin-bottom: 0;
-        }
-
-        .table-activity thead th {
-            background-color: rgba(0, 0, 0, 0.02);
-            color: var(--text-secondary);
-            font-weight: 600;
-            font-size: 0.85rem;
-            padding: 12px 20px;
-            border-color: var(--border-color);
-        }
-
-        body.dark .table-activity thead th {
-            background-color: rgba(255, 255, 255, 0.02);
-        }
-
-        .table-activity tbody td {
-            padding: 12px 20px;
-            vertical-align: middle;
-            color: var(--text-primary);
-            border-color: var(--border-color);
-        }
-
-        .activity-user {
-            display: flex;
-            align-items: center;
-        }
-
-        .activity-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 12px;
-        }
-
-        .activity-user-name {
-            margin-bottom: 2px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .activity-user-email {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-
-        .btn-icon {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background-color: var(--icon-bg);
-            color: var(--text-secondary);
-            border: none;
-            transition: all 0.2s ease;
-        }
-
-        .btn-icon:hover {
-            background-color: #3182ce;
-            color: white;
-        }
-
-        /* Llista d'usuaris destacats */
-        .user-ranking-list {
-            padding: 0;
-            margin: 0;
-            list-style: none;
-        }
-
-        .user-ranking-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 20px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .user-ranking-item:last-child {
-            border-bottom: none;
-        }
-
-        .ranking-position {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background-color: var(--icon-bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 12px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            color: var(--text-primary);
-        }
-
-        .ranking-user {
-            display: flex;
-            align-items: center;
-            flex: 1;
-        }
-
-        .ranking-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 12px;
-        }
-
-        .ranking-user-name {
-            margin-bottom: 2px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .ranking-user-level {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-
-        .badge-points {
-            background-color: rgba(49, 130, 206, 0.1);
-            color: #3182ce;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        /* Targetes de gestió */
-        .management-options {
-            padding: 10px;
-        }
-
-        .management-card {
-            display: block;
-            padding: 20px;
-            height: 100%;
-            text-align: center;
-            color: var(--text-primary);
-            text-decoration: none;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            background-color: var(--card-bg);
-            border: 1px solid var(--card-border);
-        }
-
-        .management-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .management-icon {
-            width: 60px;
-            height: 60px;
-            margin: 0 auto 16px;
-            background-color: var(--icon-bg);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .management-card:nth-child(1) .management-icon {
-            color: #3182ce;
-        }
-
-        .management-card:nth-child(2) .management-icon {
-            color: #38a169;
-        }
-
-        .management-card:nth-child(3) .management-icon {
-            color: #d69e2e;
-        }
-
-        .management-card:nth-child(4) .management-icon {
-            color: #e53e3e;
-        }
-
-        .management-title {
-            margin-bottom: 8px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .management-subtitle {
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            margin-bottom: 0;
-        }
-
-        .btn-view-all {
-            padding: 5px 12px;
-            background-color: var(--icon-bg);
-            color: var(--text-secondary);
-            border-radius: 20px;
-            font-size: 0.8rem;
-            text-decoration: none;
-            transition: all 0.2s ease;
-        }
-
-        .btn-view-all:hover {
-            background-color: #3182ce;
-            color: white;
-        }
-
-        .empty-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            color: var(--text-secondary);
-        }
-
-        /* Selectors i formularis */
-        .form-select {
-            background-color: var(--card-bg);
-            color: var(--text-primary);
-            border-color: var(--border-color);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .admin-date {
-                margin-top: 10px;
-            }
-        }
-
-        //* Arreglo para el problema del gráfico que baja sin parar */
-        .chart-card {
-            height: 400px;
-            /* Altura fija */
-        }
-
-        .chart-card-body {
-            height: calc(100% - 56px);
-            /* Altura del contenedor restando el header */
-            position: relative;
-            overflow: hidden;
-            /* Importante: oculta cualquier contenido que sobrepase */
-            display: flex;
-            /* Usar flexbox para centrar y controlar el tamaño */
-            justify-content: center;
-            align-items: center;
-        }
-
-        .chart-card-body canvas {
-            max-width: 100%;
-            max-height: 100%;
-            width: 100% !important;
-            /* Importante para Chart.js */
-            height: 100% !important;
-            /* Importante para Chart.js */
-            display: block;
-            /* Elimina espacio extra debajo de los canvas */
-        }
-
-        canvas {
-            max-height: 100%;
-        }
-
-        /* Asegura que los contenedores principales tengan altura adecuada */
-        .admin-dashboard {
-            min-height: 100vh;
-            padding-top: 60px;
-            overflow-x: hidden;
-            /* Evita scroll horizontal */
-        }
-
-        .container-fluid {
-            overflow-x: hidden;
-            /* Previene scroll horizontal */
-        }
-
-        /* Estilos para el encabezado mejorado */
-        .header-card {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 4px 16px var(--card-shadow);
-            padding: 20px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .header-icon-container {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #3182ce, #4299e1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            color: white;
-        }
-
-        .admin-title {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 0;
-        }
-
-        .dashboard-breadcrumb {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-
-        .dashboard-breadcrumb .separator {
-            margin: 0 5px;
-            color: var(--text-secondary);
-        }
-
-        .dashboard-breadcrumb .active {
-            color: #3182ce;
-            font-weight: 500;
-        }
-
-        .admin-header-right {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 20px;
-        }
-
-        .admin-date-container {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-        }
-
-        .date-item {
-            font-size: 0.85rem;
-            margin-bottom: 5px;
-        }
-
-        .date-label {
-            color: var(--text-secondary);
-            margin-right: 5px;
-        }
-
-        .date-value {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .admin-profile {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .admin-profile-info {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-        }
-
-        .admin-profile-name {
-            font-weight: 600;
-            color: var(--text-primary);
-            font-size: 0.95rem;
-        }
-
-        .admin-profile-role {
-            font-size: 0.8rem;
-            color: #3182ce;
-        }
-
-        .admin-profile-avatar {
-            width: 48px;
-            height: 48px;
-            overflow: hidden;
-            border-radius: 50%;
-            border: 2px solid #3182ce;
-        }
-
-        .admin-profile-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        @media (max-width: 992px) {
-            .admin-header-right {
-                margin-top: 15px;
-                justify-content: flex-start;
-            }
-
-            .admin-date-container,
-            .admin-profile-info {
-                align-items: flex-start;
-            }
-        }
-
-        /* Estilos para la distribución de puntos - Optimizados */
-        .points-distribution-container {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-
-        .chart-container {
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 15px;
-            height: 200px;
-        }
-
-        .chart-legend {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .chart-legend-item {
-            display: flex;
-            align-items: center;
-            padding: 6px 12px;
-            border-radius: 8px;
-            background-color: var(--card-bg);
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-            border: 1px solid var(--border-color);
-        }
-
-        .legend-color {
-            width: 12px;
-            height: 12px;
-            border-radius: 3px;
-            margin-right: 8px;
-        }
-
-        .legend-text {
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--text-primary);
-            white-space: nowrap;
-        }
-
-        /* Estilos para DataTables */
-        .dataTables_wrapper .dataTables_filter {
-            margin-bottom: 15px;
-        }
-
-        .dataTables_wrapper .dataTables_filter input {
-            padding: 6px 10px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            background-color: var(--card-bg);
-            color: var(--text-primary);
-        }
-
-        .dataTables_wrapper .dataTables_length select {
-            padding: 6px 10px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            background-color: var(--card-bg);
-            color: var(--text-primary);
-        }
-
-        .dataTables_wrapper .dataTables_info,
-        .dataTables_wrapper .dataTables_paginate {
-            margin-top: 15px;
-        }
-
-        .dataTables_wrapper .dataTables_paginate .paginate_button {
-            padding: 5px 10px;
-            margin: 0 3px;
-            border-radius: 5px;
-        }
-
-        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-            background: #3182ce;
-            border-color: #3182ce;
-            color: white !important;
-        }
-
-        /* Modo oscuro para DataTables */
-        body.dark .dataTables_wrapper .dataTables_filter input,
-        body.dark .dataTables_wrapper .dataTables_length select {
-            background-color: var(--card-bg);
-            color: var(--text-primary);
-            border-color: var(--border-color);
-        }
-
-        body.dark .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-            background: #4299e1;
-            border-color: #4299e1;
-        }
-
-        body.dark .dataTables_wrapper .dataTables_paginate .paginate_button:not(.current) {
-            color: var(--text-primary) !important;
-        }
-
-        /* Elementos que abren modal */
-        .cursor-pointer {
-            cursor: pointer;
-        }
-
-        .stat-card.cursor-pointer:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-        }
-
-        .user-ranking-item.cursor-pointer:hover {
-            background-color: var(--icon-bg);
-            transform: translateX(5px);
-        }
-
-        /* Tooltip para indicar acción de clic */
-        .cursor-pointer::after {
-            content: '';
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: rgba(49, 130, 206, 0.6);
-            transition: all 0.3s ease;
-        }
-
-        .cursor-pointer:hover::after {
-            background-color: rgba(49, 130, 206, 1);
-            transform: scale(1.2);
-        }
-
-        /* Estilos para campos editables */
-        .editable-field {
-            background-color: var(--card-bg);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
-        }
-
-        .editable-field[readonly] {
-            background-color: var(--card-bg);
-            opacity: 0.8;
-            cursor: default;
-        }
-
-        .editable-field.editable-active {
-            background-color: rgba(49, 130, 206, 0.05);
-            border-color: #3182ce;
-        }
-
-        /* Indicador visual para campos editables */
-        .form-group.has-edit-icon {
-            position: relative;
-        }
-
-        .form-group.has-edit-icon::after {
-            content: '\f044';
-            font-family: 'Font Awesome 5 Free';
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            color: #3182ce;
-        }
-
-        .form-group.has-edit-icon:hover::after {
-            opacity: 0.7;
-        }
-
-        /* Estilos base para todos los modales */
-        .modal-dialog {
-            position: relative;
-        }
-
-        .modal-body {
-            overflow-y: auto;
-        }
-
-        .modal-content {
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        /* Botón de cierre de modales */
-        .btn-close {
-            font-size: 0.75rem;
-            padding: 0.5rem;
-            opacity: 0.7;
-            width: 30px;
-            height: 30px;
-        }
-
-        .btn-close:hover {
-            opacity: 1;
-        }
-
-        /* Estilos específicos por tipo de modal */
-        /* Modal dinámico */
-        #dynamicModal.modal-users .modal-dialog {
-            max-width: 60%;
-            max-height: 80vh;
-            margin-top: 120px;
-        }
-
-        /* Modal de detalles */
-        #detailModal .modal-dialog {
-            max-width: 80%;
-            max-height: 80vh;
-            margin-top: 120px;
-        }
-
-        #detailModal .modal-content {
-            width: 100%;
-            margin: 0 auto;
-        }
-
-        /* Contenido dentro de modales */
-        .user-detail-container {
-            padding: 15px;
-        }
-
-        .table {
-            width: 100%;
-            margin-bottom: 0;
-        }
-
-        /* Contenido con scroll */
-        .modal-body-scroll {
-            max-height: calc(80vh - 180px);
-            overflow-y: auto;
-            padding-right: 5px;
-        }
-
-        /* Responsive */
-        @media (max-width: 992px) {
-            #dynamicModal.modal-users .modal-dialog {
-                max-width: 90%;
-            }
-
-            #detailModal .modal-dialog {
-                max-width: 95%;
-                margin: 80px auto;
-            }
-        }
-
-        /* Quitar los backdrops predeterminados de Bootstrap */
-        .modal-backdrop {
-            display: none !important;
-        }
-
-        /* Modificar los modales para tener fondo semitransparente propio */
-        .modal {
-            background-color: rgba(0, 0, 0, 0.5) !important;
-            /* Fondo oscuro con 50% de opacidad */
-            padding-right: 0 !important;
-            /* Quitar padding automático */
-        }
-
-        /* Asegurar que los modales se muestren correctamente */
-        .modal.show {
-            display: block !important;
-        }
-
-        /* Hacer los modales más visibles con sombras */
-        .modal-content {
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5) !important;
-        }
-
-        /* Ajustes para la jerarquía de modales */
-        #dynamicModal {
-            z-index: 1050;
-        }
-
-        #detailModal {
-            z-index: 1060 !important;
-            /* Mayor que dynamicModal */
-        }
-
-        .modal-backdrop {
-            z-index: 1040 !important;
-            /* Menor que ambos modales */
-        }
-
-        .modal-backdrop+.modal-backdrop {
-            z-index: 1055 !important;
-            /* Para cuando hay múltiples backdrops */
-        }
-
-        /* Asegurar que los campos son accesibles */
-        #detailModal input,
-        #detailModal select,
-        #detailModal textarea,
-        #detailModal button {
-            z-index: 1070 !important;
-            position: relative;
-        }
-
-        /* Añade estos estilos a tu CSS */
-        .btn-danger {
-            background-color: #dc3545;
-            border-color: #dc3545;
-            color: white;
-            transition: all 0.3s ease;
-        }
-
-        .btn-danger:hover {
-            background-color: #c82333;
-            border-color: #bd2130;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
-        }
-
-        /* Efecto para botones de eliminar */
-        .deleteBtn {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .deleteBtn::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 5px;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.5);
-            opacity: 0;
-            border-radius: 100%;
-            transform: scale(1, 1) translate(-50%);
-            transform-origin: 50% 50%;
-        }
-
-        .deleteBtn:hover::after {
-            animation: ripple 1s ease-out;
-        }
-
-        @keyframes ripple {
-            0% {
-                transform: scale(0, 0);
-                opacity: 0.5;
-            }
-
-            100% {
-                transform: scale(20, 20);
-                opacity: 0;
-            }
-        }
-
-        .btn-close {
-            background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
-            opacity: 0.5;
-        }
-
-        .btn-close:hover {
-            opacity: 0.75;
-        }
-    </style>
-
+    <!-- Mini modal de confirmación para eliminar -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Confirmar eliminació</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="confirmDeleteText">Estàs segur que vols eliminar aquest element?</p>
+                    <input type="hidden" id="deleteItemId">
+                    <input type="hidden" id="deleteItemType">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                        <i class="fas fa-trash me-1"></i> Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Cargar la biblioteca de gráficos ApexCharts -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.35.3/dist/apexcharts.min.js"></script>
+    <script>
+        // Script para el gráfico de usuarios por niveles
+        document.addEventListener('DOMContentLoaded', function () {
+            // Datos para el gráfico (necesitas añadir estos datos en tu controlador)
+            const usersLevelData = {
+                labels: {!! json_encode($usersByLevel ? array_keys($usersByLevel->toArray()) : []) !!},
+                data: {!! json_encode($usersByLevel ? array_values($usersByLevel->toArray()) : []) !!},
+                backgroundColor: [
+                    '#4CAF50', '#2196F3', '#FF9800', '#F44336',
+                    '#9C27B0', '#673AB7', '#3F51B5', '#009688'
+                ]
+            };
+
+            // Crear el gráfico
+            const usersLevelCtx = document.getElementById('usersLevelChart');
+            if (usersLevelCtx) {
+                new Chart(usersLevelCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: usersLevelData.labels,
+                        datasets: [{
+                            data: usersLevelData.data,
+                            backgroundColor: usersLevelData.backgroundColor,
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        let label = context.label || '';
+                                        let value = context.raw || 0;
+                                        let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        let percentage = Math.round((value / total) * 100);
+                                        return `${label}: ${value} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // =======================================
@@ -1762,11 +911,11 @@
                             .catch(error => {
                                 console.error('Error cargando contenido:', error);
                                 dynamicContent.innerHTML = `
-                                                                            <div class="alert alert-danger">
-                                                                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                Error cargando el contenido: ${error.message}
-                                                                            </div>
-                                                                        `;
+                                                                                                    <div class="alert alert-danger">
+                                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                        Error cargando el contenido: ${error.message}
+                                                                                                    </div>
+                                                                                                `;
                                 modalLoader.classList.add('d-none');
                                 dynamicContent.classList.remove('d-none');
                             });
@@ -1909,11 +1058,11 @@
                                 console.error('Error:', error);
                                 modalLoader.classList.add('d-none');
                                 detailContent.innerHTML = `
-                                                                            <div class="alert alert-danger">
-                                                                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                Error al cargar los detalles: ${error.message}
-                                                                            </div>
-                                                                        `;
+                                                                                                    <div class="alert alert-danger">
+                                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                        Error al cargar los detalles: ${error.message}
+                                                                                                    </div>
+                                                                                                `;
                                 detailContent.classList.remove('d-none');
                             });
                     });
@@ -2164,11 +1313,11 @@
                                     console.error('Error:', error);
                                     modalLoader.classList.add('d-none');
                                     detailContent.innerHTML = `
-                                                                                <div class="alert alert-danger">
-                                                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                    Error al cargar el formulario: ${error.message}
-                                                                                </div>
-                                                                            `;
+                                                                                                        <div class="alert alert-danger">
+                                                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                            Error al cargar el formulario: ${error.message}
+                                                                                                        </div>
+                                                                                                    `;
                                     detailContent.classList.remove('d-none');
                                 });
                         }, 300); // Esperar 300ms
@@ -2570,11 +1719,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                                    <div class="alert alert-danger">
-                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                        Error al cargar el formulario: ${error.message}
-                                                                                    </div>
-                                                                                `;
+                                                                                                            <div class="alert alert-danger">
+                                                                                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                Error al cargar el formulario: ${error.message}
+                                                                                                            </div>
+                                                                                                        `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2632,11 +1781,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                                    <div class="alert alert-danger">
-                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                        Error al cargar el formulario: ${error.message}
-                                                                                    </div>
-                                                                                `;
+                                                                                                            <div class="alert alert-danger">
+                                                                                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                Error al cargar el formulario: ${error.message}
+                                                                                                            </div>
+                                                                                                        `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2693,11 +1842,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                                    <div class="alert alert-danger">
-                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                        Error al cargar el formulario: ${error.message}
-                                                                                    </div>
-                                                                                `;
+                                                                                                            <div class="alert alert-danger">
+                                                                                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                Error al cargar el formulario: ${error.message}
+                                                                                                            </div>
+                                                                                                        `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2744,11 +1893,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                                    <div class="alert alert-danger">
-                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                        Error al cargar el formulario: ${error.message}
-                                                                                    </div>
-                                                                                `;
+                                                                                                            <div class="alert alert-danger">
+                                                                                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                Error al cargar el formulario: ${error.message}
+                                                                                                            </div>
+                                                                                                        `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2795,11 +1944,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                                    <div class="alert alert-danger">
-                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                        Error al cargar el formulario: ${error.message}
-                                                                                    </div>
-                                                                                `;
+                                                                                                            <div class="alert alert-danger">
+                                                                                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                Error al cargar el formulario: ${error.message}
+                                                                                                            </div>
+                                                                                                        `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2846,11 +1995,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                                    <div class="alert alert-danger">
-                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                        Error al cargar el formulario: ${error.message}
-                                                                                    </div>
-                                                                                `;
+                                                                                                            <div class="alert alert-danger">
+                                                                                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                Error al cargar el formulario: ${error.message}
+                                                                                                            </div>
+                                                                                                        `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2899,11 +2048,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                                    <div class="alert alert-danger">
-                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                        Error al cargar el formulario: ${error.message}
-                                                                                    </div>
-                                                                                `;
+                                                                                                            <div class="alert alert-danger">
+                                                                                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                Error al cargar el formulario: ${error.message}
+                                                                                                            </div>
+                                                                                                        `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -2950,11 +2099,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                                    <div class="alert alert-danger">
-                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                        Error al cargar el formulario: ${error.message}
-                                                                                    </div>
-                                                                                `;
+                                                                                                            <div class="alert alert-danger">
+                                                                                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                Error al cargar el formulario: ${error.message}
+                                                                                                            </div>
+                                                                                                        `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -3001,11 +2150,11 @@
                                     if (modalLoader) modalLoader.classList.add('d-none');
                                     if (detailContent) {
                                         detailContent.innerHTML = `
-                                                                                    <div class="alert alert-danger">
-                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                        Error al cargar el formulario: ${error.message}
-                                                                                    </div>
-                                                                                `;
+                                                                                                            <div class="alert alert-danger">
+                                                                                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                                Error al cargar el formulario: ${error.message}
+                                                                                                            </div>
+                                                                                                        `;
                                         detailContent.classList.remove('d-none');
                                     }
                                 });
@@ -3129,11 +2278,11 @@
                                 if (modalLoader) modalLoader.classList.add('d-none');
                                 if (modalContent) {
                                     modalContent.innerHTML = `
-                                                                                <div class="alert alert-danger">
-                                                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                    Error al cargar el historial: ${error.message}
-                                                                                </div>
-                                                                            `;
+                                                                                                        <div class="alert alert-danger">
+                                                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                            Error al cargar el historial: ${error.message}
+                                                                                                        </div>
+                                                                                                    `;
                                     modalContent.classList.remove('d-none');
                                 }
                             });
@@ -3177,11 +2326,11 @@
                                 if (modalLoader) modalLoader.classList.add('d-none');
                                 if (detailContent) {
                                     detailContent.innerHTML = `
-                                                                                <div class="alert alert-danger">
-                                                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                    Error al cargar los detalles: ${error.message}
-                                                                                </div>
-                                                                            `;
+                                                                                                        <div class="alert alert-danger">
+                                                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                                            Error al cargar los detalles: ${error.message}
+                                                                                                        </div>
+                                                                                                    `;
                                     detailContent.classList.remove('d-none');
                                 }
                             });
@@ -3285,11 +2434,11 @@
                         if (modalLoader) modalLoader.classList.add('d-none');
                         if (modalContent) {
                             modalContent.innerHTML = `
-                                                            <div class="alert alert-danger">
-                                                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                Error al cargar el ranking: ${error.message}
-                                                            </div>
-                                                        `;
+                                                                                    <div class="alert alert-danger">
+                                                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                                        Error al cargar el ranking: ${error.message}
+                                                                                    </div>
+                                                                                `;
                             modalContent.classList.remove('d-none');
                         }
                     });
@@ -3422,11 +2571,11 @@
                         if (modalLoader) modalLoader.classList.add('d-none');
                         if (modalContent) {
                             modalContent.innerHTML = `
-                                    <div class="alert alert-danger">
-                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                        Error al cargar el formulario: ${error.message}
-                                    </div>
-                                `;
+                                                            <div class="alert alert-danger">
+                                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                Error al cargar el formulario: ${error.message}
+                                                            </div>
+                                                        `;
                             modalContent.classList.remove('d-none');
                         }
                     });
