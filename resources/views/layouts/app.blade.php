@@ -154,6 +154,9 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    @if(Request::is('admin*'))
+        <script src="{{ asset('js/admin.js') }}"></script>
+    @endif
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;

@@ -2044,3 +2044,1193 @@ body.dark .card.bg-warning {
         bottom: 80px;
     }
 }
+
+/* ====== FORMULARIOS ADMIN ====== */
+/* Estilo general para los formularios */
+.modal-body-scroll {
+    max-height: 65vh;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.form-card {
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+body.dark .form-card {
+    background-color: #2d3748;
+    border-color: #4a5568;
+}
+
+/* Campos de formulario modo oscuro */
+body.dark .form-control,
+body.dark .form-select {
+    background-color: #2d3748;
+    border-color: #4a5568;
+    color: #f7fafc;
+}
+
+body.dark .form-control:focus,
+body.dark .form-select:focus {
+    background-color: #2d3748;
+    border-color: #63b3ed;
+    box-shadow: 0 0 0 0.25rem rgba(99, 179, 237, 0.25);
+    color: #f7fafc;
+}
+
+body.dark .form-text {
+    color: #a0aec0;
+}
+
+/* Mejora visual del campo de archivo en modo oscuro */
+body.dark input[type="file"].form-control::file-selector-button {
+    background-color: #4a5568;
+    color: #f7fafc;
+    border-color: #63b3ed;
+}
+
+/* Responsive para móviles */
+@media (max-width: 576px) {
+    .modal-body-scroll {
+        max-height: 70vh !important;
+        /* Más espacio en móviles */
+    }
+
+    .form-label {
+        font-size: 0.9rem;
+    }
+
+    .form-text {
+        font-size: 0.75rem;
+    }
+
+    .d-grid.gap-2.d-md-flex {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .d-grid.gap-2.d-md-flex button {
+        margin: 0 !important;
+        font-size: 0.9rem;
+        padding: 0.375rem 0.75rem;
+    }
+}
+
+/* Mejoras para los select en formularios responsivos */
+@media (max-width: 767px) {
+    select.form-select {
+        font-size: 0.9rem;
+        padding-right: 1.75rem;
+    }
+}
+
+/* ====== DETALLE DE VISTAS ADMIN ====== */
+.detail-container {
+    border-radius: 8px;
+    overflow-y: auto;
+    max-height: 70vh;
+    padding: 20px;
+    margin: 0;
+    scrollbar-width: thin;
+}
+
+body.light .detail-container {
+    background-color: #ffffff;
+}
+
+body.dark .detail-container {
+    background-color: #2d3748;
+}
+
+.detail-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.detail-container::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+    border-radius: 10px;
+}
+
+.detail-container::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 10px;
+}
+
+/* Iconos de detalle */
+.detail-icon {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.activitat-icon {
+    background-color: #3f51b5;
+}
+
+.alerta-icon {
+    background-color: #ffc107;
+}
+
+/* Tarjetas de información */
+.info-card {
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+}
+
+body.light .info-card {
+    background-color: #f8f9fa;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+body.dark .info-card {
+    background-color: #3f4a5c;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.2);
+}
+
+/* Colores para puntos de recogida */
+.punto-groc {
+    background-color: #f9d71c;
+    color: #000;
+}
+
+.punto-blau {
+    background-color: #0057b8;
+}
+
+.punto-verd {
+    background-color: #00a651;
+}
+
+.punto-marró {
+    background-color: #8c4b00;
+}
+
+.punto-gris {
+    background-color: #6c757d;
+}
+
+.punto-punt-verd {
+    background-color: #00a651;
+}
+
+.punto-icon {
+    width: 30px;
+    height: 30px;
+}
+
+/* Imagen de perfil de usuario */
+.user-profile-image {
+    max-width: 100px;
+    object-fit: cover;
+    aspect-ratio: 1/1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+    .detail-icon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .detail-container {
+        padding: 15px;
+    }
+
+    .info-card {
+        padding: 1rem;
+    }
+
+    .user-profile-image {
+        max-width: 60px;
+    }
+}
+
+/* ====== DETALLES DE VISTAS ====== */
+/* Iconos específicos de tipo */
+.codi-icon {
+    background-color: #0d6efd;
+}
+
+/* Estilos específicos para códigos */
+.codi-code {
+    font-size: 1.6rem;
+    font-weight: 600;
+}
+
+.code-label {
+    font-weight: normal;
+    font-size: 1.2rem;
+    color: #6c757d;
+    margin-right: 8px;
+}
+
+body.dark .code-label {
+    color: #a0aec0;
+}
+
+.code-value {
+    font-family: 'Courier New', monospace;
+    font-size: 1.4rem;
+    padding: 0.25rem 0.5rem;
+}
+
+body.light .code-value {
+    background-color: #f8f9fa;
+}
+
+body.dark .code-value {
+    background-color: #1a202c;
+    color: #e2e8f0;
+}
+
+/* Estilos específicos para eventos */
+.event-image-container {
+    width: 120px;
+    height: 120px;
+    overflow: hidden;
+}
+
+.event-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.event-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.event-name {
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.info-label {
+    width: 140px;
+    flex-shrink: 0;
+}
+
+.user-icon-placeholder {
+    width: 40px;
+    height: 40px;
+    background-color: #6c757d;
+}
+
+body.dark .user-icon-placeholder {
+    background-color: #4a5568;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+}
+
+/* Ajustes responsive para móviles */
+@media (max-width: 767px) {
+    .event-image-container {
+        width: 80px;
+        height: 80px;
+    }
+
+    .event-name {
+        font-size: 1.5rem;
+    }
+
+    .codi-code {
+        font-size: 1.3rem;
+    }
+
+    .code-value {
+        font-size: 1.1rem;
+    }
+
+    .info-label {
+        width: 120px;
+    }
+}
+
+/* ====== VISTAS DE DETALLE ESPECÍFICAS ====== */
+
+/* Iconos específicos */
+.opinio-icon {
+    background-color: #8e44ad;
+}
+
+.premi-icon {
+    background-color: #ff9800;
+}
+
+.premi-reclamat-icon {
+    background-color: #ff9800;
+}
+
+/* Imagen de detalle */
+.detail-image {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* Tamaño de la imagen de avatar */
+.autor-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+}
+
+/* Estrellas de valoración */
+.stars .fa-star {
+    margin-right: 2px;
+}
+
+/* Detalles de usuario en premios reclamados */
+.user-details .fw-bold {
+    color: var(--text-secondary);
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+    .detail-image {
+        width: 80px;
+        height: 80px;
+    }
+
+    .autor-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/* ====== DETALLES DE VISTAS ESPECÍFICAS ====== */
+/* Iconos de rol según tipo */
+.rol-icon-1 {
+    background-color: #dc3545;
+    /* Admin */
+}
+
+.rol-icon-2 {
+    background-color: #fd7e14;
+    /* Moderador */
+}
+
+.rol-icon-3 {
+    background-color: #28a745;
+    /* Usuario */
+}
+
+/* Iconos específicos para productos */
+.producte-icon {
+    background-color: #4caf50;
+    width: 120px;
+    height: 120px;
+}
+
+/* Fracciones de reciclaje */
+.fraccio-badge {
+    color: white;
+    padding: 5px 10px;
+}
+
+.punto-groc {
+    background-color: #f9d71c;
+    color: #000 !important;
+}
+
+.punto-blau {
+    background-color: #0057b8;
+}
+
+.punto-verd {
+    background-color: #00a651;
+}
+
+.punto-marró {
+    background-color: #8c4b00;
+}
+
+.punto-gris {
+    background-color: #6c757d;
+}
+
+.punto-punt-verd {
+    background-color: #00a651;
+}
+
+/* Mapa */
+.map-thumbnail img {
+    border-radius: 8px;
+    max-width: 100%;
+    height: auto;
+}
+
+/* Coordenadas */
+code {
+    background-color: #f8f9fa;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+body.dark code {
+    background-color: #2d3748;
+    color: #f8f9fa;
+}
+
+/* Responsive para detalles */
+@media (max-width: 767px) {
+
+    .detail-image,
+    .detail-icon {
+        width: 80px !important;
+        height: 80px !important;
+    }
+
+    .detail-name {
+        font-size: 1.5rem;
+    }
+
+    .coord-info {
+        flex-direction: column;
+    }
+
+    .map-thumbnail {
+        margin-top: 15px;
+    }
+}
+
+/* ====== DETALLES DE VISTAS ESPECÍFICAS ====== */
+/* Estilos generales para los contenedores de detalles */
+.detail-container {
+    border-radius: 8px;
+    overflow-y: auto;
+    max-height: 70vh;
+    padding: 20px;
+    margin: 0;
+    scrollbar-width: thin;
+}
+
+/* Iconos específicos */
+.tipus-alerta-icon {
+    background-color: #ffc107;
+}
+
+/* Iconos específicos para tipos de evento */
+.tipus-event-icon {
+    background-color: #4caf50;
+}
+
+/* Avatar de usuario */
+.user-avatar {
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    border: 3px solid;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+body.light .user-avatar {
+    border-color: white;
+}
+
+body.dark .user-avatar {
+    border-color: #2d3748;
+}
+
+.user-name {
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+body.light .user-name {
+    color: #333;
+}
+
+body.dark .user-name {
+    color: #f1f5f9;
+}
+
+/* Mini cards de estadísticas */
+.mini-stat-card {
+    transition: all 0.3s ease;
+}
+
+.mini-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.mini-stat-title {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+body.dark .mini-stat-title {
+    color: #a0aec0;
+}
+
+/* Imágenes de premios */
+.prize-image {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+}
+
+.prize-placeholder {
+    width: 40px;
+    height: 40px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .user-avatar {
+        width: 70px;
+        height: 70px;
+    }
+
+    .user-name {
+        font-size: 1.4rem;
+    }
+
+    .info-label {
+        width: 120px !important;
+    }
+}
+
+/* ====== FORMULARIOS DE EDICIÓN ====== */
+/* Modal con scroll */
+.modal-body-scroll {
+    max-height: 65vh;
+    overflow-y: auto;
+    padding-right: 5px;
+    scrollbar-width: thin;
+}
+
+.modal-body-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-body-scroll::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+    border-radius: 10px;
+}
+
+.modal-body-scroll::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 10px;
+}
+
+/* Previsualizaciones de imágenes */
+.preview-image {
+    max-height: 150px;
+    max-width: 200px;
+    object-fit: contain;
+    border-radius: 4px;
+    margin-top: 8px;
+}
+
+/* Avatar de usuario */
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+}
+
+.user-icon-placeholder {
+    width: 40px;
+    height: 40px;
+    background-color: #6c757d;
+}
+
+body.dark .user-icon-placeholder {
+    background-color: #4a5568;
+}
+
+/* Formularios oscuros */
+body.dark .form-control,
+body.dark .form-select {
+    background-color: #2d3748;
+    border-color: #4a5568;
+    color: #f7fafc;
+}
+
+body.dark .form-text {
+    color: #a0aec0;
+}
+
+/* Adaptación móvil */
+@media (max-width: 767px) {
+    .modal-body-scroll {
+        max-height: 75vh !important;
+        /* Más alto en móviles */
+    }
+
+    .preview-image {
+        max-height: 100px;
+    }
+}
+
+/* ====== FORMULARIOS DE EDICIÓN ====== */
+/* Vista previa de imágenes */
+.preview-image {
+    max-height: 150px;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+/* Estilizar checkbox en modo oscuro */
+body.dark .form-check-input {
+    background-color: #2d3748;
+    border-color: #4a5568;
+}
+
+body.dark .form-check-input:checked {
+    background-color: #4299e1;
+    border-color: #4299e1;
+}
+
+/* Responsive para formularios en móviles */
+@media (max-width: 767px) {
+    .preview-image {
+        max-height: 100px;
+    }
+
+    .modal-body-scroll {
+        max-height: 75vh !important;
+    }
+}
+
+/* ====== TABLAS ADMINISTRATIVAS ====== */
+.admin-table {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.admin-action-btn {
+    width: 150px;
+    white-space: nowrap;
+}
+
+.user-avatar {
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+}
+
+.user-icon-placeholder {
+    width: 30px;
+    height: 30px;
+    background-color: #6c757d;
+}
+
+body.dark .user-icon-placeholder {
+    background-color: #4a5568;
+}
+
+.punto-icon {
+    width: 40px;
+    height: 40px;
+}
+
+/* DataTables customizations for dark mode */
+body.dark .dataTables_wrapper .dataTables_length,
+body.dark .dataTables_wrapper .dataTables_filter,
+body.dark .dataTables_wrapper .dataTables_info,
+body.dark .dataTables_wrapper .dataTables_processing,
+body.dark .dataTables_wrapper .dataTables_paginate {
+    color: #e2e8f0;
+}
+
+body.dark .dataTables_wrapper .dataTables_filter input {
+    background-color: #2d3748;
+    color: #e2e8f0;
+    border: 1px solid #4a5568;
+}
+
+body.dark .paginate_button.current {
+    background: #3182ce !important;
+    color: white !important;
+    border: none !important;
+}
+
+body.dark .paginate_button:hover {
+    background: #4299e1 !important;
+    color: white !important;
+}
+
+/* ====== TABLAS ADMINISTRATIVAS ====== */
+.admin-action-btn {
+    width: 150px;
+    white-space: nowrap;
+}
+
+/* Iconos y placeholders para las tablas */
+.event-image,
+.event-icon-placeholder {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+}
+
+.prize-image,
+.prize-icon-placeholder {
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+}
+
+.prize-icon-placeholder {
+    background-color: #ff9800;
+}
+
+.event-icon-placeholder {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Filtros de premios reclamados */
+.filter-buttons .btn.active {
+    color: #fff;
+}
+
+.filter-buttons .btn-outline-primary.active {
+    background-color: #0d6efd;
+}
+
+.filter-buttons .btn-outline-warning.active {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.filter-buttons .btn-outline-info.active {
+    background-color: #0dcaf0;
+}
+
+.filter-buttons .btn-outline-success.active {
+    background-color: #198754;
+}
+
+.filter-buttons .btn-outline-danger.active {
+    background-color: #dc3545;
+}
+
+/* Estrellas de opiniones */
+.stars {
+    display: flex;
+    align-items: center;
+}
+
+.stars .fa-star {
+    margin-right: 2px;
+}
+
+body.dark .stars .text-muted {
+    color: #6c757d !important;
+}
+
+/* Ajustes para tema oscuro */
+body.dark .filter-buttons .btn-outline-primary {
+    color: #90caf9;
+    border-color: #90caf9;
+}
+
+body.dark .filter-buttons .btn-outline-warning {
+    color: #ffe082;
+    border-color: #ffe082;
+}
+
+body.dark .filter-buttons .btn-outline-info {
+    color: #80deea;
+    border-color: #80deea;
+}
+
+body.dark .filter-buttons .btn-outline-success {
+    color: #a5d6a7;
+    border-color: #a5d6a7;
+}
+
+body.dark .filter-buttons .btn-outline-danger {
+    color: #ef9a9a;
+    border-color: #ef9a9a;
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+    .filter-buttons {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .filter-buttons .btn {
+        border-radius: 0;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        margin-bottom: 2px;
+    }
+
+    .filter-buttons .btn:first-child {
+        border-top-left-radius: 0.25rem;
+        border-top-right-radius: 0.25rem;
+    }
+
+    .filter-buttons .btn:last-child {
+        border-bottom-left-radius: 0.25rem;
+        border-bottom-right-radius: 0.25rem;
+        margin-bottom: 0;
+    }
+}
+
+/* ====== TABLAS ADMINISTRATIVAS ====== */
+.admin-action-btn {
+    width: 150px;
+    white-space: nowrap;
+}
+
+/* Imágenes y placeholders para tablas */
+.prize-image,
+.product-image,
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+}
+
+.prize-icon-placeholder,
+.product-icon-placeholder,
+.user-icon-placeholder {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.prize-icon-placeholder {
+    background-color: #ff9800;
+}
+
+.product-icon-placeholder {
+    background-color: #4caf50;
+}
+
+.user-icon-placeholder {
+    background-color: #6c757d;
+}
+
+/* Badges de categorías de productos */
+.category-badge {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+}
+
+.category-paper {
+    background-color: #2859bc;
+    color: white;
+}
+
+.category-envasos {
+    background-color: #fddd19;
+    color: #000;
+}
+
+.category-organica {
+    background-color: #9e6831;
+    color: white;
+}
+
+.category-vidre {
+    background-color: #3fd055;
+    color: white;
+}
+
+.category-resta {
+    background-color: #6d7878;
+    color: white;
+}
+
+.category-deixalleria {
+    background-color: #d62c2d;
+    color: white;
+}
+
+.category-medicaments {
+    background-color: #b7e53b;
+    color: #000;
+}
+
+.category-piles {
+    background-color: #fca614;
+    color: white;
+}
+
+.category-especial {
+    background-color: #2f3939;
+    color: white;
+}
+
+.category-raee {
+    background-color: #006f3f;
+    color: white;
+}
+
+/* Iconos de puntos de recogida */
+.punto-icon {
+    width: 40px;
+    height: 40px;
+}
+
+.punto-groc {
+    background-color: #f9d71c;
+    color: #000 !important;
+}
+
+.punto-blau {
+    background-color: #0057b8;
+}
+
+.punto-verd {
+    background-color: #00a651;
+}
+
+.punto-marró {
+    background-color: #8c4b00;
+}
+
+.punto-gris {
+    background-color: #6c757d;
+}
+
+.punto-punt-verd {
+    background-color: #00a651;
+}
+
+/* Badges de roles */
+.rol-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    color: white;
+}
+
+.rol-badge-1 {
+    background-color: #dc3545;
+    /* Admin */
+}
+
+.rol-badge-2 {
+    background-color: #fd7e14;
+    /* Moderador */
+}
+
+.rol-badge-3 {
+    background-color: #28a745;
+    /* Usuario */
+}
+
+/* ====== TARJETAS ADMINISTRATIVAS ====== */
+.admin-action-btn {
+    width: 150px;
+    white-space: nowrap;
+}
+
+/* Imágenes y avatares */
+.user-avatar {
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+}
+
+/* Iconos específicos */
+.tipus-alerta-icon {
+    width: 40px;
+    height: 40px;
+    background-color: #ffc107;
+}
+
+.tipus-event-icon {
+    width: 40px;
+    height: 40px;
+}
+
+/* Ranking de usuarios */
+.ranking-position {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #6c757d;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.ranking-position.top-1 {
+    background-color: gold;
+    color: #000;
+}
+
+.ranking-position.top-2 {
+    background-color: silver;
+    color: #000;
+}
+
+.ranking-position.top-3 {
+    background-color: #cd7f32;
+    /* bronce */
+    color: white;
+}
+
+/* ====== ESTADÍSTICAS DE NAVEGACIÓN ====== */
+.stats-container {
+    padding-top: 60px;
+}
+
+.stats-header h1 {
+    margin-bottom: 15px;
+    color: var(--text-primary);
+}
+
+.stats-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.stats-table {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+body.dark .stats-table {
+    background-color: var(--card-bg);
+    border-color: var(--card-border);
+}
+
+/* Toast de actualización */
+.update-toast {
+    position: fixed;
+    bottom: -60px;
+    right: 20px;
+    z-index: 1050;
+    transition: bottom 0.3s ease;
+}
+
+.update-toast.show {
+    bottom: 100px;
+}
+
+.update-toast-content {
+    background-color: var(--bs-primary);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Botones de acción fijos */
+.stats-fixed-actions {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+}
+
+.stats-fixed-actions button {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-radius: 6px;
+    min-width: 200px;
+}
+
+.stats-fixed-actions button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Colores para gráficos */
+.bg-primary-light {
+    background-color: rgba(54, 162, 235, 0.8);
+}
+
+.bg-danger-light {
+    background-color: rgba(255, 99, 132, 0.8);
+}
+
+.bg-success-light {
+    background-color: rgba(75, 192, 192, 0.8);
+}
+
+/* Clase para la imagen en el dashboard */
+.mt-navbar {
+    margin-top: 13vh;
+}
+
+/* Leyenda para gráficos */
+.chart-legend {
+    display: flex;
+    flex-direction: column;
+    margin-top: 15px;
+}
+
+.chart-legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.legend-color {
+    width: 15px;
+    height: 15px;
+    border-radius: 3px;
+    margin-right: 8px;
+}
+
+/* Ajustes para móvil */
+@media (max-width: 576px) {
+    .stats-fixed-actions {
+        right: 10px;
+        bottom: 10px;
+    }
+
+    .stats-fixed-actions button {
+        min-width: auto;
+        padding: 8px 12px;
+    }
+
+    .update-toast.show {
+        bottom: 70px;
+    }
+}

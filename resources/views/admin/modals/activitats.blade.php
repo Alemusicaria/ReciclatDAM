@@ -1,12 +1,16 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">{{ __('messages.admin.activities.list_title') }}</h5>
+</div>
+
 <div class="table-responsive">
-    <table class="table table-striped" id="activitatsTable">
+    <table class="table table-striped admin-table" id="activitatsTable">
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Usuari</th>
-                <th>Acció</th>
-                <th>Data</th>
-                <th>Accions</th>
+                <th>{{ __('messages.admin.activities.user') }}</th>
+                <th>{{ __('messages.admin.activities.action') }}</th>
+                <th>{{ __('messages.admin.activities.date') }}</th>
+                <th>{{ __('messages.admin.common.actions') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -26,16 +30,16 @@
                                             )
                                         ) :
                                         asset('images/default-profile.png') 
-                                    }}" class="rounded-circle me-2" width="30" height="30" alt="Perfil">
+                                    }}" class="user-avatar rounded-circle me-2" alt="{{ __('messages.admin.profile_photo') }}">
                                 @else
-                                    <div class="user-icon-placeholder rounded-circle me-2 d-flex align-items-center justify-content-center bg-secondary" style="width: 30px; height: 30px;">
+                                    <div class="user-icon-placeholder rounded-circle me-2 d-flex align-items-center justify-content-center">
                                         <i class="fas fa-user text-white small"></i>
                                     </div>
                                 @endif
                                 {{ $activitat->user->nom }} {{ $activitat->user->cognoms }}
                             </div>
                         @else
-                            <span class="text-muted">Usuari desconegut</span>
+                            <span class="text-muted">{{ __('messages.admin.activities.unknown_user') }}</span>
                         @endif
                     </td>
                     <td>{{ $activitat->action }}</td>
@@ -44,7 +48,7 @@
                         <div class="btn-group">
                             <button class="btn btn-sm btn-info view-activity-details" 
                                 data-detail-type="activitat" data-detail-id="{{ $activitat->id }}" 
-                                title="Veure detalls">
+                                title="{{ __('messages.admin.common.view_details') }}">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
@@ -54,80 +58,3 @@
         </tbody>
     </table>
 </div>
-
-<script>
-// Función para inicializar DataTables
-function initActivitatsDataTable() {
-    // Comprobar si DataTables ya está inicializado
-    if ($.fn.DataTable.isDataTable('#activitatsTable')) {
-        // Si ya está inicializado, destruirlo primero
-        $('#activitatsTable').DataTable().destroy();
-    }
-    
-    // Reinicializar DataTables
-    $('#activitatsTable').DataTable({
-        language: {
-            url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/ca.json'
-        },
-        order: [[0, 'desc']], // Ordenar por ID descendente por defecto
-        pageLength: 10,        // Elementos por página
-        responsive: true,
-        dom: '<"top"f>rt<"bottom"lp><"clear">',
-        columnDefs: [
-            { orderable: false, targets: 4 } // La columna de acciones no es ordenable
-        ]
-    });
-}
-
-// Inicializar DataTables cuando el DOM esté listo
-$(document).ready(function() {
-    // Esperar un poco para asegurar que la tabla se ha renderizado completamente
-    setTimeout(function() {
-        initActivitatsDataTable();
-    }, 100);
-});
-
-// Delegación de eventos para botones de detalle
-$(document).on('click', '.view-activity-details', function(e) {
-    e.preventDefault();
-    const activityId = $(this).data('detail-id');
-    
-    // Cerrar modal dinámico si está abierto
-    if ($('#dynamicModal').hasClass('show')) {
-        $('#dynamicModal').modal('hide');
-    }
-    
-    // Configurar y abrir modal de detalles
-    const detailModal = $('#detailModal');
-    const modalTitle = $('#detailModalLabel');
-    const modalLoader = $('#detail-modal-loader');
-    const detailContent = $('#detail-content');
-    
-    modalTitle.text("Detalls de l'Activitat");
-    modalLoader.removeClass('d-none');
-    detailContent.addClass('d-none');
-    
-    detailModal.modal('show');
-    
-    // Cargar contenido
-    fetch(`/admin/detail/activitat/${activityId}`)
-        .then(response => {
-            if (!response.ok) throw new Error('Error al cargar los detalles');
-            return response.text();
-        })
-        .then(html => {
-            modalLoader.addClass('d-none');
-            detailContent.html(html).removeClass('d-none');
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            modalLoader.addClass('d-none');
-            detailContent.html(`
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    Error al cargar los detalles: ${error.message}
-                </div>
-            `).removeClass('d-none');
-        });
-});
-</script>

@@ -1,19 +1,19 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="mb-0">Llistat de Rols</h5>
-    <button id="newRolBtn" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#detailModal"
-        data-detail-type="create-rol" data-detail-title="Nou Rol">
-        <i class="fas fa-plus-circle me-1"></i> Nou Rol
+    <h5 class="mb-0">{{ __('messages.admin.roles.list_title') }}</h5>
+    <button id="newRolBtn" class="btn btn-success btn-sm admin-action-btn" data-bs-toggle="modal" data-bs-target="#detailModal"
+        data-detail-type="create-rol" data-detail-title="{{ __('messages.admin.roles.new_role') }}">
+        <i class="fas fa-plus-circle me-1"></i> {{ __('messages.admin.roles.new_role') }}
     </button>
 </div>
 
 <div class="table-responsive">
-    <table class="table table-striped" id="dynamicTable">
+    <table class="table table-striped admin-table" id="dynamicTable">
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Nom</th>
-                <th>Usuaris</th>
-                <th>Accions</th>
+                <th>{{ __('messages.admin.roles.name') }}</th>
+                <th>{{ __('messages.admin.roles.users') }}</th>
+                <th>{{ __('messages.admin.common.actions') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -23,9 +23,7 @@
                     <td>
                         <div class="d-flex align-items-center">
                             <div class="rol-icon-container me-2">
-                                <span class="rol-badge badge" style="background-color: 
-                                    @if($rol->id == 1) #dc3545 @elseif($rol->id == 2) #fd7e14 @else #28a745 @endif
-                                ">
+                                <span class="rol-badge rol-badge-{{ $rol->id }}">
                                     <i class="fas fa-user-tag"></i>
                                 </span>
                             </div>
@@ -34,17 +32,17 @@
                     </td>
                     <td>
                         <span class="badge bg-info">
-                            {{ $rol->users_count ?? $rol->users()->count() }} usuaris
+                            {{ $rol->users_count ?? $rol->users()->count() }} {{ __('messages.admin.roles.users_count') }}
                         </span>
                     </td>
                     <td>
                         <div class="btn-group">
                             <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detailModal"
-                                data-detail-type="rol" data-detail-id="{{ $rol->id }}" title="Veure detalls">
+                                data-detail-type="rol" data-detail-id="{{ $rol->id }}" title="{{ __('messages.admin.common.view_details') }}">
                                 <i class="fas fa-eye"></i>
                             </button>
                             <button class="btn btn-sm btn-primary editRolBtn" data-rol-id="{{ $rol->id }}"
-                                title="Editar">
+                                title="{{ __('messages.admin.common.edit') }}">
                                 <i class="fas fa-edit"></i>
                             </button>
                             <button class="btn btn-danger btn-sm deleteBtn" 
@@ -52,7 +50,7 @@
                                 data-item-name="{{ $rol->nom }}"
                                 data-item-type="rol"
                                 @if($rol->users()->count() > 0) disabled @endif
-                                title="@if($rol->users()->count() > 0) No es pot eliminar perquè té usuaris assignats @else Eliminar @endif">
+                                title="@if($rol->users()->count() > 0) {{ __('messages.admin.roles.cannot_delete') }} @else {{ __('messages.admin.common.delete') }} @endif">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -62,19 +60,3 @@
         </tbody>
     </table>
 </div>
-
-<style>
-    #newRolBtn {
-        width: 150px;
-    }
-    
-    .rol-badge {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        color: white;
-    }
-</style>

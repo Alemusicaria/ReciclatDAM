@@ -1,29 +1,29 @@
-<div class="tipus-event-detail-container bg-white rounded-lg shadow-sm p-4">
-    <div class="tipus-event-header mb-4">
+<div class="detail-container tipus-event-detail-container">
+    <div class="detail-header mb-4">
         <div class="row align-items-center">
             <div class="col-md-8">
                 <div class="d-flex align-items-start">
-                    <div class="tipus-event-icon-container me-4">
-                        <div class="tipus-event-icon text-white d-flex align-items-center justify-content-center rounded" 
-                            style="width: 80px; height: 80px; background-color: {{ $tipusEvent->color }}">
+                    <div class="detail-icon-container me-4">
+                        <div class="detail-icon d-flex align-items-center justify-content-center rounded"
+                            style="background-color: {{ $tipusEvent->color }}">
                             <i class="fas fa-calendar-day fa-2x"></i>
                         </div>
                     </div>
                     <div>
-                        <h2 class="tipus-event-name mb-1">{{ $tipusEvent->nom }}</h2>
-                        <div class="tipus-event-color mb-2">
+                        <h2 class="detail-name mb-1">{{ $tipusEvent->nom }}</h2>
+                        <div class="detail-badge mb-2">
                             <span class="badge py-1 px-2" style="background-color: {{ $tipusEvent->color }}">
                                 {{ $tipusEvent->color }}
                             </span>
                         </div>
-                        <div class="tipus-event-date">
+                        <div class="detail-date">
                             <i class="fas fa-calendar-day text-muted me-2"></i>
-                            <span class="text-muted">Creat el {{ $tipusEvent->created_at->format('d/m/Y H:i') }}</span>
+                            <span class="text-muted">{{ __('messages.admin.tipus_events.created_on') }} {{ $tipusEvent->created_at->format('d/m/Y H:i') }}</span>
                         </div>
                         @if($tipusEvent->updated_at && $tipusEvent->updated_at->ne($tipusEvent->created_at))
-                            <div class="tipus-event-update">
+                            <div class="detail-update">
                                 <i class="fas fa-edit text-muted me-2"></i>
-                                <span class="text-muted">Actualitzat el {{ $tipusEvent->updated_at->format('d/m/Y H:i') }}</span>
+                                <span class="text-muted">{{ __('messages.admin.tipus_events.updated_on') }} {{ $tipusEvent->updated_at->format('d/m/Y H:i') }}</span>
                             </div>
                         @endif
                     </div>
@@ -31,10 +31,10 @@
             </div>
             <div class="col-md-4 text-md-end mt-3 mt-md-0">
                 <div class="event-count">
-                    <h5 class="event-count-title mb-2">Estadístiques</h5>
-                    <div class="event-count p-3 rounded-3 shadow-sm" style="background-color: #f8f9fa;">
+                    <h5 class="mb-2">{{ __('messages.admin.tipus_events.statistics') }}</h5>
+                    <div class="event-count p-3 rounded-3 shadow-sm stats-card">
                         <div class="d-flex align-items-center justify-content-between mb-2">
-                            <span>Total d'events:</span>
+                            <span>{{ __('messages.admin.tipus_events.total_events') }}:</span>
                             <span class="badge bg-primary">{{ $tipusEvent->events()->count() }}</span>
                         </div>
                     </div>
@@ -47,12 +47,12 @@
     @if($tipusEvent->descripcio)
     <div class="row mt-4">
         <div class="col-lg-12">
-            <div class="info-card bg-light p-4 rounded-3 shadow-sm mb-4">
+            <div class="info-card mb-4">
                 <h4 class="card-title mb-3">
-                    <i class="fas fa-align-left text-primary me-2"></i>Descripció
+                    <i class="fas fa-align-left text-primary me-2"></i>{{ __('messages.admin.tipus_events.description') }}
                 </h4>
                 <div class="tipus-event-description">
-                    <p class="mb-0">{{ $tipusEvent->descripcio ?: 'No hi ha descripció disponible.' }}</p>
+                    <p class="mb-0">{{ $tipusEvent->descripcio ?: __('messages.admin.tipus_events.no_description') }}</p>
                 </div>
             </div>
         </div>
@@ -62,20 +62,20 @@
     <!-- Eventos de este tipo -->
     <div class="row mt-2">
         <div class="col-lg-12">
-            <div class="info-card bg-light p-4 rounded-3 shadow-sm mb-4">
+            <div class="info-card mb-4">
                 <h4 class="card-title mb-3">
-                    <i class="fas fa-calendar-alt text-success me-2"></i>Events d'aquest tipus
+                    <i class="fas fa-calendar-alt text-success me-2"></i>{{ __('messages.admin.tipus_events.events_of_this_type') }}
                 </h4>
                 
                 @if($tipusEvent->events()->count() > 0)
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover table-borderless">
                             <thead>
                                 <tr>
-                                    <th>Nom</th>
-                                    <th>Data Inici</th>
-                                    <th>Data Fi</th>
-                                    <th>Participants</th>
+                                    <th>{{ __('messages.admin.tipus_events.name') }}</th>
+                                    <th>{{ __('messages.admin.tipus_events.start_date') }}</th>
+                                    <th>{{ __('messages.admin.tipus_events.end_date') }}</th>
+                                    <th>{{ __('messages.admin.tipus_events.participants') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -86,7 +86,7 @@
                                         <td>{{ $event->data_fi->format('d/m/Y H:i') }}</td>
                                         <td>
                                             <span class="badge bg-info">
-                                                {{ $event->participants()->count() }} participants
+                                                {{ $event->participants()->count() }} {{ __('messages.admin.tipus_events.participants') }}
                                             </span>
                                         </td>
                                     </tr>
@@ -96,52 +96,16 @@
                         
                         @if($tipusEvent->events()->count() > 10)
                             <div class="text-center mt-3">
-                                <span class="text-muted">Mostrant 10 de {{ $tipusEvent->events()->count() }} events</span>
+                                <span class="text-muted">{{ __('messages.admin.tipus_events.showing_events', ['showing' => 10, 'total' => $tipusEvent->events()->count()]) }}</span>
                             </div>
                         @endif
                     </div>
                 @else
                     <div class="alert alert-info mb-0">
-                        <i class="fas fa-info-circle me-2"></i>No hi ha events d'aquest tipus registrats.
+                        <i class="fas fa-info-circle me-2"></i>{{ __('messages.admin.tipus_events.no_events') }}
                     </div>
                 @endif
             </div>
         </div>
     </div>
 </div>
-
-<style>
-    /* Contenedor principal con scroll */
-    .tipus-event-detail-container {
-        border-radius: 8px;
-        overflow-y: auto;
-        max-height: 70vh;
-        padding: 20px;
-        margin: 0;
-        scrollbar-width: thin;
-    }
-    
-    /* Estilos para la barra de desplazamiento */
-    .tipus-event-detail-container::-webkit-scrollbar {
-        width: 6px;
-    }
-    
-    .tipus-event-detail-container::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 10px;
-    }
-    
-    .tipus-event-detail-container::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 10px;
-    }
-    
-    /* Modo oscuro */
-    body.dark .tipus-event-detail-container {
-        background-color: #2d3748 !important;
-    }
-    
-    body.dark .info-card {
-        background-color: #3f4a5c !important;
-    }
-</style>

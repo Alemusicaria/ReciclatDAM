@@ -1,19 +1,19 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="mb-0">Llistat de Productes</h5>
-    <button id="newProducteBtn" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#detailModal"
-        data-detail-type="create-producte" data-detail-title="Nou Producte">
-        <i class="fas fa-plus-circle me-1"></i> Nou Producte
+    <h5 class="mb-0">{{ __('messages.admin.productes.list_title') }}</h5>
+    <button id="newProducteBtn" class="btn btn-success btn-sm admin-action-btn" data-bs-toggle="modal" data-bs-target="#detailModal"
+        data-detail-type="create-producte" data-detail-title="{{ __('messages.admin.productes.new_product') }}">
+        <i class="fas fa-plus-circle me-1"></i> {{ __('messages.admin.productes.new_product') }}
     </button>
 </div>
 
 <div class="table-responsive">
-    <table class="table table-striped" id="dynamicTable">
+    <table class="table table-striped admin-table" id="dynamicTable">
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Nom</th>
-                <th>Categoria</th>
-                <th>Accions</th>
+                <th>{{ __('messages.admin.productes.name') }}</th>
+                <th>{{ __('messages.admin.productes.category') }}</th>
+                <th>{{ __('messages.admin.common.actions') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -23,11 +23,9 @@
                     <td>
                         <div class="d-flex align-items-center">
                             @if($producte->imatge)
-                                <img src="{{ asset($producte->imatge) }}" class="rounded me-2" width="40" height="40"
-                                    alt="Producte" style="object-fit: cover; margin-right: 10px;">
+                                <img src="{{ asset($producte->imatge) }}" class="product-image rounded me-2" alt="{{ __('messages.admin.productes.product_image') }}">
                             @else
-                                <div class="product-icon-placeholder rounded me-2 d-flex align-items-center justify-content-center"
-                                    style="width: 40px; height: 40px; background-color: #4caf50;">
+                                <div class="product-icon-placeholder rounded me-2 d-flex align-items-center justify-content-center">
                                     <i class="fas fa-box text-white"></i>
                                 </div>
                             @endif
@@ -35,44 +33,23 @@
                         </div>
                     </td>
                     <td>
-                        <span class="badge" style="
-                    @if($producte->categoria == 'Paper')
-                        background-color: #2859bc; /* Blau */
-                    @elseif($producte->categoria == 'Envasos')
-                        background-color: #fddd19; color: #000; /* Groc */
-                    @elseif($producte->categoria == 'Organica')
-                        background-color: #9e6831; /* Marró */
-                    @elseif($producte->categoria == 'Vidre')
-                        background-color: #3fd055; /* Verd */
-                    @elseif($producte->categoria == 'Resta')
-                        background-color: #6d7878; /* Gris */
-                    @elseif($producte->categoria == 'Deixalleria')
-                        background-color: #d62c2d; /* Vermell */
-                    @elseif($producte->categoria == 'Medicaments')
-                        background-color: #b7e53b; color: #000; /* Verd clar */
-                    @elseif($producte->categoria == 'Piles')
-                        background-color: #fca614; /* Taronja */
-                    @elseif($producte->categoria == 'Especial')
-                        background-color: #2f3939; /* Gris fosc */
-                    @elseif($producte->categoria == 'RAEE')
-                        background-color: #006f3f; /* Verd fosc */
-                    @else
-                        background-color: #3f51b5; /* Color por defecto */
-                    @endif
-                ">{{ $producte->categoria }}</span>
+                        <span class="badge category-badge category-{{ strtolower($producte->categoria) }}">
+                            {{ $producte->categoria }}
+                        </span>
                     </td>
                     <td>
                         <div class="btn-group">
                             <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detailModal"
-                                data-detail-type="producte" data-detail-id="{{ $producte->id }}" title="Veure detalls">
+                                data-detail-type="producte" data-detail-id="{{ $producte->id }}" title="{{ __('messages.admin.common.view_details') }}">
                                 <i class="fas fa-eye"></i>
                             </button>
                             <button class="btn btn-sm btn-primary editProducteBtn" data-producte-id="{{ $producte->id }}"
-                                title="Editar">
+                                title="{{ __('messages.admin.common.edit') }}">
                                 <i class="fas fa-edit"></i>
                             </button>
                             <button class="btn btn-danger btn-sm deleteBtn" data-item-id="{{ $producte->id }}"
-                                data-item-name="{{ $producte->nom }}" data-item-type="producte">
+                                data-item-name="{{ $producte->nom }}" data-item-type="producte"
+                                title="{{ __('messages.admin.common.delete') }}">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -82,9 +59,3 @@
         </tbody>
     </table>
 </div>
-
-<style>
-    #newProducteBtn {
-        width: 150px;
-    }
-</style>

@@ -1,40 +1,37 @@
-<div class="premi-detail-container bg-white rounded-lg shadow-sm p-4">
+<div class="detail-container premi-detail-container">
     <!-- Encabezado del premio -->
-    <div class="premi-header mb-4">
+    <div class="detail-header mb-4">
         <div class="row align-items-center">
             <div class="col-md-8">
                 <div class="d-flex align-items-center">
-                    <div class="premi-image-container me-4">
+                    <div class="detail-image-container me-4">
                         @if($premi->imatge)
-                            <img src="{{ asset($premi->imatge) }}" class="premi-image rounded" alt="Imatge premi" style="width: 120px; height: 120px; object-fit: cover; margin-right: 10px;">
+                            <img src="{{ asset($premi->imatge) }}" class="detail-image rounded" alt="{{ __('messages.admin.premis.prize_image') }}">
                         @else
-                            <div class="premi-placeholder rounded d-flex align-items-center justify-content-center" 
-                                style="width: 120px; height: 120px; background-color: #ff9800;">
-                                <i class="fas fa-gift fa-3x text-white"></i>
+                            <div class="detail-icon premi-icon d-flex align-items-center justify-content-center rounded">
+                                <i class="fas fa-gift fa-3x"></i>
                             </div>
                         @endif
                     </div>
                     <div>
-                        <h2 class="premi-name mb-1">{{ $premi->nom }}</h2>
-                        <div class="premi-points mb-2">
+                        <h2 class="detail-name mb-1">{{ $premi->nom }}</h2>
+                        <div class="detail-badge mb-2">
                             <span class="badge bg-primary py-1 px-2">
-                                <i class="fas fa-coins me-1"></i>{{ $premi->punts_requerits }} punts
+                                <i class="fas fa-coins me-1"></i>{{ $premi->punts_requerits }} {{ __('messages.admin.premis.points') }}
                             </span>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                <div class="premi-stats">
-                    <div class="stats-card bg-success-subtle p-3 rounded-3 shadow-sm">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="mb-0">Reclamacions</h6>
-                                <small class="text-muted">Total històric</small>
-                            </div>
-                            <div class="stats-value">
-                                <span class="fs-4 fw-bold text-success">{{ $premi->premiReclamats()->count() }}</span>
-                            </div>
+                <div class="stats-card bg-success-subtle p-3 rounded-3 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">{{ __('messages.admin.premis.claims') }}</h6>
+                            <small class="text-muted">{{ __('messages.admin.premis.total_history') }}</small>
+                        </div>
+                        <div class="stats-value">
+                            <span class="fs-4 fw-bold text-success">{{ $premi->premiReclamats()->count() }}</span>
                         </div>
                     </div>
                 </div>
@@ -45,12 +42,12 @@
     <!-- Información detallada -->
     <div class="row mt-4">
         <div class="col-lg-12">
-            <div class="info-card bg-light p-4 rounded-3 shadow-sm mb-4">
+            <div class="info-card mb-4">
                 <h4 class="card-title mb-3">
-                    <i class="fas fa-align-left text-success me-2" style="margin-right: 10px;"></i>Descripció
+                    <i class="fas fa-align-left text-success me-2"></i>{{ __('messages.admin.premis.description') }}
                 </h4>
                 <div class="premi-description">
-                    <p class="mb-0">{{ $premi->descripcio ?: 'Sense descripció' }}</p>
+                    <p class="mb-0">{{ $premi->descripcio ?: __('messages.admin.premis.no_description') }}</p>
                 </div>
             </div>
         </div>
@@ -59,20 +56,20 @@
     <!-- Lista de usuarios que han reclamado el premio -->
     <div class="row mt-2">
         <div class="col-12">
-            <div class="info-card bg-light p-4 rounded-3 shadow-sm">
+            <div class="info-card">
                 <h4 class="card-title mb-3">
-                    <i class="fas fa-users text-warning me-2" style="margin-right: 10px;"></i>Reclamacions d'aquest premi
+                    <i class="fas fa-users text-warning me-2"></i>{{ __('messages.admin.premis.prize_claims') }}
                 </h4>
                 
                 @if($premi->premiReclamats->count() > 0)
                     <div class="table-responsive">
                         <table class="table table-hover table-borderless">
-                            <thead class="table-light">
+                            <thead>
                                 <tr>
-                                    <th scope="col">Usuari</th>
-                                    <th scope="col">Data Reclamació</th>
-                                    <th scope="col">Estat</th>
-                                    <th scope="col">Punts</th>
+                                    <th scope="col">{{ __('messages.admin.premis.user') }}</th>
+                                    <th scope="col">{{ __('messages.admin.premis.claim_date') }}</th>
+                                    <th scope="col">{{ __('messages.admin.premis.status') }}</th>
+                                    <th scope="col">{{ __('messages.admin.premis.points') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -83,14 +80,13 @@
                                                 @if($reclamat->user && $reclamat->user->foto_perfil)
                                                     <img src="{{ asset('storage/' . $reclamat->user->foto_perfil) }}" 
                                                          alt="{{ $reclamat->user->nom }}" 
-                                                         class="me-2 rounded-circle" style="width: 40px; height: 40px; object-fit: cover; margin-right: 5px;">
+                                                         class="user-avatar rounded-circle me-2">
                                                 @else
-                                                    <span class="user-placeholder me-2 bg-secondary rounded-circle d-flex align-items-center justify-content-center" 
-                                                          style="width: 40px; height: 40px;">
+                                                    <span class="user-icon-placeholder rounded-circle me-2 d-flex align-items-center justify-content-center">
                                                         <i class="fas fa-user text-white"></i>
                                                     </span>
                                                 @endif
-                                                <span>{{ $reclamat->user ? $reclamat->user->nom . ' ' . $reclamat->user->cognoms : 'Usuari no disponible' }}</span>
+                                                <span>{{ $reclamat->user ? $reclamat->user->nom . ' ' . $reclamat->user->cognoms : __('messages.admin.premis.user_not_available') }}</span>
                                             </div>
                                         </td>
                                         <td>{{ date('d/m/Y', strtotime($reclamat->data_reclamacio)) }}</td>
@@ -111,62 +107,10 @@
                 @else
                     <div class="empty-state text-center p-4">
                         <i class="fas fa-gift text-muted fa-3x mb-3"></i>
-                        <p class="lead">Aquest premi encara no ha estat reclamat per cap usuari</p>
+                        <p class="lead">{{ __('messages.admin.premis.not_claimed_yet') }}</p>
                     </div>
                 @endif
             </div>
         </div>
     </div>
 </div>
-
-<style>
-    /* Contenedor principal con un único scroll */
-    .premi-detail-container {
-        border-radius: 8px;
-        overflow-y: auto;
-        max-height: 70vh;
-        padding: 20px;
-        margin: 0;
-        scrollbar-width: thin;
-    }
-    
-    /* Estilos para la barra de desplazamiento */
-    .premi-detail-container::-webkit-scrollbar {
-        width: 6px;
-    }
-    
-    .premi-detail-container::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 10px;
-    }
-    
-    .premi-detail-container::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 10px;
-    }
-    
-    /* Modo oscuro */
-    body.dark .premi-detail-container {
-        background-color: #2d3748 !important;
-    }
-    
-    body.dark .info-card {
-        background-color: #3f4a5c !important;
-    }
-    
-    body.dark .premi-name {
-        color: #f1f5f9;
-    }
-    
-    body.dark .card-title {
-        color: #e2e8f0;
-    }
-    .btn-close {
-        background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
-        opacity: 0.5;
-    }
-
-    .btn-close:hover {
-        opacity: 0.75;
-    }
-</style>

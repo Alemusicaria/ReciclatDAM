@@ -1,25 +1,30 @@
-<div class="producte-detail-container bg-white rounded-lg shadow-sm p-4">
+<div class="detail-container producte-detail-container">
     <!-- Encabezado del producto -->
-    <div class="producte-header mb-4">
+    <div class="detail-header mb-4">
         <div class="row align-items-center">
             <div class="col-md-8">
                 <div class="d-flex align-items-start">
-                    <div class="producte-image-container me-4">
+                    <div class="detail-image-container me-4">
                         @if($producte->imatge)
-                            <img src="{{ asset($producte->imatge) }}" class="producte-image rounded" alt="Imatge producte" style="width: 120px; height: 120px; object-fit: cover;">
+                            <img src="{{ asset($producte->imatge) }}" class="detail-image rounded" alt="{{ __('messages.admin.products.product_image') }}">
                         @else
-                            <div class="producte-placeholder rounded d-flex align-items-center justify-content-center" 
-                                style="width: 120px; height: 120px; background-color: #4caf50;">
-                                <i class="fas fa-box fa-3x text-white"></i>
+                            <div class="detail-icon producte-icon d-flex align-items-center justify-content-center rounded">
+                                <i class="fas fa-box fa-3x"></i>
                             </div>
                         @endif
                     </div>
                     <div>
-                        <h2 class="producte-name mb-1">{{ $producte->nom }}</h2>
+                        <h2 class="detail-name mb-1">{{ $producte->nom }}</h2>
                         <div class="producte-category mb-2">
                             <span class="badge bg-primary py-1 px-2">
                                 <i class="fas fa-tag me-1"></i>{{ $producte->categoria }}
                             </span>
+                        </div>
+                        <div class="product-info mt-3">
+                            <div class="text-muted">
+                                <i class="fas fa-info-circle me-2"></i>
+                                {{ __('messages.admin.products.category_description', ['category' => $producte->categoria]) }}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -27,39 +32,3 @@
         </div>
     </div>
 </div>
-
-<style>
-    /* Contenedor principal con scroll */
-    .producte-detail-container {
-        border-radius: 8px;
-        overflow-y: auto;
-        max-height: 70vh;
-        padding: 20px;
-        margin: 0;
-        scrollbar-width: thin;
-    }
-    
-    /* Estilos para la barra de desplazamiento */
-    .producte-detail-container::-webkit-scrollbar {
-        width: 6px;
-    }
-    
-    .producte-detail-container::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 10px;
-    }
-    
-    .producte-detail-container::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 10px;
-    }
-    
-    /* Modo oscuro */
-    body.dark .producte-detail-container {
-        background-color: #2d3748 !important;
-    }
-    
-    body.dark .producte-name {
-        color: #f1f5f9;
-    }
-</style>

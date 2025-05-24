@@ -1,122 +1,46 @@
 <div class="container-fluid p-0">
     <div class="row">
         <div class="col-12">
-            <h4 class="mb-3">Crear Nou Premi</h4>
+            <h4 class="mb-3">{{ __('messages.admin.premis.create_title') }}</h4>
 
-            <div class="modal-body-scroll" style="max-height: 65vh; overflow-y: auto; padding-right: 5px;">
-                <form id="createPremiForm" method="POST" action="{{ route('premis.store') }}"
-                    enctype="multipart/form-data">
+            <div class="modal-body-scroll">
+                <form id="createPremiForm" method="POST" action="{{ route('premis.store') }}" enctype="multipart/form-data">
                     @csrf
 
-                    <div class="card mb-3">
+                    <div class="card mb-3 form-card">
                         <div class="card-header">
-                            <h5 class="card-title mb-0">Informació Bàsica</h5>
+                            <h5 class="card-title mb-0">{{ __('messages.admin.premis.basic_info') }}</h5>
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
-                                <label for="nom" class="form-label">Nom <span class="text-danger">*</span></label>
+                                <label for="nom" class="form-label">{{ __('messages.admin.premis.name') }} <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="nom" name="nom" required>
                             </div>
 
                             <div class="mb-3">
-                                <label for="punts_requerits" class="form-label">Punts Requerits <span class="text-danger">*</span></label>
+                                <label for="punts_requerits" class="form-label">{{ __('messages.admin.premis.points_required') }} <span class="text-danger">*</span></label>
                                 <input type="number" class="form-control" id="punts_requerits" name="punts_requerits" min="1" required>
                             </div>
 
                             <div class="mb-3">
-                                <label for="descripcio" class="form-label">Descripció</label>
+                                <label for="descripcio" class="form-label">{{ __('messages.admin.premis.description') }}</label>
                                 <textarea class="form-control" id="descripcio" name="descripcio" rows="3"></textarea>
                             </div>
 
                             <div class="mb-3">
-                                <label for="imatge" class="form-label">Imatge del Premi</label>
+                                <label for="imatge" class="form-label">{{ __('messages.admin.premis.image') }}</label>
                                 <input type="file" class="form-control" id="imatge" name="imatge">
-                                <div class="form-text">Formats acceptats: JPG, PNG. Mida màxima: 2MB</div>
+                                <div class="form-text">{{ __('messages.admin.premis.image_help') }}</div>
                             </div>
                         </div>
                     </div>
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
-                        <button type="submit" class="btn btn-primary" id="submitCreatePremiForm">Guardar Premi</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.common.cancel') }}</button>
+                        <button type="submit" class="btn btn-primary" id="submitCreatePremiForm">{{ __('messages.admin.premis.save_button') }}</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
-
-<style>
-    
-</style>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('createPremiForm');
-        if (form) {
-            form.addEventListener('submit', function (e) {
-                e.preventDefault();
-
-                // Validación básica
-                let isValid = true;
-                form.querySelectorAll('[required]').forEach(input => {
-                    if (!input.value.trim()) {
-                        input.classList.add('is-invalid');
-                        isValid = false;
-                    } else {
-                        input.classList.remove('is-invalid');
-                    }
-                });
-
-                if (!isValid) return;
-
-                // Mostrar indicador de carga
-                const submitBtn = document.getElementById('submitCreatePremiForm');
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Guardant...';
-
-                // Enviar formulario via AJAX
-                const formData = new FormData(form);
-
-                fetch(form.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Cerrar modal
-                        closeAnyModal('detailModal');
-                        
-                        // Recargar lista de premios
-                        setTimeout(() => {
-                            const premisBtn = document.querySelector('[data-content-type="premis"]');
-                            if (premisBtn) premisBtn.click();
-                        }, 300);
-                    } else {
-                        // Restaurar botón
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = 'Guardar Premi';
-
-                        // Mostrar error
-                        alert('Error: ' + (data.message || 'No s\'ha pogut crear el premi'));
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    
-                    // Restaurar botón
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = 'Guardar Premi';
-                    
-                    // Mostrar error
-                    alert('Error al crear el premi: ' + error.message);
-                });
-            });
-        }
-    });
-</script>

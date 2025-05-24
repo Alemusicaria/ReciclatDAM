@@ -1,127 +1,53 @@
 <div class="container-fluid p-0">
     <div class="row">
         <div class="col-12">
-            <h4 class="mb-3">Crear Nou Producte</h4>
+            <h4 class="mb-3">{{ __('messages.admin.productes.create_title') }}</h4>
 
-            <div class="modal-body-scroll" style="max-height: 65vh; overflow-y: auto; padding-right: 5px;">
-                <form id="createProducteForm" method="POST" action="{{ route('admin.productes.store') }}"
-                    enctype="multipart/form-data">
+            <div class="modal-body-scroll">
+                <form id="createProducteForm" method="POST" action="{{ route('admin.productes.store') }}" enctype="multipart/form-data">
                     @csrf
 
-                    <div class="card mb-3">
+                    <div class="card mb-3 form-card">
                         <div class="card-header">
-                            <h5 class="card-title mb-0">Informació del Producte</h5>
+                            <h5 class="card-title mb-0">{{ __('messages.admin.productes.info_title') }}</h5>
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
-                                <label for="nom" class="form-label">Nom <span class="text-danger">*</span></label>
+                                <label for="nom" class="form-label">{{ __('messages.admin.productes.name') }} <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="nom" name="nom" required>
                             </div>
 
                             <div class="mb-3">
-                                <label for="categoria" class="form-label">Categoria <span
-                                        class="text-danger">*</span></label>
+                                <label for="categoria" class="form-label">{{ __('messages.admin.productes.category') }} <span class="text-danger">*</span></label>
                                 <select class="form-select" id="categoria" name="categoria" required>
-                                    <option value="">Selecciona una categoria</option>
-                                    <option value="Deixalleria">Deixalleria</option>
-                                    <option value="Envasos">Envasos</option>
-                                    <option value="Especial">Especial</option>
-                                    <option value="Medicaments">Medicaments</option>
-                                    <option value="Organica">Orgànica</option>
-                                    <option value="Paper">Paper</option>
-                                    <option value="Piles">Piles</option>
-                                    <option value="RAEE">RAEE</option>
-                                    <option value="Resta">Resta</option>
-                                    <option value="Vidre">Vidre</option>
+                                    <option value="">{{ __('messages.admin.productes.select_category') }}</option>
+                                    <option value="Deixalleria">{{ __('messages.admin.productes.category_waste') }}</option>
+                                    <option value="Envasos">{{ __('messages.admin.productes.category_packaging') }}</option>
+                                    <option value="Especial">{{ __('messages.admin.productes.category_special') }}</option>
+                                    <option value="Medicaments">{{ __('messages.admin.productes.category_meds') }}</option>
+                                    <option value="Organica">{{ __('messages.admin.productes.category_organic') }}</option>
+                                    <option value="Paper">{{ __('messages.admin.productes.category_paper') }}</option>
+                                    <option value="Piles">{{ __('messages.admin.productes.category_batteries') }}</option>
+                                    <option value="RAEE">{{ __('messages.admin.productes.category_raee') }}</option>
+                                    <option value="Resta">{{ __('messages.admin.productes.category_rest') }}</option>
+                                    <option value="Vidre">{{ __('messages.admin.productes.category_glass') }}</option>
                                 </select>
                             </div>
 
                             <div class="mb-3">
-                                <label for="imatge" class="form-label">Imatge del Producte</label>
+                                <label for="imatge" class="form-label">{{ __('messages.admin.productes.image') }}</label>
                                 <input type="file" class="form-control" id="imatge" name="imatge">
-                                <div class="form-text">Formats acceptats: JPG, PNG. Mida màxima: 2MB</div>
+                                <div class="form-text">{{ __('messages.admin.productes.image_help') }}</div>
                             </div>
                         </div>
                     </div>
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
-                        <button type="submit" class="btn btn-primary" id="submitCreateProducteForm">Guardar
-                            Producte</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.common.cancel') }}</button>
+                        <button type="submit" class="btn btn-primary" id="submitCreateProducteForm">{{ __('messages.admin.productes.save_button') }}</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const form = document.getElementById('createProducteForm');
-        if (form) {
-            form.addEventListener('submit', function (e) {
-                e.preventDefault();
-
-                // Validación básica
-                let isValid = true;
-                form.querySelectorAll('[required]').forEach(input => {
-                    if (!input.value.trim()) {
-                        input.classList.add('is-invalid');
-                        isValid = false;
-                    } else {
-                        input.classList.remove('is-invalid');
-                    }
-                });
-
-                if (!isValid) return;
-
-                // Mostrar indicador de carga
-                const submitBtn = document.getElementById('submitCreateProducteForm');
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Guardant...';
-
-                // Enviar formulario via AJAX
-                const formData = new FormData(form);
-
-                fetch('/admin/productes', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Cerrar modal
-                            closeAnyModal('detailModal');
-
-                            // Recargar lista de productos
-                            setTimeout(() => {
-                                const productesBtn = document.querySelector('[data-content-type="productes"]');
-                                if (productesBtn) productesBtn.click();
-                            }, 300);
-                        } else {
-                            // Restaurar botón
-                            submitBtn.disabled = false;
-                            submitBtn.innerHTML = 'Guardar Producte';
-
-                            // Mostrar error
-                            alert('Error: ' + (data.message || 'No s\'ha pogut crear el producte'));
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-
-                        // Restaurar botón
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = 'Guardar Producte';
-
-                        // Mostrar error
-                        alert('Error al crear el producte: ' + error.message);
-                    });
-            });
-        }
-    });
-</script>
