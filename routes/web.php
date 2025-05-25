@@ -47,7 +47,12 @@ Route::localizedGroup(function () {
 
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
-
+    // En routes/web.php o habilitar en routes/auth.php
+    Route::get('/forgot-password', [App\Http\Controllers\Auth\PasswordResetLinkController::class, 'create'])->name('password.request');
+    Route::post('/forgot-password', [App\Http\Controllers\Auth\PasswordResetLinkController::class, 'store'])->name('password.email');
+    Route::get('/reset-password/{token}', [App\Http\Controllers\Auth\NewPasswordController::class, 'create'])->name('password.reset');
+    Route::post('/reset-password', [App\Http\Controllers\Auth\NewPasswordController::class, 'store'])->name('password.update');
+    
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
 
@@ -93,7 +98,7 @@ Route::localizedGroup(function () {
     Route::get('/offline', function () {
         return view('offline');
     });
-    
+
     // Rutas para el panel de administración
     Route::prefix('admin')->middleware(['auth'])->group(function () {
         // Aquí todas tus rutas de administrador
