@@ -497,6 +497,9 @@ return [
             'update_button' => 'Actualitzar Usuari',
             'list_title' => 'Llistat d\'Usuaris',
             'new_user' => 'Nou Usuari',
+            'profile' => 'Perfil',
+            'logout' => 'Tancar Sessió',
+            'login' => 'Iniciar Sessió',
         ],
 
         'tipus_events' => [
@@ -762,6 +765,5 @@ return [
         'save' => 'Guardar',
         'saving' => 'Guardant...',
         'updating' => 'Actualitzant...',
-
     ],
 ];
