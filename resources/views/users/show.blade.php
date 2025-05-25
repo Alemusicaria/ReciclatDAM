@@ -123,7 +123,7 @@
                 </div>
 
                 <!-- Tarjeta de estadísticas visuales -->
-                <div class="card mb-4 stats-card">
+                <div class="card mb-4 stats-card" style="height: 45vh;">
                     <div class="card-body">
                         <h5 class="card-title mb-4">
                             <i class="fas fa-chart-pie me-2" style="margin-right: 5px;"></i>Distribució de Punts
@@ -343,7 +343,7 @@
                 </div>
 
                 <!-- Gráfico de actividad -->
-                <div class="card mb-4 stats-card">
+                <div class="card mb-4 stats-card" style="height: 45vh;">
                     <div class="card-body">
                         <h5 class="card-title mb-3">
                             <i class="fas fa-chart-line me-2" style="margin-right: 5px;"></i>Activitat recent

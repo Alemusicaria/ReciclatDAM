@@ -4872,3 +4872,49 @@ body.dark .navbar-nav .nav-link.active {
 body.dark .navbar-nav .nav-link.active::after {
     background-color: #66bb6a !important;
 }
+
+/* Estilos para los contenedores de gráficos */
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* Asegurar que las tarjetas de estadísticas tienen altura uniforme */
+.stats-card {
+    transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
+}
+
+/* Responsivo para dispositivos pequeños */
+@media (max-width: 768px) {
+    .chart-container {
+        min-height: 200px !important;
+    }
+}
+
+/* Asegurar visibilidad de dropdowns en toda la aplicación */
+.navbar.fixed-top {
+    z-index: 1050 !important;
+}
+
+.dropdown-menu.dropdown-menu-end {
+    z-index: 1051 !important;
+}
+
+/* Asegurar que la vista de admin no interfiere */
+body.admin-dashboard .navbar.fixed-top {
+    z-index: 2000 !important;
+}
+
+body.admin-dashboard .dropdown-menu {
+    z-index: 2001 !important;
+}
+
+.dropdown-menu.show {
+    display: block !important;
+}

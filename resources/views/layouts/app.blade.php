@@ -35,7 +35,6 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <!-- Enlaces de navegación a la izquierda -->
-                <!-- Enlaces de navegación a la izquierda -->
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     @php $isHomePage = request()->path() === '/' || request()->path() === app()->getLocale(); @endphp
 
@@ -500,6 +499,61 @@
             // Aplicar estilos iniciales
             applyActiveStyles();
 
+        });
+    </script>
+    <script>
+        // Código para asegurar que los dropdowns funcionen en todas las páginas
+        window.addEventListener('load', function () { // Usar load en lugar de DOMContentLoaded
+            // Primero: método directo con jQuery que suele funcionar siempre
+            if (typeof $ !== 'undefined') {
+                // Inicializar con jQuery
+                $('#navbarDropdown').dropdown();
+
+                // Manejar los clics de forma manual
+                $(document).on('click', '#navbarDropdown', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // Alternar el dropdown manualmente
+                    $(this).next('.dropdown-menu').toggleClass('show');
+
+                    // Asegurar z-index alto
+                    $(this).next('.dropdown-menu').css('z-index', '9999');
+                });
+
+                // Cerrar al hacer clic fuera
+                $(document).on('click', function (e) {
+                    if (!$(e.target).closest('.dropdown').length) {
+                        $('.dropdown-menu').removeClass('show');
+                    }
+                });
+            } else {
+                // Método alternativo usando JavaScript vanilla
+                const dropdownElementList = document.querySelectorAll('.dropdown-toggle');
+
+                dropdownElementList.forEach(function (dropdownToggleEl) {
+                    // Método manual por si Bootstrap no está disponible o falla
+                    dropdownToggleEl.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        const menu = this.nextElementSibling;
+                        if (menu && menu.classList.contains('dropdown-menu')) {
+                            menu.classList.toggle('show');
+                            menu.style.zIndex = '9999';
+                        }
+                    });
+                });
+
+                // Cerrar dropdowns al hacer clic fuera
+                document.addEventListener('click', function (e) {
+                    if (!e.target.closest('.dropdown')) {
+                        document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+                            menu.classList.remove('show');
+                        });
+                    }
+                });
+            }
         });
     </script>
 
