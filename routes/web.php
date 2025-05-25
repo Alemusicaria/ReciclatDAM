@@ -92,83 +92,73 @@ Route::localizedGroup(function () {
 
     // Rutas para el panel de administración
     Route::prefix('admin')->middleware(['auth'])->group(function () {
-        // Aplicar validación de administrador a todo el grupo
-        Route::group([
-            'middleware' => function ($request, $next) {
-                if (auth()->user()->rol_id != 1) {
-                    return redirect()->route('home')->with('error', 'No tens permís per accedir al panell d\'administració');
-                }
-                return $next($request);
-            }
-        ], function () {
-            // Aquí todas tus rutas de administrador
-            Route::get('/', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.dashboard');
+        // Aquí todas tus rutas de administrador
+        Route::get('/', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.dashboard');
 
-            // Modales dinámicos
-            Route::get('/modal-content/{type}', [App\Http\Controllers\AdminController::class, 'getModalContent'])->name('admin.modal-content');
+        // Modales dinámicos
+        Route::get('/modal-content/{type}', [App\Http\Controllers\AdminController::class, 'getModalContent'])->name('admin.modal-content');
 
-            // Formularios
-            Route::get('/create-form/{type}', [App\Http\Controllers\AdminController::class, 'getCreateForm'])->name('admin.create-form');
+        // Formularios
+        Route::get('/create-form/{type}', [App\Http\Controllers\AdminController::class, 'getCreateForm'])->name('admin.create-form');
 
-            // Detalles y actualización
-            Route::get('/detail/{type}/{id?}', [App\Http\Controllers\AdminController::class, 'getDetails'])->name('admin.details');
+        // Detalles y actualización
+        Route::get('/detail/{type}/{id?}', [App\Http\Controllers\AdminController::class, 'getDetails'])->name('admin.details');
 
-            Route::get('/edit-form/{type}/{id}', [App\Http\Controllers\AdminController::class, 'getEditForm'])->name('admin.edit-form');
+        Route::get('/edit-form/{type}/{id}', [App\Http\Controllers\AdminController::class, 'getEditForm'])->name('admin.edit-form');
 
-            Route::post('/update/{type}/{id}', [App\Http\Controllers\AdminController::class, 'updateDetails'])->name('admin.update');
+        Route::post('/update/{type}/{id}', [App\Http\Controllers\AdminController::class, 'updateDetails'])->name('admin.update');
 
-            // Eliminar registro
-            Route::delete('/destroy/{type}/{id}', [App\Http\Controllers\AdminController::class, 'destroyDetails'])->name('admin.destroy');
-            // Eventos para FullCalendar
-            Route::get('/events-json', [App\Http\Controllers\AdminController::class, 'getEventsJson'])->name('admin.events-json');
+        // Eliminar registro
+        Route::delete('/destroy/{type}/{id}', [App\Http\Controllers\AdminController::class, 'destroyDetails'])->name('admin.destroy');
+        // Eventos para FullCalendar
+        Route::get('/events-json', [App\Http\Controllers\AdminController::class, 'getEventsJson'])->name('admin.events-json');
 
-            // Gestión de usuarios
-            Route::resource('users', App\Http\Controllers\UserController::class);
+        // Gestión de usuarios
+        Route::resource('users', App\Http\Controllers\UserController::class);
 
-            // Gestión de eventos
-            Route::resource('events', App\Http\Controllers\EventsController::class);
-            Route::put('/events/{id}/update-dates', [App\Http\Controllers\EventsController::class, 'updateDates'])->name('events.update-dates');
+        // Gestión de eventos
+        Route::resource('events', App\Http\Controllers\EventsController::class);
+        Route::put('/events/{id}/update-dates', [App\Http\Controllers\EventsController::class, 'updateDates'])->name('events.update-dates');
 
-            // Gestión de premios
-            Route::resource('premis', App\Http\Controllers\PremiController::class);
+        // Gestión de premios
+        Route::resource('premis', App\Http\Controllers\PremiController::class);
 
-            // Gestión de premios reclamados
-            Route::resource('premis-reclamats', App\Http\Controllers\PremiReclamatController::class);
-            Route::post('/premis-reclamats/{id}/approve', [App\Http\Controllers\PremiReclamatController::class, 'approve'])->name('premis-reclamats.approve');
-            Route::post('/premis-reclamats/{id}/reject', [App\Http\Controllers\PremiReclamatController::class, 'reject'])->name('premis-reclamats.reject');
+        // Gestión de premios reclamados
+        Route::resource('premis-reclamats', App\Http\Controllers\PremiReclamatController::class);
+        Route::post('/premis-reclamats/{id}/approve', [App\Http\Controllers\PremiReclamatController::class, 'approve'])->name('premis-reclamats.approve');
+        Route::post('/premis-reclamats/{id}/reject', [App\Http\Controllers\PremiReclamatController::class, 'reject'])->name('premis-reclamats.reject');
 
-            // Gestión de puntos de reciclaje
-            Route::resource('punts-reciclatge', App\Http\Controllers\PuntDeRecollidaController::class);
+        // Gestión de puntos de reciclaje
+        Route::resource('punts-reciclatge', App\Http\Controllers\PuntDeRecollidaController::class);
 
-            Route::post('/admin/events', [App\Http\Controllers\EventsController::class, 'store'])->name('admin.events.store');
+        Route::post('/admin/events', [App\Http\Controllers\EventsController::class, 'store'])->name('admin.events.store');
 
-            Route::post('/admin/codis', [App\Http\Controllers\CodiController::class, 'store'])->name('admin.codis.store');
-            Route::put('/admin/codis/{codi}', [App\Http\Controllers\CodiController::class, 'update'])->name('admin.codis.update');
+        Route::post('/admin/codis', [App\Http\Controllers\CodiController::class, 'store'])->name('admin.codis.store');
+        Route::put('/admin/codis/{codi}', [App\Http\Controllers\CodiController::class, 'update'])->name('admin.codis.update');
 
-            Route::post('/admin/productes', [App\Http\Controllers\ProducteController::class, 'store'])->name('admin.productes.store');
-            Route::put('/admin/productes/{producte}', [App\Http\Controllers\ProducteController::class, 'update'])->name('admin.productes.update');
+        Route::post('/admin/productes', [App\Http\Controllers\ProducteController::class, 'store'])->name('admin.productes.store');
+        Route::put('/admin/productes/{producte}', [App\Http\Controllers\ProducteController::class, 'update'])->name('admin.productes.update');
 
-            Route::post('/admin/punts', [App\Http\Controllers\PuntDeRecollidaController::class, 'store'])->name('admin.punts.store');
-            Route::put('/admin/punts/{punt}', [App\Http\Controllers\PuntDeRecollidaController::class, 'update'])->name('admin.punts.update');
+        Route::post('/admin/punts', [App\Http\Controllers\PuntDeRecollidaController::class, 'store'])->name('admin.punts.store');
+        Route::put('/admin/punts/{punt}', [App\Http\Controllers\PuntDeRecollidaController::class, 'update'])->name('admin.punts.update');
 
-            Route::post('/admin/rols', [App\Http\Controllers\RolController::class, 'store'])->name('admin.rols.store');
-            Route::put('/admin/rols/{rol}', [App\Http\Controllers\RolController::class, 'update'])->name('admin.rols.update');
+        Route::post('/admin/rols', [App\Http\Controllers\RolController::class, 'store'])->name('admin.rols.store');
+        Route::put('/admin/rols/{rol}', [App\Http\Controllers\RolController::class, 'update'])->name('admin.rols.update');
 
-            Route::post('/admin/tipus-alertes', [App\Http\Controllers\TipusAlertaController::class, 'store'])->name('admin.tipus-alertes.store');
-            Route::put('/admin/tipus-alertes/{tipusAlerta}', [App\Http\Controllers\TipusAlertaController::class, 'update'])->name('admin.tipus-alertes.update');
+        Route::post('/admin/tipus-alertes', [App\Http\Controllers\TipusAlertaController::class, 'store'])->name('admin.tipus-alertes.store');
+        Route::put('/admin/tipus-alertes/{tipusAlerta}', [App\Http\Controllers\TipusAlertaController::class, 'update'])->name('admin.tipus-alertes.update');
 
-            Route::post('/admin/alertes-punts', [App\Http\Controllers\AlertaPuntDeRecollidaController::class, 'store'])->name('admin.alertes-punts.store');
-            Route::put('/admin/alertes-punts/{alertaPuntDeRecollida}', [App\Http\Controllers\AlertaPuntDeRecollidaController::class, 'update'])->name('admin.alertes-punts.update');
+        Route::post('/admin/alertes-punts', [App\Http\Controllers\AlertaPuntDeRecollidaController::class, 'store'])->name('admin.alertes-punts.store');
+        Route::put('/admin/alertes-punts/{alertaPuntDeRecollida}', [App\Http\Controllers\AlertaPuntDeRecollidaController::class, 'update'])->name('admin.alertes-punts.update');
 
-            Route::post('/admin/tipus-events', [App\Http\Controllers\TipusEventController::class, 'store'])->name('admin.tipus-events.store');
-            Route::put('/admin/tipus-events/{tipusEvent}', [App\Http\Controllers\TipusEventController::class, 'update'])->name('admin.tipus-events.update');
+        Route::post('/admin/tipus-events', [App\Http\Controllers\TipusEventController::class, 'store'])->name('admin.tipus-events.store');
+        Route::put('/admin/tipus-events/{tipusEvent}', [App\Http\Controllers\TipusEventController::class, 'update'])->name('admin.tipus-events.update');
 
-            Route::get('/admin/navigator-stats', [App\Http\Controllers\AdminController::class, 'navigatorStats'])->name('admin.navigator-stats');
-            Route::get('/admin/navigator-stats-data', [App\Http\Controllers\AdminController::class, 'navigatorStatsData'])->name('admin.navigator-stats-data');
-            Route::post('/admin/premis-reclamats/{id}/approve', [App\Http\Controllers\PremiReclamatController::class, 'approve'])->name('admin.premis-reclamats.approve');
-            Route::post('/admin/premis-reclamats/{id}/reject', [App\Http\Controllers\PremiReclamatController::class, 'reject'])->name('admin.premis-reclamats.reject');
-            Route::put('/admin/premis-reclamats/{id}', [App\Http\Controllers\PremiReclamatController::class, 'update'])->name('admin.premis-reclamats.update');
-            Route::get('/admin/edit-form/premi-reclamat/{id}', [App\Http\Controllers\AdminController::class, 'getEditForm'])->name('admin.edit-form.premi-reclamat');
-        });
+        Route::get('/admin/navigator-stats', [App\Http\Controllers\AdminController::class, 'navigatorStats'])->name('admin.navigator-stats');
+        Route::get('/admin/navigator-stats-data', [App\Http\Controllers\AdminController::class, 'navigatorStatsData'])->name('admin.navigator-stats-data');
+        Route::post('/admin/premis-reclamats/{id}/approve', [App\Http\Controllers\PremiReclamatController::class, 'approve'])->name('admin.premis-reclamats.approve');
+        Route::post('/admin/premis-reclamats/{id}/reject', [App\Http\Controllers\PremiReclamatController::class, 'reject'])->name('admin.premis-reclamats.reject');
+        Route::put('/admin/premis-reclamats/{id}', [App\Http\Controllers\PremiReclamatController::class, 'update'])->name('admin.premis-reclamats.update');
+        Route::get('/admin/edit-form/premi-reclamat/{id}', [App\Http\Controllers\AdminController::class, 'getEditForm'])->name('admin.edit-form.premi-reclamat');
     });
 });
