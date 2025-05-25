@@ -90,6 +90,10 @@ Route::localizedGroup(function () {
         ->name('premis.canjear')
         ->middleware('auth');
 
+    Route::get('/offline', function () {
+        return view('offline');
+    });
+    
     // Rutas para el panel de administración
     Route::prefix('admin')->middleware(['auth'])->group(function () {
         // Aquí todas tus rutas de administrador

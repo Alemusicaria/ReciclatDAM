@@ -22,6 +22,9 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
+
+    <!-- PWA -->
+    @laravelPWA
 </head>
 
 <body class="{{ session('theme', 'light') }}">

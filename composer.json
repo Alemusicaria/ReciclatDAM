@@ -13,7 +13,8 @@
         "laravel/framework": "^12.0",
         "laravel/socialite": "^5.18",
         "laravel/tinker": "^2.10.1",
-        "mcamara/laravel-localization": "^2.3"
+        "mcamara/laravel-localization": "^2.3",
+        "silviolleite/laravelpwa": "^2.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
