@@ -11,6 +11,7 @@ return [
         'display' => 'standalone',
         'orientation' => 'any',
         'status_bar' => 'black',
+        'permissions' => ['camera'],
         'icons' => [
             '72x72' => [
                 'path' => '/images/icons/icon-72x72.png',

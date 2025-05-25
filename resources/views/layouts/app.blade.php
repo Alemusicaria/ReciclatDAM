@@ -19,7 +19,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
-
+    <!-- En la sección head de app.blade.php o crear una nueva vista -->
+    <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 
@@ -78,6 +79,13 @@
                         <a class="nav-link" href="{{ $isHomePage ? '#opinions' : url('/#opinions') }}"
                             data-section="opinions">{{ __('messages.footer.opinions') }}</a>
                     </li>
+                    @auth
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-success text-white" href="{{ route('scanner') }}">
+                                <i class="fas fa-qrcode me-1"></i> Escanejar Codi
+                            </a>
+                        </li>
+                    @endauth
                     @if(Auth::check() && Auth::user()->rol_id == 1)
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url('/admin') }}">
@@ -95,9 +103,8 @@
                                 role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 @if(Auth::user()->foto_perfil)
                                     @if(str_starts_with(Auth::user()->foto_perfil, 'https://'))
-                                        <img src="{{ Auth::user()->foto_perfil }}" alt="Foto de perfil"
-                                            class="rounded-circle " id="profile-image"
-                                            style="width: 30px; height: 30px; margin-right: 5px; ">
+                                        <img src="{{ Auth::user()->foto_perfil }}" alt="Foto de perfil" class="rounded-circle "
+                                            id="profile-image" style="width: 30px; height: 30px; margin-right: 5px; ">
                                     @elseif(file_exists(public_path('storage/' . Auth::user()->foto_perfil)))
                                         <img src="{{ asset('storage/' . Auth::user()->foto_perfil) }}" alt="Foto de perfil"
                                             class="rounded-circle " id="profile-image"

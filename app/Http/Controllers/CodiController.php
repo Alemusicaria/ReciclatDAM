@@ -1,89 +1,90 @@
 <?php
+
 namespace App\Http\Controllers;
 
-use App\Models\Codi;
 use Illuminate\Http\Request;
+use App\Models\Codi;
+use App\Models\Activity;
+use Carbon\Carbon;
 
 class CodiController extends Controller
 {
-    public function index()
-    {
-        $codis = Codi::all();
-        return view('codis.index', compact('codis'));
-    }
-
-    public function create()
-    {
-        return view('codis.create');
-    }
-
-    public function store(Request $request)
+    /**
+     * Procesa un código escaneado y asigna puntos
+     */
+    public function processCode(Request $request)
     {
         try {
-            $validatedData = $request->validate([
-                'codi' => 'required|string',
-                'user_id' => 'nullable|exists:users,id',
-                'punts' => 'required|integer|min:0',
-                'data_escaneig' => 'required|date',
-            ]);
-
-            $codi = new Codi();
-            $codi->codi = $validatedData['codi'];
-            $codi->user_id = $validatedData['user_id'];
-            $codi->punts = $validatedData['punts'];
-            $codi->data_escaneig = $validatedData['data_escaneig'];
-            $codi->save();
-
-            if ($request->expectsJson() || $request->ajax()) {
-                // Para peticiones AJAX/JSON, devolver respuesta simplificada
+            $code = $request->input('code');
+            $user = auth()->user();
+            
+            // Verificar si el usuario ha escaneado este código recientemente (últimos 5 minutos)
+            $ultimoEscaneo = Codi::where('codi', $code)
+                                 ->where('user_id', $user->id)
+                                 ->where('data_escaneig', '>=', Carbon::now()->subMinutes(5))
+                                 ->first();
+                                     
+            if ($ultimoEscaneo) {
                 return response()->json([
-                    'success' => true
+                    'success' => false,
+                    'message' => 'Has d\'esperar 5 minuts abans de tornar a escanejar aquest codi'
                 ]);
             }
 
-            // Para peticiones normales, redirigir
-            return redirect()->route('admin.dashboard')->with('success', 'Codi creat correctament');
-
+            // Calcular puntos según el código (puedes modificar esta lógica)
+            $puntos = $this->calcularPuntos($code);
+            
+            // Guardar el nuevo escaneo
+            $codi = new Codi();
+            $codi->codi = $code;
+            $codi->user_id = $user->id;
+            $codi->punts = $puntos;
+            $codi->data_escaneig = now();
+            $codi->save();
+            
+            // Actualizar puntos del usuario
+            $user->punts_actuals += $puntos;
+            $user->punts_totals += $puntos;
+            $user->save();
+            
+            // Registrar actividad
+            Activity::create([
+                'user_id' => $user->id,
+                'action' => 'Ha escanejat el codi ' . $code . ' i ha guanyat ' . $puntos . ' punts'
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'points' => $puntos,
+                'new_total' => $user->punts_actuals,
+                'message' => 'Has guanyat ' . $puntos . ' ECODAMS'
+            ]);
+            
         } catch (\Exception $e) {
-            \Log::error('Error al crear codi: ' . $e->getMessage());
-
-            if ($request->expectsJson() || $request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error: ' . $e->getMessage()
-                ], 422);
-            }
-
-            return back()->withErrors(['error' => 'Error al crear el codi: ' . $e->getMessage()]);
+            \Log::error('Error procesando código', [
+                'code' => $request->input('code'), 
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error intern: ' . $e->getMessage()
+            ], 500);
         }
     }
-
-    public function show(Codi $codi)
+    
+    /**
+     * Calcula los puntos basados en el código de barras
+     * Puedes implementar aquí tu propia lógica de puntuación
+     */
+    private function calcularPuntos($code)
     {
-        return view('codis.show', compact('codi'));
-    }
-
-    public function edit(Codi $codi)
-    {
-        return view('codis.edit', compact('codi'));
-    }
-
-    public function update(Request $request, Codi $codi)
-    {
-        $request->validate([
-            'user_id' => 'nullable|exists:users,id',
-            'codi' => 'required|unique:codis,codi,' . $codi->id,
-            'punts' => 'required|integer',
-            'data_escaneig' => 'required|date',
-        ]);
-
-        $codi->update($request->all());
-        return redirect()->route('codis.index');
-    }
-
-    public function destroy(Codi $codi)
-    {
-        $codi->delete();
-        return redirect()->route('codis.index');
+        // Ejemplo: asignar puntos basados en la longitud o algún algoritmo
+        // En este caso simple, damos entre 10 y 20 puntos
+        return rand(10, 20);
+        
+        // Alternativa: usar los últimos dígitos del código como puntos
+        // return min(50, max(5, intval(substr($code, -2))));
     }
 }

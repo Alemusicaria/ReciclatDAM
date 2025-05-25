@@ -20,6 +20,9 @@ use App\Http\Controllers\AlertaPuntDeRecollidaController;
 use App\Http\Controllers\EventsController;
 use App\Http\Controllers\TipusEventController;
 use App\Http\Controllers\PremiReclamatController;
+use Illuminate\Http\Request;
+use App\Models\PuntDeRecollida;
+use App\Models\TipusAlerta;
 
 Route::localizedGroup(function () {
     Route::get('set-password', [SocialiteController::class, 'showSetPasswordForm'])->name('set-password');
@@ -52,7 +55,7 @@ Route::localizedGroup(function () {
     Route::post('/forgot-password', [App\Http\Controllers\Auth\PasswordResetLinkController::class, 'store'])->name('password.email');
     Route::get('/reset-password/{token}', [App\Http\Controllers\Auth\NewPasswordController::class, 'create'])->name('password.reset');
     Route::post('/reset-password', [App\Http\Controllers\Auth\NewPasswordController::class, 'store'])->name('password.update');
-    
+
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
 
@@ -97,6 +100,51 @@ Route::localizedGroup(function () {
 
     Route::get('/offline', function () {
         return view('offline');
+    });
+
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/scanner', function () {
+            return view('scanner');
+        })->name('scanner');
+
+        // Actualiza esta línea para añadir el nombre de la ruta
+        Route::post('/process-code', [App\Http\Controllers\CodiController::class, 'processCode'])->name('process-code');
+    });
+
+    Route::get('/punts-recollida/nearby', function (Request $request) {
+        $lat = $request->get('lat');
+        $lng = $request->get('lng');
+        $distance = $request->get('distance', 1); // 1 km por defecto
+
+        // Fórmula aproximada para buscar puntos dentro de un radio
+        try {
+            $points = PuntDeRecollida::where('disponible', true)
+                ->whereRaw("
+                    (6371 * acos(
+                        cos(radians(?)) * 
+                        cos(radians(latitud)) * 
+                        cos(radians(longitud) - radians(?)) + 
+                        sin(radians(?)) * 
+                        sin(radians(latitud))
+                    )) < ?",
+                    [$lat, $lng, $lat, $distance]
+                )
+                ->get();
+
+            return response()->json($points);
+        } catch (\Exception $e) {
+            \Log::error('Error en punts-recollida/nearby: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    });
+
+    Route::get('/tipus-alertes', function () {
+        try {
+            return response()->json(TipusAlerta::all());
+        } catch (\Exception $e) {
+            \Log::error('Error en tipus-alertes: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     });
 
     // Rutas para el panel de administración
