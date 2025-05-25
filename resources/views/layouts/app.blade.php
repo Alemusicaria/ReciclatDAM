@@ -93,7 +93,25 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown"
                                 role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <!-- Imagen de perfil code permanece igual -->
+                                @if(Auth::user()->foto_perfil)
+                                    @if(str_starts_with(Auth::user()->foto_perfil, 'https://'))
+                                        <img src="{{ Auth::user()->foto_perfil }}" alt="Foto de perfil"
+                                            class="rounded-circle " id="profile-image"
+                                            style="width: 30px; height: 30px; margin-right: 5px; ">
+                                    @elseif(file_exists(public_path('storage/' . Auth::user()->foto_perfil)))
+                                        <img src="{{ asset('storage/' . Auth::user()->foto_perfil) }}" alt="Foto de perfil"
+                                            class="rounded-circle " id="profile-image"
+                                            style="width: 30px; height: 30px; object-fit: cover; margin-right: 5px; ">
+                                    @else
+                                        <img src="{{ asset('images/default-profile.png') }}" alt="Foto de perfil"
+                                            class="rounded-circle " id="profile-image"
+                                            style="width: 13px; height: 30px; object-fit: cover; margin-right: 5px; ">
+                                    @endif
+                                @else
+                                    <img src="{{ asset('images/default-profile.png') }}" alt="Foto de perfil"
+                                        class="rounded-circle " id="profile-image"
+                                        style="width: 30px; height: 30px; object-fit: cover; margin-right: 5px; ">
+                                @endif
                                 <span>{{ Auth::user()->nom }} ({{ Auth::user()->punts_actuals }} ECODAMS)</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
