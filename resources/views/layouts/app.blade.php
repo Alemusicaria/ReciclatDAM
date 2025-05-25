@@ -227,7 +227,6 @@
 
             // Inicializar navegación suave por secciones
             const navLinks = document.querySelectorAll('.navbar-nav .nav-link[href^="#"]');
-            console.log("Enlaces de navegación encontrados:", navLinks.length);
 
             // Función para actualizar el icono del tema
             function updateThemeIcon(theme) {
@@ -326,7 +325,6 @@
 
                     if (targetId === '') return;
 
-                    console.log('Navegando a sección:', targetId);
 
                     const targetElement = document.getElementById(targetId);
 
@@ -480,7 +478,6 @@
                 document.body.style.overflow = '';
                 document.body.style.paddingRight = '';
 
-                console.log('Backdrops eliminados y body restaurado');
             }
 
             // Limpiar backdrops cuando se cierra cualquier modal

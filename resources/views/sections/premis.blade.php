@@ -252,7 +252,6 @@
                     awardId = award.id || award.objectID;
                 }
             }
-            console.log('ID limpio para el modal:', awardId);
 
             // Eliminar modales anteriores de forma segura
             try {
@@ -329,7 +328,6 @@
             $(`#canjeModal-${awardId}`).modal('show');
 
             // Verificar que el formulario existe y está configurado correctamente
-            console.log('Formulario en modal:', $(`#canjeModal-${awardId} form`).length > 0 ? 'Encontrado' : 'No encontrado');
             // Agrega este código para manejar el envío del formulario
             $(`#canje-form-${awardId}`).on('submit', function (e) {
                 e.preventDefault(); // Prevenir el envío normal del formulario

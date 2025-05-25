@@ -419,7 +419,6 @@
                 $('.modal-backdrop').remove();
             }
 
-            console.log('Modal y backdrop eliminados manualmente');
         }
     });
 </script>

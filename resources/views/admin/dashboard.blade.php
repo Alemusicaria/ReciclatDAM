@@ -853,7 +853,6 @@
                         card.addEventListener('click', function () {
                             // Solo permitir clic si no hay modal abierto
                             if (document.querySelector('.modal.show')) {
-                                console.log('Ya hay un modal abierto, ignorando clic');
                                 return;
                             }
 
@@ -924,7 +923,6 @@
                     // Cuando se ha mostrado completamente el modal
                     dynamicModal.addEventListener('shown.bs.modal', function () {
                         self.activeModals++;
-                        console.log('Modal dinámico mostrado, activos:', self.activeModals);
                         self.cleanupExtraBackdrops();
                     });
 
@@ -967,7 +965,6 @@
                         const id = button.getAttribute('data-detail-id');
                         const title = button.getAttribute('data-detail-title') || 'Detalls';
 
-                        console.log('Abriendo modal con tipo:', type, 'id:', id, 'título:', title);
                         // Configurar el título correctamente
                         modalTitle.textContent = title;
 
@@ -1013,7 +1010,6 @@
                         const title = btn.getAttribute('data-detail-title') || 'Detalls';
                         const editable = btn.getAttribute('data-detail-editable') === 'true';
 
-                        console.log('Cargando modal tipo:', type, 'id:', id, 'título:', title);
 
                         // Configurar modal
                         modalTitle.textContent = title;
@@ -1040,15 +1036,12 @@
                             url = `/admin/detail/${type}/${id}`; // Ruta normal para detalles
                         }
 
-                        console.log('Cargando URL:', url);
 
                         fetch(url).then(response => {
-                            console.log('Respuesta del servidor:', response.status);
                             if (!response.ok) throw new Error('Error al cargar los detalles');
                             return response.text();
                         })
                             .then(html => {
-                                console.log('Contenido HTML recibido');
                                 // Ocultar loader, mostrar contenido
                                 modalLoader.classList.add('d-none');
                                 detailContent.innerHTML = html;
@@ -1223,7 +1216,6 @@
                     document.body.style.overflow = '';
                     document.body.style.paddingRight = '';
 
-                    console.log('Limpieza completa de efectos de modales');
                 }
             };
             // Limpiar cualquier backdrop existente
@@ -1398,7 +1390,6 @@
     <script>
         // Función global para cerrar modales de forma segura (disponible en toda la aplicación)
         window.closeAnyModal = function (modalId) {
-            console.log("Cerrando modal: " + modalId);
 
             const modal = document.getElementById(modalId);
             if (modal) {
@@ -1417,14 +1408,12 @@
                 // Eliminar todos los backdrops
                 document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
 
-                console.log("Modal cerrado correctamente");
 
                 // Recargar lista si es necesario
                 if (modalId === 'detailModal') {
                     setTimeout(() => {
                         const usersBtn = document.querySelector('[data-content-type="users"]');
                         if (usersBtn) {
-                            console.log("Recargando lista de usuarios");
                             usersBtn.click();
                         }
                     }, 300);
@@ -1496,7 +1485,6 @@
             document.addEventListener('click', function (event) {
                 if (event.target && event.target.id === 'cancelEditBtn') {
                     // Código del manejador de eventos aquí (puedes copiar el mismo código de arriba)
-                    console.log('Cancel button clicked through delegation');
                     // ...
                 }
             });
@@ -1525,7 +1513,6 @@
 
             // Función global para cerrar modales
             window.closeAnyModal = function (modalId) {
-                console.log("Cerrando modal: " + modalId);
 
                 safeDOM('#' + modalId, function (modal) {
                     modal.classList.remove('show');
@@ -1686,7 +1673,6 @@
                     const btn = e.target.closest('.editEventBtn');
                     const eventId = btn.getAttribute('data-event-id');
 
-                    console.log('Editando evento:', eventId);
 
                     // Cerrar el modal dinámico primero si está abierto
                     const dynamicModal = document.getElementById('dynamicModal');
@@ -1754,7 +1740,6 @@
                     const btn = e.target.closest('.editPremiBtn');
                     const premiId = btn.getAttribute('data-premi-id');
 
-                    console.log('Editando premio:', premiId);
 
                     // Cerrar el modal dinámico primero si está abierto
                     closeAnyModal('dynamicModal');
@@ -1815,7 +1800,6 @@
                     const btn = e.target.closest('.editCodiBtn');
                     const codiId = btn.getAttribute('data-codi-id');
 
-                    console.log('Editando código:', codiId);
 
                     // Cerrar el modal dinámico primero si está abierto
                     closeAnyModal('dynamicModal');
@@ -2029,7 +2013,6 @@
                     const btn = e.target.closest('.editTipusAlertaBtn');
                     const tipusAlertaId = btn.getAttribute('data-tipus-alerta-id');
 
-                    console.log('Editando tipo de alerta:', tipusAlertaId);
 
                     closeAnyModal('dynamicModal');
 
@@ -2187,7 +2170,6 @@
 
         // Función mejorada para cerrar modales
         window.closeAnyModal = function (modalId) {
-            console.log("Cerrando modal: " + modalId);
 
             const modal = document.getElementById(modalId);
             if (modal) {
@@ -2209,7 +2191,6 @@
                 // Recargar la última vista activa después de cerrar
                 if (modalId === 'detailModal') {
                     setTimeout(() => {
-                        console.log("Recargando última vista activa:", window.lastActiveContentType);
                         const contentBtn = document.querySelector(`[data-content-type="${window.lastActiveContentType}"]`);
                         if (contentBtn) contentBtn.click();
                     }, 300);
@@ -2223,7 +2204,6 @@
             if (contentTypeBtn) {
                 const contentType = contentTypeBtn.getAttribute('data-content-type');
                 if (contentType) {
-                    console.log("Guardando última vista activa:", contentType);
                     window.lastActiveContentType = contentType;
                 }
             }

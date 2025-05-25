@@ -67,7 +67,6 @@
                 screenPixelDepth: window.screen.pixelDepth
             };
 
-            console.log('Navigator and Window Info:', info);
 
             // Enviar les dades al servidor
             fetch('/save-navigator-info', {
