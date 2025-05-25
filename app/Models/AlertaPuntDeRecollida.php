@@ -12,6 +12,7 @@ class AlertaPuntDeRecollida extends Model
     protected $table = 'alertes_punts_de_recollida';
 
     protected $fillable = [
+        'user_id',
         'punt_de_recollida_id',
         'tipus_alerta_id',
         'descripció',
@@ -25,11 +26,17 @@ class AlertaPuntDeRecollida extends Model
     {
         return [
             'id' => $this->id,
+            'user_id' => $this->user_id,
             'punt_de_recollida_id' => $this->punt_de_recollida_id,
             'tipus_alerta_id' => $this->tipus_alerta_id,
             'descripció' => $this->descripció,
             'imatge' => $this->imatge,
         ];
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function puntDeRecollida()

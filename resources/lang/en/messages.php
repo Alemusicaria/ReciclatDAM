@@ -564,6 +564,11 @@ return [
             'creation_date' => 'Creation Date',
             'unknown' => 'Unknown',
             'alert' => 'Alert',
+            'reported_by' => 'Reported by',
+            'select_usuari' => 'Select a user',
+            'usuari' => 'User',
+            'usuari_help' => 'Select the user who reported the alert',
+            'unknown_user' => 'Unknown user',
         ],
 
         'profile_photo' => 'Profile photo',
@@ -737,7 +742,7 @@ return [
             'cookies_enabled' => 'Enabled',
             'cookies_disabled' => 'Disabled',
         ],
-        
+
         'common' => [
             'actions' => 'Actions',
             'view_details' => 'View details',

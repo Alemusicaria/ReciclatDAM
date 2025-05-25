@@ -10,21 +10,32 @@
                     </div>
                     <div>
                         <h2 class="detail-name mb-1">
-                            {{ __('messages.admin.alerts.alert_at') }} {{ $alerta->puntDeRecollida ? $alerta->puntDeRecollida->nom : __('messages.admin.alerts.unknown_point') }}
+                            {{ __('messages.admin.alerts.alert_at') }}
+                            {{ $alerta->puntDeRecollida ? $alerta->puntDeRecollida->nom : __('messages.admin.alerts.unknown_point') }}
                         </h2>
                         <div class="detail-tipus mb-2">
                             <span class="badge bg-warning py-1 px-2">
-                                <i class="fas fa-bell me-1"></i>{{ $alerta->tipus ? $alerta->tipus->nom : __('messages.admin.alerts.unknown_type') }}
+                                <i
+                                    class="fas fa-bell me-1"></i>{{ $alerta->tipus ? $alerta->tipus->nom : __('messages.admin.alerts.unknown_type') }}
                             </span>
                         </div>
                         <div class="detail-date">
                             <i class="fas fa-calendar-day text-muted me-2"></i>
-                            <span class="text-muted">{{ __('messages.admin.alerts.created_on') }} {{ $alerta->created_at->format('d/m/Y H:i') }}</span>
+                            <span class="text-muted">{{ __('messages.admin.alerts.created_on') }}
+                                {{ $alerta->created_at->format('d/m/Y H:i') }}</span>
                         </div>
+                        @if($alerta->user)
+                            <div class="detail-user mt-2">
+                                <i class="fas fa-user text-muted me-2"></i>
+                                <span class="text-muted">{{ __('messages.admin.alerts.reported_by') }}:
+                                    <strong>{{ $alerta->user->name }}</strong></span>
+                            </div>
+                        @endif
                         @if($alerta->updated_at && $alerta->updated_at->ne($alerta->created_at))
                             <div class="detail-update">
                                 <i class="fas fa-edit text-muted me-2"></i>
-                                <span class="text-muted">{{ __('messages.admin.alerts.updated_on') }} {{ $alerta->updated_at->format('d/m/Y H:i') }}</span>
+                                <span class="text-muted">{{ __('messages.admin.alerts.updated_on') }}
+                                    {{ $alerta->updated_at->format('d/m/Y H:i') }}</span>
                             </div>
                         @endif
                     </div>
@@ -36,7 +47,8 @@
                     <div class="punt-details p-3 rounded-3 shadow-sm">
                         @if($alerta->puntDeRecollida)
                             <div class="d-flex align-items-center mb-2">
-                                <div class="punto-icon punto-{{ strtolower(str_replace(' ', '-', $alerta->puntDeRecollida->fraccio)) }} rounded-circle me-2 d-flex align-items-center justify-content-center">
+                                <div
+                                    class="punto-icon punto-{{ strtolower(str_replace(' ', '-', $alerta->puntDeRecollida->fraccio)) }} rounded-circle me-2 d-flex align-items-center justify-content-center">
                                     <i class="fas fa-recycle text-white small"></i>
                                 </div>
                                 <span class="ms-1 fw-medium">{{ $alerta->puntDeRecollida->nom }}</span>
@@ -73,7 +85,8 @@
                         <i class="fas fa-image text-success me-2"></i>{{ __('messages.admin.alerts.image') }}
                     </h4>
                     <div class="alert-image">
-                        <img src="{{ asset($alerta->imatge) }}" alt="{{ __('messages.admin.alerts.alert_image') }}" class="img-fluid rounded">
+                        <img src="{{ asset($alerta->imatge) }}" alt="{{ __('messages.admin.alerts.alert_image') }}"
+                            class="img-fluid rounded">
                     </div>
                 </div>
             @endif

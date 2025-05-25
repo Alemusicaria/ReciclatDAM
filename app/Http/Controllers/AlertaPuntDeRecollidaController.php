@@ -39,6 +39,11 @@ class AlertaPuntDeRecollidaController extends Controller
             $alerta->tipus_alerta_id = $validatedData['tipus_alerta_id'];
             $alerta->descripció = $validatedData['descripció'];
 
+            // Asignar el usuario actual si está autenticado
+            if (auth()->check()) {
+                $alerta->user_id = auth()->id();
+            }
+
             // Procesar y guardar la imagen si existe
             if ($request->hasFile('imatge')) {
                 $file = $request->file('imatge');
