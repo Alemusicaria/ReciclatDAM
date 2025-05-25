@@ -1,8 +1,8 @@
 var staticCacheName = "pwa-v" + new Date().getTime();
 var filesToCache = [
     '/offline',
-    '/css/app.css',
-    '/js/app.js',
+    '/css/styles.css',
+    '/images/logo.png',
     '/images/icons/icon-72x72.png',
     '/images/icons/icon-96x96.png',
     '/images/icons/icon-128x128.png',
@@ -11,6 +11,7 @@ var filesToCache = [
     '/images/icons/icon-192x192.png',
     '/images/icons/icon-384x384.png',
     '/images/icons/icon-512x512.png',
+    '/images/offline.svg'
 ];
 
 // Cache on install
@@ -19,10 +20,21 @@ self.addEventListener("install", event => {
     event.waitUntil(
         caches.open(staticCacheName)
             .then(cache => {
-                return cache.addAll(filesToCache);
+                console.log('Intentando cachear archivos');
+                // Cachear archivos uno por uno para evitar que uno fallido detenga todo el proceso
+                return Promise.all(
+                    filesToCache.map(file => {
+                        return cache.add(file).catch(error => {
+                            console.error('Error cacheando ' + file + ': ' + error);
+                            // Continuar a pesar del error
+                            return Promise.resolve();
+                        });
+                    })
+                );
             })
     )
 });
+
 
 // Clear cache on activate
 self.addEventListener('activate', event => {
