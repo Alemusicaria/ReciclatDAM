@@ -469,11 +469,43 @@
                     }, 500);
                 }
             }
+            function cleanupModalBackdrops() {
+                // Eliminar todos los backdrops
+                document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+                    backdrop.remove();
+                });
+
+                // Restaurar el estado del body
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+
+                console.log('Backdrops eliminados y body restaurado');
+            }
+
+            // Limpiar backdrops cuando se cierra cualquier modal
+            document.addEventListener('hidden.bs.modal', function (event) {
+                setTimeout(cleanupModalBackdrops, 100);
+            });
+
+            // Añadir función a window para llamarla desde la consola en caso de emergencia
+            window.fixModals = cleanupModalBackdrops;
+
+            // Ejecutar limpieza al cargar la página (por si hay residuos)
+            document.addEventListener('DOMContentLoaded', cleanupModalBackdrops);
+
+            // Añadir manejador de tecla Escape para limpiar modales
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    setTimeout(cleanupModalBackdrops, 100);
+                }
+            });
             // Aplicar estilos iniciales
             applyActiveStyles();
 
         });
     </script>
+
 </body>
 
 </html>
