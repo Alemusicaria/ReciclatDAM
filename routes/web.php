@@ -170,15 +170,10 @@ Route::localizedGroup(function () {
         // Eventos para FullCalendar
         Route::get('/events-json', [App\Http\Controllers\AdminController::class, 'getEventsJson'])->name('admin.events-json');
 
-        // Gestión de usuarios
-        Route::resource('users', App\Http\Controllers\UserController::class);
-
         // Gestión de eventos
-        Route::resource('events', App\Http\Controllers\EventsController::class);
         Route::put('/events/{id}/update-dates', [App\Http\Controllers\EventsController::class, 'updateDates'])->name('events.update-dates');
 
         // Gestión de premios
-        Route::resource('premis', App\Http\Controllers\PremiController::class);
 
         // Gestión de premios reclamados
         Route::resource('premis-reclamats', App\Http\Controllers\PremiReclamatController::class);
