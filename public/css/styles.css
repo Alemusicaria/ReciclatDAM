@@ -3505,6 +3505,7 @@ body.dark .social-icon:hover {
 
 .star.half {
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     background: linear-gradient(90deg, #ffc107 50%, #e4e5e9 50%)
 }
