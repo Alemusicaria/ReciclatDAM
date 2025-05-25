@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Activity;
+use App\Mail\WelcomeMail;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -60,6 +62,11 @@ class UserController extends Controller
 
             $user->save();
 
+            // Enviar correo de bienvenida
+            if ($user->email) {
+                Mail::to($user->email)->send(new WelcomeMail($user));
+            }
+            
             // Registrar activitat
             if (auth()->check()) {
                 Activity::create([
@@ -233,7 +240,7 @@ class UserController extends Controller
             return back()->withErrors(['error' => 'Error al actualitzar l\'usuari: ' . $e->getMessage()]);
         }
     }
-    
+
     public function destroy(User $user)
     {
         try {
