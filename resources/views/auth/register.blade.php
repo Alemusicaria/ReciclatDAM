@@ -49,13 +49,17 @@
             color: red;
             margin-left: 5px;
         }
+
+        .auth-background {
+            background-image: url('/images/bg-01.jpg');
+        }
     </style>
 </head>
 
 <body>
 
     <div class="limiter">
-        <div class="container-login100" style="background-image: url('{{ asset('images/bg-01.jpg') }}');">
+        <div class="container-login100 auth-background">
             <div class="wrap-login100 p-l-110 p-r-110 p-t-62 p-b-33">
                 <form action="{{ route('register') }}" method="POST" class="login100-form validate-form flex-sb flex-w"
                     enctype="multipart/form-data">
@@ -68,15 +72,20 @@
                         Registra't
                     </span>
 
-                    <a href="{{ url('login/facebook') }}" class="btn-face m-b-20">
-                        <i class="fa fa-facebook-official"></i>
-                        Facebook
-                    </a>
+                    @if ($errors->any())
+                        <div class="w-full alert alert-danger m-b-20" role="alert">
+                            @foreach ($errors->all() as $error)
+                                <div>{{ $error }}</div>
+                            @endforeach
+                        </div>
+                    @endif
 
-                    <a href="{{ url('login/google') }}" class="btn-google m-b-20">
-                        <img src="{{ asset('images/icons/icon-google.png') }}" alt="GOOGLE">
-                        Google
-                    </a>
+                    <div class="w-full d-flex justify-content-center">
+                        <a href="{{ url('login/google') }}" class="btn-google m-b-20">
+                            <img src="{{ asset('images/icons/icon-google.png') }}" alt="GOOGLE">
+                            Google
+                        </a>
+                    </div>
 
                     <div class="p-t-31 p-b-9">
                         <span class="txt1">
@@ -84,7 +93,7 @@
                         </span>
                     </div>
                     <div class="wrap-input100 validate-input" data-validate="El nom és obligatori">
-                        <input class="input100" type="text" name="nom" required>
+                        <input class="input100" type="text" name="nom" value="{{ old('nom') }}" required>
                         <span class="focus-input100"></span>
                     </div>
 
@@ -94,7 +103,7 @@
                         </span>
                     </div>
                     <div class="wrap-input100 validate-input" data-validate="Els cognoms són obligatoris">
-                        <input class="input100" type="text" name="cognoms" required>
+                        <input class="input100" type="text" name="cognoms" value="{{ old('cognoms') }}" required>
                         <span class="focus-input100"></span>
                     </div>
 
@@ -104,7 +113,7 @@
                         </span>
                     </div>
                     <div class="wrap-input100">
-                        <input class="input100" type="date" name="data_naixement">
+                        <input class="input100" type="date" name="data_naixement" value="{{ old('data_naixement') }}">
                         <span class="focus-input100"></span>
                     </div>
 
@@ -114,7 +123,7 @@
                         </span>
                     </div>
                     <div class="wrap-input100">
-                        <input class="input100" type="text" name="telefon">
+                        <input class="input100" type="text" name="telefon" value="{{ old('telefon') }}">
                         <span class="focus-input100"></span>
                     </div>
 
@@ -124,7 +133,7 @@
                         </span>
                     </div>
                     <div class="wrap-input100">
-                        <textarea class="input100" name="ubicacio"></textarea>
+                        <textarea class="input100" name="ubicacio">{{ old('ubicacio') }}</textarea>
                         <span class="focus-input100"></span>
                     </div>
 
@@ -144,7 +153,7 @@
                         </span>
                     </div>
                     <div class="wrap-input100 validate-input" data-validate="L'email és obligatori">
-                        <input class="input100" type="email" name="email" required>
+                        <input class="input100" type="email" name="email" value="{{ old('email') }}" autocomplete="username" required>
                         <span class="focus-input100"></span>
                     </div>
 
@@ -154,7 +163,7 @@
                         </span>
                     </div>
                     <div class="wrap-input100 validate-input" data-validate="La contrasenya és obligatòria">
-                        <input class="input100" type="password" name="password" required>
+                        <input class="input100" type="password" name="password" autocomplete="new-password" required>
                         <span class="focus-input100"></span>
                         <span class="btn-show-pass">
                             <i class="fa fa-eye" id="toggle-password"></i>

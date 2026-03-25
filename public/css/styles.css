@@ -125,7 +125,15 @@
     gap: 10px;
     position: fixed;
     right: 20px;
-    z-index: 1000
+    z-index: 20000
+}
+
+.fixed-bottom-right .dropdown-menu {
+    bottom: calc(100% + 8px) !important;
+    left: auto !important;
+    right: 0 !important;
+    top: auto !important;
+    z-index: 20001;
 }
 
 .fixed-bottom-right .btn,
@@ -501,7 +509,7 @@ section {
 }
 
 .admin-dashboard {
-    background-color: var(--admin-bg);
+    background-color: transparent;
     color: var(--text-primary);
     min-height: 100vh;
     padding-top: 20px;
@@ -1186,6 +1194,37 @@ body.light .recycling-tips {
 .stat-card-info,
 .points-distribution-container .chart-container {
     flex-grow: 1
+}
+
+.points-distribution-container .points-chart-container {
+    background-color: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    margin-bottom: 10px;
+    padding: 0;
+}
+
+.distribution-user-info {
+    background-color: color-mix(in srgb, var(--card-bg) 85%, transparent);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: .9rem;
+    font-weight: 500;
+    margin-bottom: 10px;
+    min-height: 42px;
+    padding: 10px 12px;
+}
+
+body.dark .distribution-user-info {
+    background-color: #1f2937cc;
+    border-color: #475569;
+}
+
+.distribution-totals {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 6px;
 }
 
 .stat-card-link {
@@ -2841,7 +2880,7 @@ body.dark .user-icon-placeholder {
     display: flex;
     flex-direction: column;
     position: fixed;
-    right: 20px;
+    right: 90px;
     z-index: 1000
 }
 

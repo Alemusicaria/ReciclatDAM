@@ -8,6 +8,9 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Config;
+use GuzzleHttp\Client as GuzzleClient;
+use Laravel\Socialite\Two\AbstractProvider;
 use Exception;
 use Illuminate\Support\Str;
 
@@ -15,19 +18,51 @@ class SocialiteController extends Controller
 {
     public function redirectToProvider($provider)
     {
-        return Socialite::driver($provider)->redirect();
+        if (!$this->isProviderSupported($provider)) {
+            return redirect('login')->withErrors(['msg' => 'Proveedor de autenticacion no soportado.']);
+        }
+
+        if (!$this->hasProviderConfig($provider)) {
+            Log::error('Social login missing provider configuration', ['provider' => $provider]);
+            return redirect('login')->withErrors(['msg' => 'Falta configurar el inicio de sesion con ' . $provider . '.']);
+        }
+
+        $response = $this->socialiteDriver($provider)->redirect();
+
+        Log::info('Social redirect generated', [
+            'provider' => $provider,
+            'target_url' => $response->getTargetUrl(),
+        ]);
+
+        return $response;
     }
 
     public function handleProviderCallback($provider)
     {
+        if (!$this->isProviderSupported($provider)) {
+            return redirect('login')->withErrors(['msg' => 'Proveedor de autenticacion no soportado.']);
+        }
+
+        if (!$this->hasProviderConfig($provider)) {
+            Log::error('Social login missing provider configuration on callback', ['provider' => $provider]);
+            return redirect('login')->withErrors(['msg' => 'Falta configurar el inicio de sesion con ' . $provider . '.']);
+        }
+
         try {
-            $socialUser = Socialite::driver($provider)->user();
-            $findUser = User::where('email', $socialUser->getEmail())->first();
+            $socialUser = $this->socialiteDriver($provider)->user();
+            $email = $socialUser->getEmail();
+
+            if (empty($email)) {
+                Log::warning('Social provider did not return email', ['provider' => $provider]);
+                return redirect('login')->withErrors(['msg' => 'No hem pogut obtenir el teu email de ' . $provider . '. Revisa permisos del compte i torna-ho a provar.']);
+            }
+
+            $findUser = User::where('email', $email)->first();
     
             // Registrar información detallada para depuración
             Log::info('Social login attempt', [
                 'provider' => $provider,
-                'email' => $socialUser->getEmail(),
+                'email' => $email,
                 'user_exists' => $findUser ? 'yes' : 'no'
             ]);
     
@@ -53,7 +88,7 @@ class SocialiteController extends Controller
                 $newUser = User::create([
                     'nom' => $firstName,
                     'cognoms' => $lastName,
-                    'email' => $socialUser->getEmail(),
+                    'email' => $email,
                     'password' => Hash::make(Str::random(16)), // Contraseña aleatoria segura
                     'rol_id' => 2,
                     'foto_perfil' => $avatar,
@@ -64,7 +99,7 @@ class SocialiteController extends Controller
     
                 // Verificar explícitamente que el usuario se creó
                 if (!$newUser->exists) {
-                    Log::error('Failed to create user', ['email' => $socialUser->getEmail()]);
+                    Log::error('Failed to create user', ['email' => $email]);
                     return redirect('login')->withErrors(['msg' => 'Error creating user account']);
                 }
     
@@ -88,6 +123,30 @@ class SocialiteController extends Controller
             ]);
             return redirect('login')->withErrors(['msg' => 'Error al iniciar sesión con ' . $provider . '. Por favor, inténtalo de nuevo.']);
         }
+    }
+
+    private function isProviderSupported(string $provider): bool
+    {
+        return in_array($provider, ['google'], true);
+    }
+
+    private function hasProviderConfig(string $provider): bool
+    {
+        return filled(Config::get("services.{$provider}.client_id"))
+            && filled(Config::get("services.{$provider}.client_secret"))
+            && filled(Config::get("services.{$provider}.redirect"));
+    }
+
+    private function socialiteDriver(string $provider)
+    {
+        $driver = Socialite::driver($provider);
+
+        // Windows local setups can fail OAuth token exchange due to missing CA bundle.
+        if (app()->environment('local') && $driver instanceof AbstractProvider) {
+            $driver->setHttpClient(new GuzzleClient(['verify' => false]));
+        }
+
+        return $driver;
     }
 
     public function setPassword(Request $request)

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ca">
 
 <head>
-    <title>Login V5</title>
+    <title>Iniciar sessio</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!--===============================================================================================-->
@@ -44,13 +44,17 @@
             font-size: 18px;
             color: #999999;
         }
+
+        .auth-background {
+            background-image: url('/images/bg-01.jpg');
+        }
     </style>
 </head>
 
 <body>
 
     <div class="limiter">
-        <div class="container-login100" style="background-image: url('{{ asset('images/bg-01.jpg') }}');">
+        <div class="container-login100 auth-background">
             <div class="wrap-login100 p-l-110 p-r-110 p-t-62 p-b-33">
                 <form action="{{ route('login') }}" method="POST" class="login100-form validate-form flex-sb flex-w">
                     @csrf
@@ -58,27 +62,40 @@
                         <img src="{{ asset('images/logo.png') }}" alt="Logo" style="max-width: 150px;">
                     </div>
 
-                    <span class="login100-form-title p-b-53">
+                    <span class="login100-form-title p-b-20">
                         Iniciar sessió
                     </span>
 
-                    <a href="{{ url('login/facebook') }}" class="btn-face m-b-20">
-                        <i class="fa fa-facebook-official"></i>
-                        Facebook
-                    </a>
+                    @if (session('status'))
+                        <div class="w-full alert alert-success m-b-20" role="alert">
+                            {{ session('status') }}
+                        </div>
+                    @endif
 
-                    <a href="{{ url('login/google') }}" class="btn-google m-b-20">
-                        <img src="{{ asset('images/icons/icon-google.png') }}" alt="GOOGLE">
-                        Google
-                    </a>
+                    @if ($errors->any())
+                        <div class="w-full alert alert-danger m-b-20" role="alert">
+                            @foreach ($errors->all() as $error)
+                                <div>{{ $error }}</div>
+                            @endforeach
+                        </div>
+                    @endif
 
-                    <div class="p-t-31 p-b-9">
-                        <span class="txt1">
-                            Email
-                        </span>
+                    <div class="w-full d-flex justify-content-center">
+                        <a href="{{ url('login/google') }}" class="btn-google m-b-20">
+                            <img src="{{ asset('images/icons/icon-google.png') }}" alt="GOOGLE">
+                            Google
+                        </a>
+                    </div>
+
+                    <div class="w-full">
+                        <div class="p-b-9">
+                            <span class="txt1">
+                                Email
+                            </span>
+                        </div>
                     </div>
                     <div class="wrap-input100 validate-input" data-validate="Email is required">
-                        <input class="input100" type="email" name="email" required>
+                        <input class="input100" type="email" name="email" value="{{ old('email') }}" autocomplete="username" required>
                         <span class="focus-input100"></span>
                     </div>
 
@@ -92,7 +109,7 @@
                         </a>
                     </div>
                     <div class="wrap-input100 validate-input" data-validate="Password is required">
-                        <input class="input100" type="password" name="password" required>
+                        <input class="input100" type="password" name="password" autocomplete="current-password" required>
                         <span class="focus-input100"></span>
                         <span class="btn-show-pass">
                             <i class="fa fa-eye" id="toggle-password"></i>
@@ -140,7 +157,7 @@
     <script src="{{ asset('js/main.js') }}"></script>
 
     <script>
-        document.getElementById('toggle-password').addEventListener('click', function () {
+        document.getElementById('toggle-password').addEventListener('click', function() {
             const passwordInput = document.querySelector('input[name="password"]');
             const icon = this;
             if (passwordInput.type === 'password') {
@@ -154,12 +171,12 @@
             }
         });
 
-        (function ($) {
+        (function($) {
             "use strict";
 
             var input = $('.validate-input .input100');
 
-            $('.validate-form').on('submit', function () {
+            $('.validate-form').on('submit', function() {
                 var check = true;
 
                 for (var i = 0; i < input.length; i++) {
@@ -172,8 +189,8 @@
                 return check;
             });
 
-            $('.validate-form .input100').each(function () {
-                $(this).focus(function () {
+            $('.validate-form .input100').each(function() {
+                $(this).focus(function() {
                     hideValidate(this);
                 });
             });

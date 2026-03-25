@@ -642,8 +642,8 @@
                                              <p>${product.allergens_tags.map(a => formatAllergen(a)).join(', ')}</p>
                                            </div>` : ''}
 
-                                        <a href="https://world.openfoodfacts.org/product/${product.code}" 
-                                           target="_blank" class="btn btn-outline-primary btn-sm">
+                                                     <a href="https://world.openfoodfacts.org/product/${product.code}" 
+                                                         target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">
                                            Més informació
                                         </a>
                                     `;

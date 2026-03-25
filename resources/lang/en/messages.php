@@ -1,8 +1,9 @@
 <?php
 return [
     // Global texts
-    'welcome' => 'Welcome to Recycle DAM Dashboard',
+    'welcome' => 'Welcome to Reciclat DAM Dashboard',
     'partner' => 'Your partner in sustainable recycling solutions',
+    'brand' => 'Recycle DAM',
     'language' => 'EN',
     'catalan' => 'Catalan',
     'english' => 'English',
@@ -25,6 +26,7 @@ return [
         'no_city' => 'No city found',
         'address' => 'Address',
         'avilable' => 'Available',
+        'available' => 'Available',
         'not_available' => 'Not Available',
     ],
 
@@ -48,9 +50,9 @@ return [
 
     // About us section
     'about_us' => [
-        'title' => 'What is Recycle DAM?',
-        'description_1' => 'RecycleDAM is an innovative application that allows you to recycle easily and in a fun way. Earn points called <strong>ECODAMS</strong> for each recycling action and use them to get exclusive rewards. Join our community and help make the world a more sustainable place!',
-        'description_2' => 'With Recycle DAM and your <strong>ECODAMS</strong>, you win and the environment wins.',
+        'title' => 'What is Reciclat DAM?',
+        'description_1' => 'Reciclat DAM is an innovative application that allows you to recycle easily and in a fun way. Earn points called <strong>ECODAMS</strong> for each recycling action and use them to get exclusive rewards. Join our community and help make the world a more sustainable place!',
+        'description_2' => 'With Reciclat DAM and your <strong>ECODAMS</strong>, you win and the environment wins.',
         'image_alt' => 'Recycling related photo'
     ],
 
@@ -679,6 +681,17 @@ return [
             'entry_date' => 'Entry date',
             'entry_time' => 'Entry time',
             'main_metrics' => 'Main Metrics',
+            'navigation_statistics' => 'Navigation Statistics',
+            'device_behavior_analysis' => 'Device and user behavior analysis',
+            'activity_ranking' => 'Activity and Ranking',
+            'recent_activity' => 'Recent Activity',
+            'view_all' => 'View all',
+            'user_ranking' => 'User Ranking',
+            'last_6_months' => 'Last 6 months',
+            'last_year' => 'Last year',
+            'this_year' => 'This year',
+            'months' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            'loading' => 'Loading...',
             'users' => 'Users',
             'since_last_month' => 'since last month',
             'events' => 'Events',
@@ -689,6 +702,7 @@ return [
             'analysis_charts' => 'Analysis and Charts',
             'user_activity' => 'User Activity',
             'points_distribution' => 'Points Distribution',
+            'distribution_hover_hint' => 'Hover or click on a section to view user and points.',
             'active_points' => 'Active Points',
             'spent_points' => 'Spent Points',
             'event_points' => 'Event Points',
@@ -710,6 +724,38 @@ return [
             'claimed_prizes' => 'Claimed Prizes',
             'advanced_statistics' => 'Advanced Statistics',
             'no_data' => 'No data available',
+        ],
+
+        'activity_actions' => [
+            'profile_updated' => 'Updated profile of :name',
+            'user_deleted' => 'Deleted user :name',
+            'user_created' => 'Created a new user: :name',
+            'event_created' => 'Created a new event: :name',
+            'event_deleted' => 'Deleted event: :name',
+            'event_updated' => 'Updated event: :name',
+            'prize_deleted' => 'Deleted prize: :name',
+            'code_deleted' => 'Deleted code: :code',
+            'product_deleted' => 'Deleted product: :name',
+            'collection_point_created' => 'Created a new collection point: :name',
+            'collection_point_updated' => 'Updated collection point: :name',
+            'collection_point_deleted' => 'Deleted collection point: :name',
+            'role_created' => 'Created a new role: :name',
+            'role_updated' => 'Updated role: :name',
+            'role_deleted' => 'Deleted role: :name',
+            'alert_type_created' => 'Created a new alert type: :name',
+            'alert_type_updated' => 'Updated alert type: :name',
+            'alert_type_deleted' => 'Deleted alert type: :name',
+            'alert_updated_id' => 'Updated alert ID: :id',
+            'point_alert_deleted' => 'Deleted collection-point alert: :name',
+            'point_alert_created_id' => 'Created a new alert for collection point ID: :id',
+            'event_type_created' => 'Created a new event type: :name',
+            'event_type_updated' => 'Updated event type: :name',
+            'event_type_deleted' => 'Deleted event type: :name',
+            'prize_request_approved' => 'Approved prize request #:id for :user',
+            'prize_request_approved_with_tracking' => 'Approved prize request #:id for :user with tracking code: :tracking',
+            'prize_request_rejected' => 'Rejected prize request #:id for :user',
+            'claimed_prize_status_updated' => 'Updated claimed prize #:id status to :status',
+            'code_scanned_points' => 'Scanned code :code and earned :points points',
         ],
 
         'stats' => [

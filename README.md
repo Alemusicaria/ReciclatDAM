@@ -1,66 +1,212 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# ReciclatDAM
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplicacio web de reciclatge gamificat feta amb Laravel.
 
-## About Laravel
+Inclou:
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Registre/login tradicional i login amb Google
+- Escaneig de codis
+- Sistema de punts i premis
+- Mapa de punts de recollida i alertes
+- Esdeveniments
+- Panell d'administracio
+- Multiidioma (`ca`, `es`, `en`)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 1) Estat actual (funcionalitat i accessibilitat)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Revisio tecnica feta:
 
-## Learning Laravel
+- Rutes netejades i unificades
+- Fixes aplicats a JS admin per evitar URLs trencades en edicio i eliminacio
+- Millora de seguretat en links externs (`rel="noopener noreferrer"`)
+- Carga correcta de `admin.js` tambe en rutes localitzades (`/ca/admin`, `/es/admin`, ...)
+- Tests existents en verd (`2/2`)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Notes importants:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- El projecte te base responsive (viewport + media queries + Bootstrap).
+- La validacio 100% visual en tots els dispositius requereix prova manual al navegador (veure seccio 7).
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 2) Requisits
 
-## Laravel Sponsors
+- PHP 8.2+
+- Composer
+- Node.js 18+ i npm
+- MySQL o MariaDB
+- Extensio PHP `pdo_mysql` activa
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 3) Instal.lacio pas a pas (clonant des de GitHub)
 
-### Premium Partners
+### 3.1 Clonar i preparar projecte
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+```bash
+git clone <URL_DEL_REPO>
+cd ReciclatDAM
+composer install
+npm install
+```
 
-## Contributing
+### 3.2 Configurar entorn
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-## Code of Conduct
+Edita `.env` i posa les teves dades de BD:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```env
+APP_URL=http://127.0.0.1:8000
 
-## Security Vulnerabilities
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=reciclat_bbdd
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 4) Base de dades completa (totes les taules + dades default)
 
-## License
+Aquest repo ja inclou el dump complet:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- `database-reciclatdam.sql`
+
+S'ha afegit un importador automatic:
+
+- `tools/import_sql_dump.php`
+- script Composer: `db:import`
+
+Executa:
+
+```bash
+composer run-script db:import
+```
+
+Que fa:
+
+- Llegeix `.env`
+- Connecta a MySQL
+- Importa `database-reciclatdam.sql` (estructura + dades per defecte)
+
+Si falla la connexio:
+
+- Revisa `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`
+- Assegura que la BD existeix
+
+## 5) Arrencar l'aplicacio
+
+Terminal 1:
+
+```bash
+npm run dev
+```
+
+Terminal 2:
+
+```bash
+php artisan serve
+```
+
+URL local:
+
+- `http://127.0.0.1:8000`
+
+## 6) Com funciona (manual funcional)
+
+### 6.1 Usuari final
+
+1. Registrar-se o iniciar sessio (`/register`, `/login`)
+2. Accedir al dashboard principal
+3. Escanejar codis (`/scanner`) i acumular punts
+4. Consultar punts i perfil
+5. Participar en events i consultar premis
+6. Reportar alertes de punts de recollida
+
+### 6.2 Administracio
+
+1. Entrar a `/admin` (o `/{locale}/admin`)
+2. Gestionar contingut des de modals i detall:
+- usuaris
+- productes
+- codis
+- punts de recollida
+- tipus d'alerta
+- alerts de punts
+- tipus d'event
+- events
+- premis
+- premis reclamats
+3. Aprovar/rebutjar premis reclamats
+4. Consultar estadistiques de navegacio
+
+## 7) Validacio mobile / tablet / desktop (checklist recomanada)
+
+Fer prova manual en DevTools:
+
+- 360x640 (mobil petit)
+- 390x844 (mobil modern)
+- 768x1024 (tablet)
+- 1024x1366 (tablet gran)
+- 1366x768 (laptop)
+- 1920x1080 (desktop)
+
+Pantalles a validar:
+
+- Home
+- Login/Register/Forgot/Reset
+- Scanner
+- Perfil usuari
+- Admin dashboard
+- Taules admin (scroll horitzontal, botons, modal detall/edició)
+- Formularis CRUD (errors, focus, teclat)
+
+Criteris minims:
+
+- Sense solapaments
+- Sense text tallat
+- Botons clicables
+- Menus navegables amb teclat
+- Taules usables en pantalles petites
+
+## 8) Comandes utils
+
+```bash
+# tests
+php artisan test
+
+# auditoria i18n
+composer run-script i18n:audit
+
+# importar base de dades completa
+composer run-script db:import
+```
+
+## 9) Resolucio de problemes frequents
+
+### Error: "could not find driver"
+
+- Activa `pdo_mysql` a `php.ini`
+- Reinicia terminal/servei PHP
+
+### Error OAuth Google (redirect_uri_mismatch)
+
+- Revisa URL exacta de callback al provider
+- Revisa `APP_URL` i claus Google a `.env`
+
+### Admin no carrega be en URL localitzada
+
+- Ja corregit al projecte: es carrega `admin.js` per `/admin` i `/{locale}/admin`
+
+## 10) Estructura rellevant del repo
+
+- `routes/web.php`: rutes principals i admin
+- `app/Http/Controllers/PageAndApiController.php`: endpoints de pagina/API simples
+- `public/js/admin.js`: logica del panell admin
+- `resources/views/`: vistes Blade
+- `database-reciclatdam.sql`: esquema + dades default
+- `tools/import_sql_dump.php`: import automatic de BD
+
+## 11) Llicencia
+
+Projecte academic basat en Laravel.
