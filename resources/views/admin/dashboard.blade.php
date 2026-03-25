@@ -12,18 +12,18 @@
                                 <i class="fas fa-tachometer-alt"></i>
                             </div>
                             <div>
-                                <h1 class="admin-title mb-1">Panell d'Administració</h1>
+                                <h1 class="admin-title mb-1">{{ __('messages.admin.dashboard.title') }}</h1>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 text-lg-end">
                         <div class="admin-date-container">
                             <div class="date-item">
-                                <span class="date-label"><i class="far fa-calendar-alt me-1"></i> Data d'entrada:</span>
+                                <span class="date-label"><i class="far fa-calendar-alt me-1"></i> {{ __('messages.admin.dashboard.entry_date') }}:</span>
                                 <span class="date-value">{{ now()->setTimezone('Europe/Madrid')->format('d M, Y') }}</span>
                             </div>
                             <div class="date-item">
-                                <span class="date-label"><i class="far fa-clock me-1"></i> Hora d'entrada:</span>
+                                <span class="date-label"><i class="far fa-clock me-1"></i> {{ __('messages.admin.dashboard.entry_time') }}:</span>
                                 <span class="date-value">{{ now()->setTimezone('Europe/Madrid')->format('H:i') }}</span>
                             </div>
                         </div>
@@ -33,7 +33,7 @@
 
             <!-- Sección 2: Métricas Principales -->
             <div class="section-header mb-3">
-                <h2 class="section-title"><i class="fas fa-chart-pie me-2"></i>Mètriques Principals</h2>
+                <h2 class="section-title"><i class="fas fa-chart-pie me-2"></i>{{ __('messages.admin.dashboard.main_metrics') }}</h2>
                 <hr class="section-divider">
             </div>
 
@@ -48,11 +48,11 @@
                             </div>
                             <div class="stat-card-info">
                                 <h3 class="stat-card-number">{{ $totalUsers }}</h3>
-                                <p class="stat-card-title">Usuaris</p>
+                                <p class="stat-card-title">{{ __('messages.admin.dashboard.users') }}</p>
                                 <div class="stat-card-percent">
                                     <i
                                         class="fas {{ $newUsersPercent > 0 ? 'fa-arrow-up text-success' : 'fa-arrow-down text-danger' }}"></i>
-                                    <span>{{ $newUsersPercent }}%</span> des del mes anterior
+                                    <span>{{ $newUsersPercent }}%</span> {{ __('messages.admin.dashboard.since_last_month') }}
                                 </div>
                             </div>
                         </div>
@@ -68,9 +68,9 @@
                             </div>
                             <div class="stat-card-info">
                                 <h3 class="stat-card-number">{{ $totalEvents }}</h3>
-                                <p class="stat-card-title">Events</p>
+                                <p class="stat-card-title">{{ __('messages.admin.dashboard.events') }}</p>
                                 <div class="stat-card-badge">
-                                    <span class="badge">{{ $activeEvents }} actius</span>
+                                    <span class="badge">{{ $activeEvents }} {{ __('messages.admin.dashboard.active') }}</span>
                                 </div>
                             </div>
                         </div>
@@ -86,9 +86,9 @@
                             </div>
                             <div class="stat-card-info">
                                 <h3 class="stat-card-number">{{ $totalPremis }}</h3>
-                                <p class="stat-card-title">Premis</p>
+                                <p class="stat-card-title">{{ __('messages.admin.dashboard.prizes') }}</p>
                                 <div class="stat-card-badge">
-                                    <span class="badge">{{ $pendingRewards }} pendents</span>
+                                    <span class="badge">{{ $pendingRewards }} {{ __('messages.admin.dashboard.pending') }}</span>
                                 </div>
                             </div>
                         </div>
@@ -104,11 +104,11 @@
                             </div>
                             <div class="stat-card-info">
                                 <h3 class="stat-card-number">{{ $totalCodis }}</h3>
-                                <p class="stat-card-title">Codis</p>
+                                <p class="stat-card-title">{{ __('messages.admin.dashboard.codes') }}</p>
                                 <div class="stat-card-percent">
                                     <i
                                         class="fas {{ $newCodisPercent > 0 ? 'fa-arrow-up text-success' : 'fa-arrow-down text-danger' }}"></i>
-                                    <span>{{ $newCodisPercent }}%</span> des del mes anterior
+                                    <span>{{ $newCodisPercent }}%</span> {{ __('messages.admin.dashboard.since_last_month') }}
                                 </div>
                             </div>
                         </div>
@@ -118,7 +118,7 @@
 
             <!-- Sección 3: Análisis y Gráficos -->
             <div class="section-header mb-3">
-                <h2 class="section-title"><i class="fas fa-chart-line me-2"></i>Anàlisi i Gràfics</h2>
+                <h2 class="section-title"><i class="fas fa-chart-line me-2"></i>{{ __('messages.admin.dashboard.analysis_charts') }}</h2>
                 <hr class="section-divider">
             </div>
 
@@ -127,12 +127,12 @@
                 <div class="col-xl-8 col-lg-7 mb-4">
                     <div class="chart-card h-100">
                         <div class="chart-card-header">
-                            <h4 class="chart-card-title">Activitat Usuaris</h4>
+                            <h4 class="chart-card-title">{{ __('messages.admin.dashboard.user_activity') }}</h4>
                             <div class="chart-card-actions">
                                 <select class="form-select form-select-sm" id="activityPeriodSelect">
-                                    <option selected>Últims 6 mesos</option>
-                                    <option>Últim any</option>
-                                    <option>Aquest any</option>
+                                    <option selected>{{ __('messages.admin.dashboard.last_6_months') }}</option>
+                                    <option>{{ __('messages.admin.dashboard.last_year') }}</option>
+                                    <option>{{ __('messages.admin.dashboard.this_year') }}</option>
                                 </select>
                             </div>
                         </div>
@@ -145,26 +145,21 @@
                 <div class="col-xl-4 col-lg-5 mb-4">
                     <div class="chart-card h-100">
                         <div class="chart-card-header">
-                            <h4 class="chart-card-title">Distribució Punts</h4>
+                            <h4 class="chart-card-title">{{ __('messages.admin.dashboard.points_distribution') }}</h4>
                         </div>
                         <div class="chart-card-body">
                             <div class="points-distribution-container">
-                                <div class="chart-container">
+                                <div class="chart-container points-chart-container">
                                     <canvas id="distributionChart" height="200"></canvas>
                                 </div>
-                                <div class="chart-legend">
-                                    <div class="chart-legend-item">
-                                        <span class="legend-color" style="background-color: rgba(54, 162, 235, 0.8)"></span>
-                                        <span class="legend-text">Punts Actius: {{ $totalActivePoints }}</span>
-                                    </div>
-                                    <div class="chart-legend-item">
-                                        <span class="legend-color" style="background-color: rgba(255, 99, 132, 0.8)"></span>
-                                        <span class="legend-text">Punts Gastats: {{ $totalSpentPoints }}</span>
-                                    </div>
-                                    <div class="chart-legend-item">
-                                        <span class="legend-color" style="background-color: rgba(75, 192, 192, 0.8)"></span>
-                                        <span class="legend-text">Punts per Events: {{ $totalEventPoints }}</span>
-                                    </div>
+                                <div class="distribution-user-info" id="distributionUserInfo">
+                                    {{ __('messages.admin.dashboard.distribution_hover_hint') }}
+                                </div>
+                                <div class="chart-legend" id="distributionLegend"></div>
+                                <div class="distribution-totals mt-2">
+                                    <span class="legend-text">{{ __('messages.admin.dashboard.active_points') }}: {{ $totalActivePoints }}</span>
+                                    <span class="legend-text ms-3">{{ __('messages.admin.dashboard.spent_points') }}: {{ $totalSpentPoints }}</span>
+                                    <span class="legend-text ms-3">{{ __('messages.admin.dashboard.event_points') }}: {{ $totalEventPoints }}</span>
                                 </div>
                             </div>
                         </div>
@@ -174,7 +169,7 @@
 
             <!-- Sección 4: Gestión del Sistema -->
             <div class="section-header mb-3">
-                <h2 class="section-title"><i class="fas fa-cogs me-2"></i>Gestió del Sistema</h2>
+                <h2 class="section-title"><i class="fas fa-cogs me-2"></i>{{ __('messages.admin.dashboard.system_management') }}</h2>
                 <hr class="section-divider">
             </div>
 
@@ -189,9 +184,9 @@
                             </div>
                             <div class="stat-card-info">
                                 <h3 class="stat-card-number">{{ \App\Models\Producte::count() }}</h3>
-                                <p class="stat-card-title">Productes</p>
+                                <p class="stat-card-title">{{ __('messages.admin.dashboard.products') }}</p>
                                 <div class="stat-card-badge">
-                                    <span class="badge">Gestió de productes</span>
+                                    <span class="badge">{{ __('messages.admin.dashboard.product_management') }}</span>
                                 </div>
                             </div>
                         </div>
@@ -207,10 +202,10 @@
                             </div>
                             <div class="stat-card-info">
                                 <h3 class="stat-card-number">{{ \App\Models\PuntDeRecollida::count() }}</h3>
-                                <p class="stat-card-title">Punts de Recollida</p>
+                                <p class="stat-card-title">{{ __('messages.admin.dashboard.collection_points') }}</p>
                                 <div class="stat-card-badge">
                                     <span class="badge">
-                                        {{ \App\Models\PuntDeRecollida::where('disponible', 1)->count() }} disponibles
+                                        {{ \App\Models\PuntDeRecollida::where('disponible', 1)->count() }} {{ __('messages.admin.dashboard.available') }}
                                     </span>
                                 </div>
                             </div>
@@ -227,10 +222,10 @@
                             </div>
                             <div class="stat-card-info">
                                 <h3 class="stat-card-number">{{ \App\Models\Rol::count() }}</h3>
-                                <p class="stat-card-title">Rols</p>
+                                <p class="stat-card-title">{{ __('messages.admin.dashboard.roles') }}</p>
                                 <div class="stat-card-badge">
                                     <span class="badge">
-                                        Gestió de rols i permisos
+                                        {{ __('messages.admin.dashboard.roles_permissions') }}
                                     </span>
                                 </div>
                             </div>
@@ -247,10 +242,10 @@
                             </div>
                             <div class="stat-card-info">
                                 <h3 class="stat-card-number">{{ \App\Models\TipusAlerta::count() }}</h3>
-                                <p class="stat-card-title">Tipus d'Alertes</p>
+                                <p class="stat-card-title">{{ __('messages.admin.dashboard.alert_types') }}</p>
                                 <div class="stat-card-badge">
                                     <span class="badge">
-                                        Gestió d'alertes
+                                        {{ __('messages.admin.dashboard.alert_management') }}
                                     </span>
                                 </div>
                             </div>
@@ -269,11 +264,11 @@
                             </div>
                             <div class="stat-card-info">
                                 <h3 class="stat-card-number">{{ \App\Models\AlertaPuntDeRecollida::count() }}</h3>
-                                <p class="stat-card-title">Alertes Punts</p>
+                                <p class="stat-card-title">{{ __('messages.admin.dashboard.point_alerts') }}</p>
                                 <div class="stat-card-badge">
                                     <span class="badge">
                                         {{ \App\Models\AlertaPuntDeRecollida::where('created_at', '>=', \Carbon\Carbon::now()->subDays(7))->count() }}
-                                        noves aquesta setmana
+                                        {{ __('messages.admin.dashboard.new_this_week') }}
                                     </span>
                                 </div>
                             </div>
@@ -290,10 +285,10 @@
                             </div>
                             <div class="stat-card-info">
                                 <h3 class="stat-card-number">{{ \App\Models\TipusEvent::count() }}</h3>
-                                <p class="stat-card-title">Tipus d'Events</p>
+                                <p class="stat-card-title">{{ __('messages.admin.dashboard.event_types') }}</p>
                                 <div class="stat-card-badge">
                                     <span class="badge">
-                                        Gestió de categories
+                                        {{ __('messages.admin.dashboard.category_management') }}
                                     </span>
                                 </div>
                             </div>
@@ -310,11 +305,11 @@
                             </div>
                             <div class="stat-card-info">
                                 <h3 class="stat-card-number">{{ \App\Models\Opinions::count() }}</h3>
-                                <p class="stat-card-title">Opinions</p>
+                                <p class="stat-card-title">{{ __('messages.admin.dashboard.opinions') }}</p>
                                 <div class="stat-card-badge">
                                     <span class="badge">
                                         {{ \App\Models\Opinions::where('created_at', '>=', \Carbon\Carbon::now()->subDays(30))->count() }}
-                                        noves aquest mes
+                                        {{ __('messages.admin.dashboard.new_this_month') }}
                                     </span>
                                 </div>
                             </div>
@@ -331,7 +326,7 @@
                             </div>
                             <div class="stat-card-info">
                                 <h3 class="stat-card-number">{{ \App\Models\PremiReclamat::count() }}</h3>
-                                <p class="stat-card-title">Premis Reclamats</p>
+                                <p class="stat-card-title">{{ __('messages.admin.dashboard.claimed_prizes') }}</p>
                                 <div class="stat-card-badge">
                                     <span class="badge">
                                         {{ \App\Models\PremiReclamat::where('estat', 'pendent')->count() }} pendents
@@ -345,7 +340,7 @@
 
             <!-- Sección 5: Estadísticas Avanzadas -->
             <div class="section-header mb-3">
-                <h2 class="section-title"><i class="fas fa-chart-bar me-2"></i>Estadístiques Avançades</h2>
+                <h2 class="section-title"><i class="fas fa-chart-bar me-2"></i>{{ __('messages.admin.dashboard.advanced_statistics') }}</h2>
                 <hr class="section-divider">
             </div>
 
@@ -358,8 +353,8 @@
                                     <i class="fas fa-chart-bar"></i>
                                 </div>
                                 <div class="stat-card-info">
-                                    <h3 class="stat-card-number">Estadístiques de Navegació</h3>
-                                    <p class="stat-card-title">Anàlisi de dispositius i comportament dels usuaris</p>
+                                    <h3 class="stat-card-number">{{ __('messages.admin.dashboard.navigation_statistics') }}</h3>
+                                    <p class="stat-card-title">{{ __('messages.admin.dashboard.device_behavior_analysis') }}</p>
                                 </div>
                             </div>
                         </div>
@@ -369,7 +364,7 @@
 
             <!-- Sección 6: Actividad y Ranking -->
             <div class="section-header mb-3">
-                <h2 class="section-title"><i class="fas fa-history me-2"></i>Activitat i Rànking</h2>
+                <h2 class="section-title"><i class="fas fa-history me-2"></i>{{ __('messages.admin.dashboard.activity_ranking') }}</h2>
                 <hr class="section-divider">
             </div>
 
@@ -379,9 +374,9 @@
                     <div class="content-card h-100">
                         <div class="content-card-header">
                             <h4 class="content-card-title">
-                                <i class="fas fa-history me-2"></i>Activitat Recent
+                                <i class="fas fa-history me-2"></i>{{ __('messages.admin.dashboard.recent_activity') }}
                             </h4>
-                            <a href="#" class="btn-sm btn-view-all" id="viewAllActivitiesBtn">Veure Tot</a>
+                            <a href="#" class="btn-sm btn-view-all" id="viewAllActivitiesBtn">{{ __('messages.admin.dashboard.view_all') }}</a>
                         </div>
                         <div class="content-card-body p-0">
                             <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
@@ -421,7 +416,7 @@
                                                                                     </div>
                                                                                 </div>
                                                                             </td>
-                                                                            <td>{{ $activity->action }}</td>
+                                                                            <td>{{ $activity->localized_action }}</td>
                                                                             <td>{{ $activity->created_at->format('d/m/Y H:i') }}</td>
                                                                             <td>
                                                                                 <button class="btn-icon view-activity-details" data-detail-type="activitat"
@@ -437,7 +432,7 @@
                                                 <td colspan="4" class="text-center py-4">
                                                     <div class="empty-state">
                                                         <i class="fas fa-history fa-3x mb-3"></i>
-                                                        <p>No hi ha activitat recent</p>
+                                                        <p>{{ __('messages.admin.dashboard.no_data') }}</p>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -454,9 +449,9 @@
                     <div class="content-card h-100">
                         <div class="content-card-header">
                             <h4 class="content-card-title">
-                                <i class="fas fa-trophy me-2"></i>Millors Usuaris
+                                <i class="fas fa-trophy me-2"></i>{{ __('messages.admin.dashboard.user_ranking') }}
                             </h4>
-                            <a href="#" class="btn-sm btn-view-all" id="viewAllUsersBtn">Veure Tot</a>
+                            <a href="#" class="btn-sm btn-view-all" id="viewAllUsersBtn">{{ __('messages.admin.dashboard.view_all') }}</a>
                         </div>
                         <div class="content-card-body p-0">
                             <ul class="user-ranking-list">
@@ -508,7 +503,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="dynamicModalLabel">Cargando ...</h5>
+                    <h5 class="modal-title" id="dynamicModalLabel">{{ __('messages.admin.dashboard.loading') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -516,7 +511,7 @@
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden"></span>
                         </div>
-                        <p class="mt-2">Cargando contenido...</p>
+                        <p class="mt-2">{{ __('messages.admin.dashboard.loading') }}</p>
                     </div>
                     <div id="dynamic-content" class="d-none"></div>
                 </div>
@@ -529,7 +524,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="detailModalLabel">Detalls</h5>
+                    <h5 class="modal-title" id="detailModalLabel">{{ __('messages.admin.common.view_details') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -537,15 +532,15 @@
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden"></span>
                         </div>
-                        <p class="mt-2">Carregant informació...</p>
+                        <p class="mt-2">{{ __('messages.admin.dashboard.loading') }}</p>
                     </div>
                     <div id="detail-content" class="d-none">
                         <!-- El contenido se cargará dinámicamente aquí -->
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary d-none" id="toggleEditBtn">Editar</button>
-                    <button type="button" class="btn btn-success d-none" id="saveChangesBtn">Guardar</button>
+                    <button type="button" class="btn btn-primary d-none" id="toggleEditBtn">{{ __('messages.admin.common.edit') }}</button>
+                    <button type="button" class="btn btn-success d-none" id="saveChangesBtn">{{ __('messages.common.save') }}</button>
                 </div>
             </div>
         </div>
@@ -556,26 +551,25 @@
         <div class="modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content">
                 <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title">Confirmar eliminació</h5>
+                    <h5 class="modal-title">{{ __('messages.admin.common.delete') }}</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p id="confirmDeleteText">Estàs segur que vols eliminar aquest element?</p>
+                    <p id="confirmDeleteText">{{ __('messages.admin.common.delete') }}?</p>
                     <input type="hidden" id="deleteItemId">
                     <input type="hidden" id="deleteItemType">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.common.cancel') }}</button>
                     <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
-                        <i class="fas fa-trash me-1"></i> Eliminar
+                        <i class="fas fa-trash me-1"></i> {{ __('messages.admin.common.delete') }}
                     </button>
                 </div>
             </div>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Cargar la biblioteca de gráficos ApexCharts -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.35.3/dist/apexcharts.min.js"></script>
     <script>
@@ -640,9 +634,52 @@
             // -----------------------------------------
 
             // Detectar modo oscuro/claro
-            const isDarkMode = document.body.classList.contains('dark');
+            const isDarkMode = document.body.classList.contains('dark') || localStorage.getItem('theme') === 'dark';
             const textColor = isDarkMode ? '#f7fafc' : '#2d3748';
             const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+
+            const getDistributionPalette = (darkMode) => {
+                if (darkMode) {
+                    return {
+                        background: ['rgba(96, 165, 250, 0.9)', 'rgba(244, 114, 182, 0.9)', 'rgba(45, 212, 191, 0.9)'],
+                        border: ['#1e293b', '#1e293b', '#1e293b']
+                    };
+                }
+
+                return {
+                    background: ['rgba(54, 162, 235, 0.8)', 'rgba(255, 99, 132, 0.8)', 'rgba(75, 192, 192, 0.8)'],
+                    border: ['#ffffff', '#ffffff', '#ffffff']
+                };
+            };
+
+            const distributionPalette = getDistributionPalette(isDarkMode);
+            const topUsersForDistribution = {!! json_encode($topUsersForDistribution) !!};
+            const distributionLabels = topUsersForDistribution.map((item) => item.name);
+            const distributionValues = topUsersForDistribution.map((item) => item.points);
+
+            const distributionLegend = document.getElementById('distributionLegend');
+            const distributionUserInfo = document.getElementById('distributionUserInfo');
+            const distributionHoverHint = @json(__('messages.admin.dashboard.distribution_hover_hint'));
+
+            const renderDistributionLegend = () => {
+                if (!distributionLegend) return;
+
+                distributionLegend.innerHTML = '';
+
+                distributionLabels.forEach((label, index) => {
+                    const value = distributionValues[index] ?? 0;
+
+                    const item = document.createElement('div');
+                    item.className = 'chart-legend-item';
+
+                    item.innerHTML = `
+                        <span class="legend-color" style="background-color: ${distributionPalette.background[index % distributionPalette.background.length]}"></span>
+                        <span class="legend-text">${label}: ${value} punts</span>
+                    `;
+
+                    distributionLegend.appendChild(item);
+                });
+            };
 
             // Configuración global de Chart.js
             Chart.defaults.color = textColor;
@@ -738,20 +775,12 @@
                 {
                     type: 'doughnut',
                     data: {
-                        labels: ['Punts Actius', 'Punts Gastats', 'Punts per Events'],
+                        labels: distributionLabels,
                         datasets: [{
-                            data: [{{ $totalActivePoints }}, {{ $totalSpentPoints }}, {{ $totalEventPoints }}],
-                            backgroundColor: [
-                                'rgba(54, 162, 235, 0.8)',
-                                'rgba(255, 99, 132, 0.8)',
-                                'rgba(75, 192, 192, 0.8)'
-                            ],
-                            borderColor: [
-                                'rgba(54, 162, 235, 1)',
-                                'rgba(255, 99, 132, 1)',
-                                'rgba(75, 192, 192, 1)'
-                            ],
-                            borderWidth: 1
+                            data: distributionValues,
+                            backgroundColor: distributionPalette.background,
+                            borderColor: distributionPalette.border,
+                            borderWidth: 2
                         }]
                     },
                     options: {
@@ -770,17 +799,46 @@
                                 padding: 12,
                                 boxPadding: 6,
                                 usePointStyle: true,
+                                callbacks: {
+                                    label: function (context) {
+                                        const value = context.raw || 0;
+                                        return `${context.label}: ${value} punts`;
+                                    }
+                                }
                             }
                         },
-                        cutout: '70%'
+                        cutout: '70%',
+                        onHover: function (event, activeElements) {
+                            if (!distributionUserInfo) return;
+
+                            if (activeElements.length === 0) {
+                                distributionUserInfo.textContent = distributionHoverHint;
+                                return;
+                            }
+
+                            const index = activeElements[0].index;
+                            const label = distributionLabels[index] || 'Usuari';
+                            const value = distributionValues[index] || 0;
+                            distributionUserInfo.textContent = `${label}: ${value} punts`;
+                        },
+                        onClick: function (event, activeElements) {
+                            if (!distributionUserInfo || activeElements.length === 0) return;
+
+                            const index = activeElements[0].index;
+                            const label = distributionLabels[index] || 'Usuari';
+                            const value = distributionValues[index] || 0;
+                            distributionUserInfo.textContent = `Seleccionat: ${label} (${value} punts)`;
+                        }
                     }
                 }
             );
 
+            renderDistributionLegend();
+
             // Actualizar gráficos cuando cambia el tema
             document.getElementById('theme-toggle')?.addEventListener('click', function () {
                 setTimeout(() => {
-                    const isDarkMode = document.body.classList.contains('dark');
+                    const isDarkMode = document.body.classList.contains('dark') || localStorage.getItem('theme') === 'dark';
                     const textColor = isDarkMode ? '#f7fafc' : '#2d3748';
                     const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
 
@@ -809,9 +867,24 @@
                             chart.options.plugins.tooltip.borderColor = isDarkMode ? '#718096' : '#e2e8f0';
                         }
 
+                        if (chart === distributionChart) {
+                            const palette = getDistributionPalette(isDarkMode);
+                            chart.data.datasets[0].backgroundColor = palette.background;
+                            chart.data.datasets[0].borderColor = palette.border;
+                            chart.data.datasets[0].borderWidth = 2;
+                        }
+
                         chart.update();
                     });
+
+                    document.querySelectorAll('.chart-legend .legend-text').forEach((legendText) => {
+                        legendText.style.color = textColor;
+                    });
                 }, 200);
+            });
+
+            document.querySelectorAll('.chart-legend .legend-text').forEach((legendText) => {
+                legendText.style.color = textColor;
             });
 
             // -----------------------------------------

@@ -1257,7 +1257,7 @@ const AdminDashboard = {
             }
 
             // Cargar formulario de edición
-            fetch(`/admin/edit/${type}/${id}`)
+            fetch(`/admin/edit-form/${type}/${id}`)
                 .then(response => {
                     if (!response.ok) throw new Error('Error al cargar el formulario');
                     return response.text();
@@ -1341,7 +1341,7 @@ const AdminDashboard = {
         },
 
         deleteItem: function (id, type) {
-            fetch(`/admin/${type}/${id}`, {
+            fetch(`/admin/destroy/${type}/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),

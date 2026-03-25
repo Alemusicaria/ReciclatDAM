@@ -1,8 +1,9 @@
 <?php
 return [
     // Textos globales
-    'welcome' => 'Bienvenido al Panel de Reciclado DAM',
+    'welcome' => 'Bienvenido al Panel de Reciclat DAM',
     'partner' => 'Tu aliado en soluciones de reciclaje sostenible',
+    'brand' => 'Recicla DAM',
     'language' => 'ES',
     'catalan' => 'Catalán',
     'english' => 'Inglés',
@@ -25,6 +26,7 @@ return [
         'no_city' => 'No se ha encontrado ninguna ciudad',
         'address' => 'Dirección',
         'avilable' => 'Disponible',
+        'available' => 'Disponible',
         'not_available' => 'No Disponible',
     ],
 
@@ -48,9 +50,9 @@ return [
 
     // About us section
     'about_us' => [
-        'title' => '¿Qué es Reciclado DAM?',
-        'description_1' => 'RecicladoDAM es una aplicación innovadora que te permite reciclar de manera fácil y divertida. Gana puntos llamados <strong>ECODAMS</strong> por cada acción de reciclaje y utilízalos para conseguir premios exclusivos. ¡Únete a nuestra comunidad y ayuda a hacer del mundo un lugar más sostenible!',
-        'description_2' => 'Con Reciclado DAM y tus <strong>ECODAMS</strong>, ganas tú y gana el medio ambiente.',
+        'title' => '¿Qué es Reciclat DAM?',
+        'description_1' => 'Reciclat DAM es una aplicación innovadora que te permite reciclar de manera fácil y divertida. Gana puntos llamados <strong>ECODAMS</strong> por cada acción de reciclaje y utilízalos para conseguir premios exclusivos. ¡Únete a nuestra comunidad y ayuda a hacer del mundo un lugar más sostenible!',
+        'description_2' => 'Con Reciclat DAM y tus <strong>ECODAMS</strong>, ganas tú y gana el medio ambiente.',
         'image_alt' => 'Foto relacionada con reciclaje'
     ],
 
@@ -689,6 +691,7 @@ return [
             'analysis_charts' => 'Análisis y Gráficos',
             'user_activity' => 'Actividad Usuarios',
             'points_distribution' => 'Distribución Puntos',
+            'distribution_hover_hint' => 'Pasa el ratón o haz clic en una sección para ver usuario y puntos.',
             'active_points' => 'Puntos Activos',
             'spent_points' => 'Puntos Gastados',
             'event_points' => 'Puntos por Eventos',
@@ -721,6 +724,38 @@ return [
             'months' => ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
             'loading' => 'Cargando...',
             'no_data' => 'No hay datos disponibles',
+        ],
+
+        'activity_actions' => [
+            'profile_updated' => 'Ha actualizado el perfil de :name',
+            'user_deleted' => 'Ha eliminado al usuario :name',
+            'user_created' => 'Ha creado un nuevo usuario: :name',
+            'event_created' => 'Ha creado un nuevo evento: :name',
+            'event_deleted' => 'Ha eliminado evento: :name',
+            'event_updated' => 'Ha actualizado el evento: :name',
+            'prize_deleted' => 'Ha eliminado premio: :name',
+            'code_deleted' => 'Ha eliminado código: :code',
+            'product_deleted' => 'Ha eliminado producto: :name',
+            'collection_point_created' => 'Ha creado un nuevo punto de recogida: :name',
+            'collection_point_updated' => 'Ha actualizado el punto de recogida: :name',
+            'collection_point_deleted' => 'Ha eliminado punto de reciclaje: :name',
+            'role_created' => 'Ha creado un nuevo rol: :name',
+            'role_updated' => 'Ha actualizado el rol: :name',
+            'role_deleted' => 'Ha eliminado rol: :name',
+            'alert_type_created' => 'Ha creado un nuevo tipo de alerta: :name',
+            'alert_type_updated' => 'Ha actualizado el tipo de alerta: :name',
+            'alert_type_deleted' => 'Ha eliminado tipo-alerta: :name',
+            'alert_updated_id' => 'Ha actualizado la alerta ID: :id',
+            'point_alert_deleted' => 'Ha eliminado alerta-punto: :name',
+            'point_alert_created_id' => 'Ha creado una nueva alerta para el punto de recogida ID: :id',
+            'event_type_created' => 'Ha creado un nuevo tipo de evento: :name',
+            'event_type_updated' => 'Ha actualizado el tipo de evento: :name',
+            'event_type_deleted' => 'Ha eliminado tipo-evento: :name',
+            'prize_request_approved' => 'Ha aprobado la solicitud de premio #:id para :user',
+            'prize_request_approved_with_tracking' => 'Ha aprobado la solicitud de premio #:id para :user con código de seguimiento: :tracking',
+            'prize_request_rejected' => 'Ha rechazado la solicitud de premio #:id para :user',
+            'claimed_prize_status_updated' => 'Ha actualizado el estado del premio reclamado #:id a :status',
+            'code_scanned_points' => 'Ha escaneado el código :code y ha ganado :points puntos',
         ],
 
         'stats' => [

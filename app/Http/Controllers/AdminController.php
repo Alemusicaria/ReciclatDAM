@@ -56,6 +56,17 @@ class AdminController extends Controller
         $pendingRewards = PremiReclamat::where('estat', 'pendent')->count();
 
         $topUsers = User::orderBy('punts_actuals', 'desc')->get();
+        $topUsersForDistribution = $topUsers
+            ->take(6)
+            ->map(function ($user) {
+                $fullName = trim(($user->nom ?? '') . ' ' . ($user->cognoms ?? ''));
+
+                return [
+                    'name' => $fullName !== '' ? $fullName : ($user->email ?? 'Usuari'),
+                    'points' => (int) ($user->punts_actuals ?? 0),
+                ];
+            })
+            ->values();
         $usersByLevel = DB::table('users')
             ->join('nivells', 'users.nivell_id', '=', 'nivells.id')
             ->select('nivells.nom', DB::raw('count(*) as total'))
@@ -128,6 +139,7 @@ class AdminController extends Controller
             'activeEvents',
             'pendingRewards',
             'topUsers',
+            'topUsersForDistribution',
             'recentActivities',
             'totalActivePoints',
             'totalSpentPoints',

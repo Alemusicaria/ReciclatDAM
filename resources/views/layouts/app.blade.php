@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reciclat DAM - {{ __('messages.language') }}</title>
+    <title>{{ __('messages.brand') }}</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}" />
@@ -32,15 +32,14 @@
     <!-- Navbar con clases de Bootstrap 5 -->
     <nav class="navbar navbar-expand-lg fixed-top light">
         <div class="container-fluid">
-            <a class="navbar-brand"
-                href="{{ url('/') }}">{{ __('messages.language') == 'CA' ? 'Reciclat DAM' : 'Recycle DAM' }}</a>
+            <a class="navbar-brand" href="{{ url('/') }}">{{ __('messages.brand') }}</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <!-- Enlaces de navegación a la izquierda -->
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 flex-nowrap">
                     @php $isHomePage = request()->path() === '/' || request()->path() === app()->getLocale(); @endphp
 
                     <li class="nav-item">
@@ -86,13 +85,6 @@
                             </a>
                         </li>
                     @endauth
-                    @if(Auth::check() && Auth::user()->rol_id == 1)
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url('/admin') }}">
-                                <i class="fas fa-cogs"></i> {{ __('messages.admin.dashboard.title') }}
-                            </a>
-                        </li>
-                    @endif
                 </ul>
 
                 <!-- Usuario/Login a la derecha -->
@@ -112,7 +104,7 @@
                                     @else
                                         <img src="{{ asset('images/default-profile.png') }}" alt="Foto de perfil"
                                             class="rounded-circle " id="profile-image"
-                                            style="width: 13px; height: 30px; object-fit: cover; margin-right: 5px; ">
+                                            style="width: 30px; height: 30px; object-fit: cover; margin-right: 5px; ">
                                     @endif
                                 @else
                                     <img src="{{ asset('images/default-profile.png') }}" alt="Foto de perfil"
@@ -122,6 +114,16 @@
                                 <span>{{ Auth::user()->nom }} ({{ Auth::user()->punts_actuals }} ECODAMS)</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                @if(Auth::user()->rol_id == 1)
+                                    <li>
+                                        <a class="dropdown-item" href="{{ url('/admin') }}">
+                                            <i class="fas fa-cogs me-1"></i> {{ __('messages.admin.dashboard.title') }}
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                @endif
                                 <li><a class="dropdown-item"
                                         href="{{ route('users.show', Auth::user()->id) }}">{{ __('messages.admin.users.profile') }}</a>
                                 </li>
@@ -157,10 +159,10 @@
     <div class="fixed-bottom-right">
         <div class="dropdown">
             <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="settingsDropdown"
-                data-bs-toggle="dropdown" aria-expanded="false">
+                aria-expanded="false">
                 <i class="fas fa-cog"></i>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="settingsDropdown">
+            <ul class="dropdown-menu dropdown-menu-end" id="settingsDropdownMenu" aria-labelledby="settingsDropdown">
                 <li>
                     <button id="theme-toggle" class="dropdown-item">
                         <i id="theme-icon" class="fas"></i> {{ __('Toggle Theme') }}
@@ -170,21 +172,27 @@
                     <hr class="dropdown-divider">
                 </li>
                 <li>
-                    <a class="dropdown-item" id="lang-ca" href="{{ url('/ca') }}" data-lang="ca">
+                    <a class="dropdown-item" id="lang-ca"
+                        href="{{ \Mcamara\LaravelLocalization\Facades\LaravelLocalization::getLocalizedURL('ca', null, [], true) }}"
+                        data-lang="ca">
                         <img src="{{ asset('images/flags/ca.svg') }}" alt="Català"
                             style="width: 20px; margin-right: 10px;">
                         {{ __('Català') }}
                     </a>
                 </li>
                 <li>
-                    <a class="dropdown-item" id="lang-es" href="{{ url('/es') }}" data-lang="es">
+                    <a class="dropdown-item" id="lang-es"
+                        href="{{ \Mcamara\LaravelLocalization\Facades\LaravelLocalization::getLocalizedURL('es', null, [], true) }}"
+                        data-lang="es">
                         <img src="{{ asset('images/flags/es.svg') }}" alt="Español"
                             style="width: 20px; margin-right: 10px;">
                         {{ __('Español') }}
                     </a>
                 </li>
                 <li>
-                    <a class="dropdown-item" id="lang-en" href="{{ url('/en') }}" data-lang="en">
+                    <a class="dropdown-item" id="lang-en"
+                        href="{{ \Mcamara\LaravelLocalization\Facades\LaravelLocalization::getLocalizedURL('en', null, [], true) }}"
+                        data-lang="en">
                         <img src="{{ asset('images/flags/en.svg') }}" alt="English"
                             style="width: 20px; margin-right: 10px;">
                         {{ __('English') }}
@@ -204,7 +212,7 @@
     <script src="https://cdn.jsdelivr.net/npm/algoliasearch@4.17.2/dist/algoliasearch-lite.umd.js"></script>
 
     <!-- Scripts específicos para la sección de administración -->
-    @if(Request::is('admin*'))
+    @if(Request::is('admin*') || Request::is('*/admin*'))
         <script src="{{ asset('js/admin.js') }}"></script>
     @endif
 
@@ -236,6 +244,36 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
+            const settingsDropdownTrigger = document.getElementById('settingsDropdown');
+            const settingsDropdownMenu = document.getElementById('settingsDropdownMenu');
+
+            if (settingsDropdownTrigger && settingsDropdownMenu) {
+                settingsDropdownMenu.style.top = 'auto';
+                settingsDropdownMenu.style.bottom = 'calc(100% + 8px)';
+                settingsDropdownMenu.style.right = '0';
+                settingsDropdownMenu.style.left = 'auto';
+
+                settingsDropdownTrigger.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    const isOpen = settingsDropdownMenu.classList.contains('show');
+                    settingsDropdownMenu.style.top = 'auto';
+                    settingsDropdownMenu.style.bottom = 'calc(100% + 8px)';
+                    settingsDropdownMenu.classList.toggle('show', !isOpen);
+                    settingsDropdownTrigger.setAttribute('aria-expanded', (!isOpen).toString());
+                });
+
+                settingsDropdownMenu.addEventListener('click', function (event) {
+                    event.stopPropagation();
+                });
+
+                document.addEventListener('click', function () {
+                    settingsDropdownMenu.classList.remove('show');
+                    settingsDropdownTrigger.setAttribute('aria-expanded', 'false');
+                });
+            }
+
             // Inicialización del tema
             const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
             const currentTheme = localStorage.getItem('theme') || (prefersDarkScheme ? 'dark' : 'light');
