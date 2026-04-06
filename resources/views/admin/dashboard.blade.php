@@ -26,6 +26,11 @@
                                 <span class="date-label"><i class="far fa-clock me-1"></i> {{ __('messages.admin.dashboard.entry_time') }}:</span>
                                 <span class="date-value">{{ now()->setTimezone('Europe/Madrid')->format('H:i') }}</span>
                             </div>
+                            <div class="mt-2">
+                                <a href="{{ route('admin.logic-checker') }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-vial me-1"></i> Diagnòstic de lògica
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -519,8 +524,8 @@
         </div>
     </div>
     <!-- Modal para detalles -->
-    <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true"
-        data-bs-backdrop="true" data-bs-keyboard="true">
+    <div class="modal" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true"
+        data-bs-backdrop="false" data-bs-keyboard="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -891,6 +896,17 @@
             // 2. SISTEMA UNIFICADO DE GESTIÓN DE MODALES
             // -----------------------------------------
 
+            const parseJsonResponse = async (response) => {
+                const payload = await response.json().catch(() => null);
+
+                if (!response.ok) {
+                    const message = payload && payload.message ? payload.message : 'Error en la resposta del servidor';
+                    throw new Error(message);
+                }
+
+                return payload;
+            };
+
             const modalSystem = {
                 // Estado compartido
                 activeModals: 0,
@@ -1208,12 +1224,12 @@
                         fetch(`/admin/update/${type}/${id}`, {
                             method: 'POST',
                             headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                'X-CSRF-TOKEN': window.getCsrfToken ? window.getCsrfToken() : '',
                                 'Accept': 'application/json'
                             },
                             body: formData
                         })
-                            .then(response => response.json())
+                            .then(parseJsonResponse)
                             .then(data => {
                                 if (data.success) {
                                     // Volver a modo visualización
@@ -1357,10 +1373,11 @@
                             // Limpiar cualquier backdrop residual
                             document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
 
-                            // Mostrar modal
-                            detailModal.classList.add('show');
-                            detailModal.style.display = 'block';
-                            document.body.classList.add('modal-open');
+                            // Mostrar modal sin crear backdrop manual
+                            bootstrap.Modal.getOrCreateInstance(detailModal, {
+                                backdrop: false,
+                                keyboard: true
+                            }).show();
 
                             // Cargar contenido
                             fetch(`/admin/edit-form/user/${userId}`)
@@ -1403,7 +1420,7 @@
 
                 // Cargar datos del usuario
                 fetch(`/admin/users/${userId}/edit`)
-                    .then(response => response.json())
+                    .then(parseJsonResponse)
                     .then(data => {
                         document.getElementById('nom').value = data.nom || '';
                         document.getElementById('cognoms').value = data.cognoms || '';
@@ -1436,10 +1453,10 @@
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        'X-CSRF-TOKEN': window.getCsrfToken ? window.getCsrfToken() : ''
                     }
                 })
-                    .then(response => response.json())
+                    .then(parseJsonResponse)
                     .then(data => {
                         if (data.success) {
                             // Cerrar modal de formulario
@@ -1630,9 +1647,10 @@
                             safeDOM('#detail-modal-loader', el => el.classList.remove('d-none'));
                             safeDOM('#detail-content', el => el.classList.add('d-none'));
 
-                            modal.classList.add('show');
-                            modal.style.display = 'block';
-                            document.body.classList.add('modal-open');
+                            bootstrap.Modal.getOrCreateInstance(modal, {
+                                backdrop: false,
+                                keyboard: true
+                            }).show();
 
                             fetch(`/admin/edit-form/user/${userId}`)
                                 .then(response => response.text())
@@ -1695,11 +1713,11 @@
                             fetch(url, {
                                 method: 'DELETE',
                                 headers: {
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                    'X-CSRF-TOKEN': window.getCsrfToken ? window.getCsrfToken() : '',
                                     'Accept': 'application/json'
                                 }
                             })
-                                .then(response => response.json())
+                                .then(parseJsonResponse)
                                 .then(data => {
                                     if (data.success) {
                                         // Mostrar éxito
@@ -1772,10 +1790,11 @@
                             // Limpiar cualquier backdrop residual
                             document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
 
-                            // Mostrar modal
-                            detailModal.classList.add('show');
-                            detailModal.style.display = 'block';
-                            document.body.classList.add('modal-open');
+                            // Mostrar modal sin crear backdrop manual
+                            bootstrap.Modal.getOrCreateInstance(detailModal, {
+                                backdrop: false,
+                                keyboard: true
+                            }).show();
 
                             // Cargar contenido del formulario de edición
                             fetch(`/admin/edit-form/event/${eventId}`)
@@ -1833,10 +1852,11 @@
                             // Limpiar cualquier backdrop residual
                             document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
 
-                            // Mostrar modal
-                            detailModal.classList.add('show');
-                            detailModal.style.display = 'block';
-                            document.body.classList.add('modal-open');
+                            // Mostrar modal sin crear backdrop manual
+                            bootstrap.Modal.getOrCreateInstance(detailModal, {
+                                backdrop: false,
+                                keyboard: true
+                            }).show();
 
                             // Cargar contenido del formulario de edición
                             fetch(`/admin/edit-form/premi/${premiId}`)
@@ -1894,9 +1914,10 @@
                             document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
 
                             // Mostrar modal
-                            detailModal.classList.add('show');
-                            detailModal.style.display = 'block';
-                            document.body.classList.add('modal-open');
+                            bootstrap.Modal.getOrCreateInstance(detailModal, {
+                                backdrop: false,
+                                keyboard: true
+                            }).show();
 
                             // Cargar contenido del formulario de edición
                             fetch(`/admin/edit-form/codi/${codiId}`)
@@ -1946,9 +1967,10 @@
                             if (modalLoader) modalLoader.classList.remove('d-none');
                             if (detailContent) detailContent.classList.add('d-none');
 
-                            detailModal.classList.add('show');
-                            detailModal.style.display = 'block';
-                            document.body.classList.add('modal-open');
+                            bootstrap.Modal.getOrCreateInstance(detailModal, {
+                                backdrop: false,
+                                keyboard: true
+                            }).show();
 
                             fetch(`/admin/edit-form/producte/${producteId}`)
                                 .then(response => {
@@ -1997,9 +2019,10 @@
                             if (modalLoader) modalLoader.classList.remove('d-none');
                             if (detailContent) detailContent.classList.add('d-none');
 
-                            detailModal.classList.add('show');
-                            detailModal.style.display = 'block';
-                            document.body.classList.add('modal-open');
+                            bootstrap.Modal.getOrCreateInstance(detailModal, {
+                                backdrop: false,
+                                keyboard: true
+                            }).show();
 
                             fetch(`/admin/edit-form/punt-reciclatge/${puntId}`)
                                 .then(response => {
@@ -2048,9 +2071,10 @@
                             if (modalLoader) modalLoader.classList.remove('d-none');
                             if (detailContent) detailContent.classList.add('d-none');
 
-                            detailModal.classList.add('show');
-                            detailModal.style.display = 'block';
-                            document.body.classList.add('modal-open');
+                            bootstrap.Modal.getOrCreateInstance(detailModal, {
+                                backdrop: false,
+                                keyboard: true
+                            }).show();
 
                             fetch(`/admin/edit-form/rol/${rolId}`)
                                 .then(response => {
@@ -2100,9 +2124,10 @@
                             if (modalLoader) modalLoader.classList.remove('d-none');
                             if (detailContent) detailContent.classList.add('d-none');
 
-                            detailModal.classList.add('show');
-                            detailModal.style.display = 'block';
-                            document.body.classList.add('modal-open');
+                            bootstrap.Modal.getOrCreateInstance(detailModal, {
+                                backdrop: false,
+                                keyboard: true
+                            }).show();
 
                             fetch(`/admin/edit-form/tipus-alerta/${tipusAlertaId}`)
                                 .then(response => {
@@ -2151,9 +2176,10 @@
                             if (modalLoader) modalLoader.classList.remove('d-none');
                             if (detailContent) detailContent.classList.add('d-none');
 
-                            detailModal.classList.add('show');
-                            detailModal.style.display = 'block';
-                            document.body.classList.add('modal-open');
+                            bootstrap.Modal.getOrCreateInstance(detailModal, {
+                                backdrop: false,
+                                keyboard: true
+                            }).show();
 
                             fetch(`/admin/edit-form/alerta-punt/${alertaId}`)
                                 .then(response => {
@@ -2202,9 +2228,10 @@
                             if (modalLoader) modalLoader.classList.remove('d-none');
                             if (detailContent) detailContent.classList.add('d-none');
 
-                            detailModal.classList.add('show');
-                            detailModal.style.display = 'block';
-                            document.body.classList.add('modal-open');
+                            bootstrap.Modal.getOrCreateInstance(detailModal, {
+                                backdrop: false,
+                                keyboard: true
+                            }).show();
 
                             fetch(`/admin/edit-form/tipus-event/${tipusEventId}`)
                                 .then(response => {
@@ -2326,9 +2353,10 @@
                         if (modalLoader) modalLoader.classList.remove('d-none');
                         if (modalContent) modalContent.classList.add('d-none');
 
-                        dynamicModal.classList.add('show');
-                        dynamicModal.style.display = 'block';
-                        document.body.classList.add('modal-open');
+                        bootstrap.Modal.getOrCreateInstance(dynamicModal, {
+                            backdrop: false,
+                            keyboard: true
+                        }).show();
 
                         fetch('/admin/modal-content/activitats')
                             .then(response => {
@@ -2374,9 +2402,10 @@
                         if (modalLoader) modalLoader.classList.remove('d-none');
                         if (detailContent) detailContent.classList.add('d-none');
 
-                        detailModal.classList.add('show');
-                        detailModal.style.display = 'block';
-                        document.body.classList.add('modal-open');
+                        bootstrap.Modal.getOrCreateInstance(detailModal, {
+                            backdrop: false,
+                            keyboard: true
+                        }).show();
 
                         fetch(`/admin/detail/activitat/${activityId}`)
                             .then(response => {
@@ -2448,71 +2477,75 @@
             }
         });
         // Botón "Ver Todo" para el ranking de usuarios
-        document.getElementById('viewAllUsersBtn').addEventListener('click', function (e) {
-            e.preventDefault();
+        const viewAllUsersBtn = document.getElementById('viewAllUsersBtn');
+        if (viewAllUsersBtn) {
+            viewAllUsersBtn.addEventListener('click', function (e) {
+                e.preventDefault();
 
-            const dynamicModal = document.getElementById('dynamicModal');
-            if (dynamicModal) {
-                const modalTitle = document.getElementById('dynamicModalLabel');
-                const modalLoader = document.getElementById('modal-loader');
-                const modalContent = document.getElementById('dynamic-content');
+                const dynamicModal = document.getElementById('dynamicModal');
+                if (dynamicModal) {
+                    const modalTitle = document.getElementById('dynamicModalLabel');
+                    const modalLoader = document.getElementById('modal-loader');
+                    const modalContent = document.getElementById('dynamic-content');
 
-                if (modalTitle) modalTitle.textContent = "Classificació d'Usuaris";
-                if (modalLoader) modalLoader.classList.remove('d-none');
-                if (modalContent) modalContent.classList.add('d-none');
+                    if (modalTitle) modalTitle.textContent = "Classificació d'Usuaris";
+                    if (modalLoader) modalLoader.classList.remove('d-none');
+                    if (modalContent) modalContent.classList.add('d-none');
 
-                dynamicModal.classList.add('show');
-                dynamicModal.style.display = 'block';
-                document.body.classList.add('modal-open');
+                    bootstrap.Modal.getOrCreateInstance(dynamicModal, {
+                        backdrop: false,
+                        keyboard: true
+                    }).show();
 
-                fetch('/admin/modal-content/users-ranking')
-                    .then(response => {
-                        if (!response.ok) throw new Error('Error al cargar el ranking');
-                        return response.text();
-                    })
-                    .then(html => {
-                        if (modalLoader) modalLoader.classList.add('d-none');
-                        if (modalContent) {
-                            modalContent.innerHTML = html;
-                            modalContent.classList.remove('d-none');
+                    fetch('/admin/modal-content/users-ranking')
+                        .then(response => {
+                            if (!response.ok) throw new Error('Error al cargar el ranking');
+                            return response.text();
+                        })
+                        .then(html => {
+                            if (modalLoader) modalLoader.classList.add('d-none');
+                            if (modalContent) {
+                                modalContent.innerHTML = html;
+                                modalContent.classList.remove('d-none');
 
-                            // Inicializar DataTables después de cargar el contenido
-                            if (typeof $ !== 'undefined' && $.fn.DataTable) {
-                                setTimeout(function () {
-                                    if ($.fn.DataTable.isDataTable('#usersRankingTable')) {
-                                        $('#usersRankingTable').DataTable().destroy();
-                                    }
-                                    $('#usersRankingTable').DataTable({
-                                        language: {
-                                            url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/ca.json'
-                                        },
-                                        order: [[3, 'desc']], // Ordenar por puntos totales
-                                        pageLength: 10,
-                                        responsive: true,
-                                        dom: '<"top"f>rt<"bottom"lp><"clear">',
-                                        columnDefs: [
-                                            { orderable: false, targets: 5 }
-                                        ]
-                                    });
-                                }, 100);
+                                // Inicializar DataTables después de cargar el contenido
+                                if (typeof $ !== 'undefined' && $.fn.DataTable) {
+                                    setTimeout(function () {
+                                        if ($.fn.DataTable.isDataTable('#usersRankingTable')) {
+                                            $('#usersRankingTable').DataTable().destroy();
+                                        }
+                                        $('#usersRankingTable').DataTable({
+                                            language: {
+                                                url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/ca.json'
+                                            },
+                                            order: [[3, 'desc']], // Ordenar por puntos totales
+                                            pageLength: 10,
+                                            responsive: true,
+                                            dom: '<"top"f>rt<"bottom"lp><"clear">',
+                                            columnDefs: [
+                                                { orderable: false, targets: 5 }
+                                            ]
+                                        });
+                                    }, 100);
+                                }
                             }
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        if (modalLoader) modalLoader.classList.add('d-none');
-                        if (modalContent) {
-                            modalContent.innerHTML = `
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            if (modalLoader) modalLoader.classList.add('d-none');
+                            if (modalContent) {
+                                modalContent.innerHTML = `
                                                                                                                     <div class="alert alert-danger">
                                                                                                                         <i class="fas fa-exclamation-triangle me-2"></i>
                                                                                                                         Error al cargar el ranking: ${error.message}
                                                                                                                     </div>
                                                                                                                 `;
-                            modalContent.classList.remove('d-none');
-                        }
-                    });
-            }
-        });
+                                modalContent.classList.remove('d-none');
+                            }
+                        });
+                }
+            });
+        }
         // Manejador para botones de acción en premios reclamados
         document.addEventListener('click', function (e) {
             if (e.target.closest('.actionBtn')) {
@@ -2529,7 +2562,11 @@
                 let successMessage = 'Operació completada amb èxit';
                 let route = '';
 
-                if (action === 'approve') {
+                if (action === 'approve-all') {
+                    confirmMessage = 'Estàs segur que vols aprovar TOTES les sol·licituds pendents?';
+                    successMessage = 'Totes les sol·licituds pendents s\'han aprovat correctament';
+                    route = `/admin/premis-reclamats/approve-all`;
+                } else if (action === 'approve') {
                     confirmMessage = `Estàs segur que vols aprovar la sol·licitud de "${itemName}"?`;
                     successMessage = 'Sol·licitud aprovada correctament';
                     route = `/admin/premis-reclamats/${itemId}/approve`;
@@ -2537,6 +2574,10 @@
                     confirmMessage = `Estàs segur que vols rebutjar la sol·licitud de "${itemName}"?`;
                     successMessage = 'Sol·licitud rebutjada correctament';
                     route = `/admin/premis-reclamats/${itemId}/reject`;
+                } else if (action === 'deliver') {
+                    confirmMessage = `Estàs segur que vols marcar com entregat el premi "${itemName}"?`;
+                    successMessage = 'Premi marcat com entregat correctament';
+                    route = `/admin/premis-reclamats/${itemId}/deliver`;
                 }
 
                 if (confirm(confirmMessage)) {
@@ -2545,20 +2586,21 @@
                     const originalHtml = btn.innerHTML;
                     btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
 
+                    if (action === 'approve-all') {
+                        btn.dataset.originalHtml = originalHtml;
+                    }
+
                     // Realizar la acción mediante AJAX
                     fetch(route, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'X-CSRF-TOKEN': window.getCsrfToken ? window.getCsrfToken() : '',
                             'Accept': 'application/json',
                             'X-Requested-With': 'XMLHttpRequest'
                         }
                     })
-                        .then(response => {
-                            if (!response.ok) throw new Error('Error en la respuesta del servidor');
-                            return response.json();
-                        })
+                        .then(parseJsonResponse)
                         .then(data => {
                             // Mostrar mensaje de éxito
                             alert(successMessage);
@@ -2610,16 +2652,10 @@
 
                 // Mostrar modal
                 if (detailModal) {
-                    detailModal.classList.add('show');
-                    detailModal.style.display = 'block';
-                    document.body.classList.add('modal-open');
-
-                    // Crear backdrop si no existe
-                    if (!document.querySelector('.modal-backdrop')) {
-                        const backdrop = document.createElement('div');
-                        backdrop.className = 'modal-backdrop fade show';
-                        document.body.appendChild(backdrop);
-                    }
+                    bootstrap.Modal.getOrCreateInstance(detailModal, {
+                        backdrop: false,
+                        keyboard: true
+                    }).show();
                 }
 
                 // Cargar contenido mediante AJAX
@@ -2724,6 +2760,22 @@
 
         // Limpiar cualquier backdrop residual al cargar la página
         document.addEventListener('DOMContentLoaded', function () {
+            const cleanupOrphanModalLock = function () {
+                const hasVisibleModal = document.querySelector('.modal.show') !== null;
+
+                if (!hasVisibleModal) {
+                    document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+                    document.body.classList.remove('modal-open');
+                    document.body.style.overflow = '';
+                    document.body.style.paddingRight = '';
+                }
+            };
+
+            cleanupOrphanModalLock();
+
+            window.addEventListener('focus', cleanupOrphanModalLock);
+            setInterval(cleanupOrphanModalLock, 500);
+
             document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
                 backdrop.remove();
             });
@@ -2739,3 +2791,4 @@
         });
     </script>
 @endsection
+

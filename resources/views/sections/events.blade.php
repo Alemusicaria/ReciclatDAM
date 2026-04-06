@@ -46,6 +46,19 @@
     document.addEventListener('DOMContentLoaded', function () {
         // Utiliza los índices de Algolia ya inicializados en app.blade.php
         const eventsIndex = window.eventsIndex;
+        // Helper function to safely escape HTML in JavaScript
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;',
+                '/': '&#x2F;'
+            };
+            return String(text).replace(/[&<>"'/]/g, char => map[char]);
+        }
         const tipusEventsIndex = window.tipusEventsIndex;
 
         // Obtener los IDs de eventos en los que el usuario está registrado
@@ -58,6 +71,15 @@
             document.getElementById('calendar-loader').innerHTML =
                 '<div class="alert alert-danger">Error cargando eventos. Intenta recargar la página.</div>';
         });
+            const parseJsonResponse = async (response, defaultMessage = 'Error en la resposta del servidor') => {
+                const payload = await response.json().catch(() => null);
+
+                if (!response.ok) {
+                    throw new Error((payload && payload.message) || defaultMessage);
+                }
+
+                return payload;
+            };
 
         // Función para cargar eventos desde Algolia
         async function loadEvents() {
@@ -149,7 +171,7 @@
                 <div class="row g-2">
                     <div class="col-md-5">
                         <img src="${event.extendedProps.imatge ? 'images/events/' + event.extendedProps.imatge : '/images/event-default.jpg'}" 
-                             alt="${event.title}" class="event-img mb-2">
+                             alt="${escapeHtml(event.title)}" class="event-img mb-2">
                     </div>
                     <div class="col-md-7">
                         <ul class="event-details-list">
@@ -159,7 +181,7 @@
                             <li>
                                 <i class="fas fa-tag"></i> 
                                 <span class="badge" style="background-color: ${event.backgroundColor}">
-                                    ${event.extendedProps.tipus || 'General'}
+                                    ${escapeHtml(event.extendedProps.tipus || 'General')}
                                 </span>
                             </li>
                             <li><i class="fas fa-users"></i> Capacitat: ${event.extendedProps.capacitat !== null ? event.extendedProps.capacitat : 'Il·limitada'}</li>
@@ -171,6 +193,7 @@
                 <div class="mt-2">
                     <h6 class="mb-1">Descripció:</h6>
                     <p class="small mb-0">${event.extendedProps.description || 'Sense descripció'}</p>
+                    <p class="small mb-0">${escapeHtml(event.extendedProps.description || 'Sense descripció')}</p>
                 </div>
                 
                 <!-- Añadir un loading mientras verificamos el estado -->
@@ -203,8 +226,19 @@
                         'Accept': 'application/json'
                     }
                 })
-                    .then(response => response.json())
+                    .then(response => {
+                        if (response.redirected || response.status === 401) {
+                            window.location.href = "{{ route('login') }}?redirect=events";
+                            return null;
+                        }
+
+                            return parseJsonResponse(response);
+                    })
                     .then(data => {
+                        if (!data) {
+                            return;
+                        }
+
                         // Ocultar el loading
                         document.getElementById('registration-status-loading').style.display = 'none';
 
@@ -280,7 +314,7 @@
                             window.location.href = response.url;
                             return null;
                         }
-                        return response.json();
+                            return parseJsonResponse(response);
                     })
                     .then(data => {
                         if (!data) return; // Si hubo redirección
@@ -359,24 +393,12 @@
             try {
                 // Bootstrap 5
                 if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal !== 'undefined') {
-                    const modal = bootstrap.Modal.getInstance(modalElement);
+                    const modal = bootstrap.Modal.getInstance(modalElement) || bootstrap.Modal.getOrCreateInstance(modalElement);
                     if (modal) {
+                        modalElement.addEventListener('hidden.bs.modal', cleanupModalEffects, { once: true });
                         modal.hide();
-                        // Esperar a que termine la animación y luego limpiar
-                        setTimeout(() => {
-                            cleanupModalEffects();
-                        }, 300);
                         return;
                     }
-                }
-
-                // Bootstrap 4 (jQuery)
-                if (typeof $ !== 'undefined') {
-                    $(modalElement).modal('hide');
-                    setTimeout(() => {
-                        cleanupModalEffects();
-                    }, 300);
-                    return;
                 }
 
                 // Si llegamos aquí, hacemos la limpieza manual directamente

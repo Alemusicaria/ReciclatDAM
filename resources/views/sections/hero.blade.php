@@ -43,8 +43,6 @@
         const searchResults = document.getElementById('search-results');
         const clearSearchBtn = document.getElementById('clear-hero-search');
 
-        const GOOGLE_MAPS_API_KEY = "{{ config('services.google_maps.key') }}";
-
         const fraccioColors = {
             'Paper': '#2859bc',
             'Envasos': '#fddd19',
@@ -123,7 +121,30 @@
                                 <small><strong>{{ __("messages.hero.fraction") }}</strong> ${hit.fraccio}</small>
                             </div>
                             <div style="margin-left: 10px; z-index: 1;">
-                                <img src="https://maps.googleapis.com/maps/api/staticmap?center=${hit.latitud},${hit.longitud}&zoom=15&size=150x100&scale=2&markers=color:red%7C${hit.latitud},${hit.longitud}&key=${GOOGLE_MAPS_API_KEY}" alt="{{ __("messages.hero.static_map_alt") }}" style="width: 150px; height: 100px; border-radius: 5px;">
+                                <img id="map-${hit.objectID}" src="{{ asset('images/loading.gif') }}" alt="{{ __("messages.hero.static_map_alt") }}" style="width: 150px; height: 100px; border-radius: 5px;">
+                                <script>
+                                    // Cargar mapa de forma segura sin exponer API key en frontend
+                                    fetch('{{ route("map.static-map") }}', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                        },
+                                        body: JSON.stringify({
+                                            lat: ${hit.latitud},
+                                            lng: ${hit.longitud},
+                                            width: 150,
+                                            height: 100
+                                        })
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.url) {
+                                            document.getElementById('map-${hit.objectID}').src = data.url;
+                                        }
+                                    })
+                                    .catch(err => console.error('Map load error:', err));
+                                </script>
                             </div>
                         `;
 

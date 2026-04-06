@@ -1,6 +1,10 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h5 class="mb-0">{{ __('messages.admin.claimed_prizes.list_title') }}</h5>
     <div>
+        <button class="btn btn-sm btn-success actionBtn me-2" data-action="approve-all" data-item-name="totes les sol·licituds pendents"
+            title="Aprovar totes les sol·licituds pendents">
+            <i class="fas fa-check-double me-1"></i>Aprovar totes
+        </button>
         <div class="btn-group me-2 filter-buttons">
             <button class="btn btn-sm btn-outline-primary" id="filterAllBtn">{{ __('messages.admin.claimed_prizes.filter_all') }}</button>
             <button class="btn btn-sm btn-outline-warning" id="filterPendingBtn">{{ __('messages.admin.claimed_prizes.filter_pending') }}</button>
@@ -78,16 +82,31 @@
                             </button>
 
                             @if($premiReclamat->estat == 'pendent')
-                                <button class="btn btn-sm btn-success approveClaimBtn" 
-                                       data-id="{{ $premiReclamat->id }}"
+                                <button type="button" class="btn btn-sm btn-success actionBtn approveClaimBtn" 
+                                    data-action="approve"
+                                    data-item-id="{{ $premiReclamat->id }}"
+                                    data-item-name="{{ $premiReclamat->premi ? $premiReclamat->premi->nom : __('messages.admin.claimed_prizes.unknown_prize') }}"
+                                    data-item-type="premi-reclamat"
                                        title="{{ __('messages.admin.claimed_prizes.approve_request') }}">
                                     <i class="fas fa-check"></i>
                                 </button>
 
-                                <button class="btn btn-sm btn-danger rejectClaimBtn"
-                                       data-id="{{ $premiReclamat->id }}"
+                                <button type="button" class="btn btn-sm btn-danger actionBtn rejectClaimBtn"
+                                    data-action="reject"
+                                    data-item-id="{{ $premiReclamat->id }}"
+                                    data-item-name="{{ $premiReclamat->premi ? $premiReclamat->premi->nom : __('messages.admin.claimed_prizes.unknown_prize') }}"
+                                    data-item-type="premi-reclamat"
                                        title="{{ __('messages.admin.claimed_prizes.reject_request') }}">
                                     <i class="fas fa-times"></i>
+                                </button>
+                            @elseif($premiReclamat->estat == 'procesant')
+                                <button type="button" class="btn btn-sm btn-success actionBtn deliverClaimBtn" 
+                                       data-action="deliver"
+                                       data-item-id="{{ $premiReclamat->id }}"
+                                       data-item-name="{{ $premiReclamat->premi ? $premiReclamat->premi->nom : __('messages.admin.claimed_prizes.unknown_prize') }}"
+                                       data-item-type="premi-reclamat"
+                                       title="Marcar com entregat">
+                                    <i class="fas fa-box-check"></i>
                                 </button>
                             @endif
 

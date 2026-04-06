@@ -11,6 +11,39 @@
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script>
+        window.getCsrfToken = function () {
+            const meta = document.querySelector('meta[name="csrf-token"]');
+            return meta ? meta.getAttribute('content') : null;
+        };
+
+        (function () {
+            if (window.__safeCsrfQuerySelectorPatched) {
+                return;
+            }
+
+            const originalQuerySelector = Document.prototype.querySelector;
+
+            Document.prototype.querySelector = function (selector) {
+                if (selector === 'meta[name="csrf-token"]') {
+                    const meta = originalQuerySelector.call(this, selector);
+                    if (meta) {
+                        return meta;
+                    }
+
+                    return {
+                        getAttribute: function () {
+                            return null;
+                        }
+                    };
+                }
+
+                return originalQuerySelector.call(this, selector);
+            };
+
+            window.__safeCsrfQuerySelectorPatched = true;
+        })();
+    </script>
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -244,6 +277,20 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
+            function cleanupOrphanModalBackdrops() {
+                const hasVisibleModal = document.querySelector('.modal.show') !== null;
+
+                if (!hasVisibleModal) {
+                    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                    document.body.classList.remove('modal-open');
+                    document.body.style.removeProperty('padding-right');
+                    document.body.style.removeProperty('overflow');
+                }
+            }
+
+            // Clean once on load in case a stale backdrop remained after navigation.
+            cleanupOrphanModalBackdrops();
+
             const settingsDropdownTrigger = document.getElementById('settingsDropdown');
             const settingsDropdownMenu = document.getElementById('settingsDropdownMenu');
 

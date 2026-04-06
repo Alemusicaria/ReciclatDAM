@@ -25,9 +25,9 @@
                         <div class="d-flex align-items-center">
                             @if($user->foto_perfil)
                                 @if(str_starts_with($user->foto_perfil, 'https://'))
-                                    <img src="{{ $user->foto_perfil }}" class="user-avatar rounded-circle me-2" alt="{{ __('messages.admin.profile_photo') }}">
-                                @elseif(file_exists(public_path('storage/' . $user->foto_perfil)))
-                                    <img src="{{ asset('storage/' . $user->foto_perfil) }}" class="user-avatar rounded-circle me-2" alt="{{ __('messages.admin.profile_photo') }}">
+                                    <img src="{{ e($user->foto_perfil) }}" class="user-avatar rounded-circle me-2" alt="{{ __('messages.admin.profile_photo') }}">
+                                @elseif(file_exists(public_path('storage/' . e($user->foto_perfil))))
+                                    <img src="{{ asset('storage/' . e($user->foto_perfil)) }}" class="user-avatar rounded-circle me-2" alt="{{ __('messages.admin.profile_photo') }}">
                                 @else
                                     <img src="{{ asset('images/default-profile.png') }}" class="user-avatar rounded-circle me-2" alt="{{ __('messages.admin.profile_photo') }}">
                                 @endif

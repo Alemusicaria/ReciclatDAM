@@ -1,19 +1,29 @@
 /**
  * Scripts para el panel de administración
  */
+const parseJsonResponse = async (response) => {
+    const payload = await response.json().catch(() => null);
+
+    if (!response.ok) {
+        const message = payload && payload.message ? payload.message : 'Error en la resposta del servidor';
+        throw new Error(message);
+    }
+
+    return payload;
+};
 const AdminDashboard = {
     /**
-     * Objeto para gestión de códigos
+     * Objeto para gestiÃ³n de cÃ³digos
      */
     Codis: {
         init: function () {
-            // Inicializar el generador de códigos
+            // Inicializar el generador de cÃ³digos
             const generateBtn = document.getElementById('generateCode');
             if (generateBtn) {
                 generateBtn.addEventListener('click', this.generateRandomCode);
             }
 
-            // Control de tipo de código (único/múltiple)
+            // Control de tipo de cÃ³digo (Ãºnico/mÃºltiple)
             const tipusUnic = document.getElementById('tipus_unic');
             const tipusMulti = document.getElementById('tipus_multi');
             const multiUsesContainer = document.getElementById('multiUsesContainer');
@@ -53,7 +63,7 @@ const AdminDashboard = {
     },
 
     /**
-     * Objeto para gestión de eventos
+     * Objeto para gestiÃ³n de eventos
      */
     Events: {
         init: function () {
@@ -63,7 +73,7 @@ const AdminDashboard = {
                 form.addEventListener('submit', function (e) {
                     e.preventDefault();
 
-                    // Validación básica
+                    // ValidaciÃ³n bÃ¡sica
                     let isValid = true;
                     form.querySelectorAll('[required]').forEach(input => {
                         if (!input.value.trim()) {
@@ -88,11 +98,11 @@ const AdminDashboard = {
                         method: 'POST',
                         body: formData,
                         headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'X-CSRF-TOKEN': window.getCsrfToken ? window.getCsrfToken() : '',
                             'X-Requested-With': 'XMLHttpRequest'
                         }
                     })
-                        .then(response => response.json())
+                        .then(parseJsonResponse)
                         .then(data => {
                             if (data.success) {
                                 // Cerrar modal
@@ -111,7 +121,7 @@ const AdminDashboard = {
                                     }
                                 }, 500);
                             } else {
-                                // Restaurar botón
+                                // Restaurar botÃ³n
                                 submitBtn.disabled = false;
                                 submitBtn.innerHTML = 'Guardar Event';
 
@@ -122,7 +132,7 @@ const AdminDashboard = {
                         .catch(error => {
                             console.error('Error:', error);
 
-                            // Restaurar botón
+                            // Restaurar botÃ³n
                             submitBtn.disabled = false;
                             submitBtn.innerHTML = 'Guardar Event';
 
@@ -132,7 +142,7 @@ const AdminDashboard = {
                 });
             }
 
-            // Inicialización de fechas
+            // InicializaciÃ³n de fechas
             const dataInici = document.getElementById('data_inici');
             const dataFi = document.getElementById('data_fi');
             if (dataInici && dataFi) {
@@ -141,13 +151,13 @@ const AdminDashboard = {
                 const todayStr = today.toISOString().slice(0, 16);
                 dataInici.value = todayStr;
 
-                // Establecer fecha final como mañana
+                // Establecer fecha final como maÃ±ana
                 const tomorrow = new Date();
                 tomorrow.setDate(tomorrow.getDate() + 1);
                 const tomorrowStr = tomorrow.toISOString().slice(0, 16);
                 dataFi.value = tomorrowStr;
 
-                // Validación de fechas
+                // ValidaciÃ³n de fechas
                 dataInici.addEventListener('change', function () {
                     if (dataFi.value && this.value > dataFi.value) {
                         dataFi.value = this.value;
@@ -164,7 +174,7 @@ const AdminDashboard = {
         }
     },
     /**
- * Objeto para gestión de premios
+ * Objeto para gestiÃ³n de premios
  */
     Premis: {
         init: function () {
@@ -174,7 +184,7 @@ const AdminDashboard = {
                 form.addEventListener('submit', function (e) {
                     e.preventDefault();
 
-                    // Validación básica
+                    // ValidaciÃ³n bÃ¡sica
                     let isValid = true;
                     form.querySelectorAll('[required]').forEach(input => {
                         if (!input.value.trim()) {
@@ -200,11 +210,11 @@ const AdminDashboard = {
                         method: 'POST',
                         body: formData,
                         headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'X-CSRF-TOKEN': window.getCsrfToken ? window.getCsrfToken() : '',
                             'X-Requested-With': 'XMLHttpRequest'
                         }
                     })
-                        .then(response => response.json())
+                        .then(parseJsonResponse)
                         .then(data => {
                             if (data.success) {
                                 // Cerrar modal
@@ -224,7 +234,7 @@ const AdminDashboard = {
                                     else window.location.reload();
                                 }, 300);
                             } else {
-                                // Restaurar botón
+                                // Restaurar botÃ³n
                                 submitBtn.disabled = false;
                                 submitBtn.innerHTML = window.translations?.admin?.premis?.save_button || 'Guardar Premi';
 
@@ -235,7 +245,7 @@ const AdminDashboard = {
                         .catch(error => {
                             console.error('Error:', error);
 
-                            // Restaurar botón
+                            // Restaurar botÃ³n
                             submitBtn.disabled = false;
                             submitBtn.innerHTML = window.translations?.admin?.premis?.save_button || 'Guardar Premi';
 
@@ -247,7 +257,7 @@ const AdminDashboard = {
         }
     },
     /**
-     * Objeto para gestión de productos
+     * Objeto para gestiÃ³n de productos
      */
     Productes: {
         init: function () {
@@ -256,7 +266,7 @@ const AdminDashboard = {
                 form.addEventListener('submit', function (e) {
                     e.preventDefault();
 
-                    // Validación básica
+                    // ValidaciÃ³n bÃ¡sica
                     let isValid = true;
                     form.querySelectorAll('[required]').forEach(input => {
                         if (!input.value.trim()) {
@@ -282,11 +292,11 @@ const AdminDashboard = {
                         method: 'POST',
                         body: formData,
                         headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'X-CSRF-TOKEN': window.getCsrfToken ? window.getCsrfToken() : '',
                             'X-Requested-With': 'XMLHttpRequest'
                         }
                     })
-                        .then(response => response.json())
+                        .then(parseJsonResponse)
                         .then(data => {
                             if (data.success) {
                                 // Cerrar modal
@@ -323,7 +333,7 @@ const AdminDashboard = {
     },
 
     /**
-     * Objeto para gestión de puntos de reciclaje
+     * Objeto para gestiÃ³n de puntos de reciclaje
      */
     PuntsReciclatge: {
         init: function () {
@@ -332,7 +342,7 @@ const AdminDashboard = {
                 form.addEventListener('submit', function (e) {
                     e.preventDefault();
 
-                    // Validación básica
+                    // ValidaciÃ³n bÃ¡sica
                     let isValid = true;
                     form.querySelectorAll('[required]').forEach(input => {
                         if (!input.value.trim()) {
@@ -358,11 +368,11 @@ const AdminDashboard = {
                         method: 'POST',
                         body: formData,
                         headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'X-CSRF-TOKEN': window.getCsrfToken ? window.getCsrfToken() : '',
                             'X-Requested-With': 'XMLHttpRequest'
                         }
                     })
-                        .then(response => response.json())
+                        .then(parseJsonResponse)
                         .then(data => {
                             if (data.success) {
                                 // Cerrar modal
@@ -399,7 +409,7 @@ const AdminDashboard = {
     },
 
     /**
-     * Objeto para gestión de tipos de alertas
+     * Objeto para gestiÃ³n de tipos de alertas
      */
     TipusAlertes: {
         init: function () {
@@ -408,7 +418,7 @@ const AdminDashboard = {
                 form.addEventListener('submit', function (e) {
                     e.preventDefault();
 
-                    // Validación básica
+                    // ValidaciÃ³n bÃ¡sica
                     let isValid = true;
                     form.querySelectorAll('[required]').forEach(input => {
                         if (!input.value.trim()) {
@@ -434,11 +444,11 @@ const AdminDashboard = {
                         method: 'POST',
                         body: formData,
                         headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'X-CSRF-TOKEN': window.getCsrfToken ? window.getCsrfToken() : '',
                             'X-Requested-With': 'XMLHttpRequest'
                         }
                     })
-                        .then(response => response.json())
+                        .then(parseJsonResponse)
                         .then(data => {
                             if (data.success) {
                                 // Cerrar modal
@@ -458,7 +468,7 @@ const AdminDashboard = {
                                     else window.location.reload();
                                 }, 300);
                             } else {
-                                // Restaurar botón
+                                // Restaurar botÃ³n
                                 submitBtn.disabled = false;
                                 submitBtn.innerHTML = window.translations?.admin?.tipus_alertes?.save_button || 'Guardar';
 
@@ -478,7 +488,7 @@ const AdminDashboard = {
     },
 
     /**
-     * Objeto para gestión de roles
+     * Objeto para gestiÃ³n de roles
      */
     Rols: {
         init: function () {
@@ -487,7 +497,7 @@ const AdminDashboard = {
                 form.addEventListener('submit', function (e) {
                     e.preventDefault();
 
-                    // Validación básica
+                    // ValidaciÃ³n bÃ¡sica
                     let isValid = true;
                     form.querySelectorAll('[required]').forEach(input => {
                         if (!input.value.trim()) {
@@ -513,11 +523,11 @@ const AdminDashboard = {
                         method: 'POST',
                         body: formData,
                         headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'X-CSRF-TOKEN': window.getCsrfToken ? window.getCsrfToken() : '',
                             'X-Requested-With': 'XMLHttpRequest'
                         }
                     })
-                        .then(response => response.json())
+                        .then(parseJsonResponse)
                         .then(data => {
                             if (data.success) {
                                 // Cerrar modal
@@ -537,7 +547,7 @@ const AdminDashboard = {
                                     else window.location.reload();
                                 }, 300);
                             } else {
-                                // Restaurar botón
+                                // Restaurar botÃ³n
                                 submitBtn.disabled = false;
                                 submitBtn.innerHTML = window.translations?.admin?.rols?.save_button || 'Guardar Rol';
 
@@ -556,7 +566,7 @@ const AdminDashboard = {
         }
     },
     /**
-     * Objeto para gestión de tipos de eventos
+     * Objeto para gestiÃ³n de tipos de eventos
      */
     TipusEvents: {
         init: function () {
@@ -565,7 +575,7 @@ const AdminDashboard = {
                 form.addEventListener('submit', function (e) {
                     e.preventDefault();
 
-                    // Validación básica
+                    // ValidaciÃ³n bÃ¡sica
                     let isValid = true;
                     form.querySelectorAll('[required]').forEach(input => {
                         if (!input.value.trim()) {
@@ -591,11 +601,11 @@ const AdminDashboard = {
                         method: 'POST',
                         body: formData,
                         headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'X-CSRF-TOKEN': window.getCsrfToken ? window.getCsrfToken() : '',
                             'X-Requested-With': 'XMLHttpRequest'
                         }
                     })
-                        .then(response => response.json())
+                        .then(parseJsonResponse)
                         .then(data => {
                             if (data.success) {
                                 if (typeof closeAnyModal === 'function') {
@@ -631,7 +641,7 @@ const AdminDashboard = {
     },
 
     /**
-     * Objeto para gestión de usuarios
+     * Objeto para gestiÃ³n de usuarios
      */
     Users: {
         init: function () {
@@ -641,7 +651,7 @@ const AdminDashboard = {
                 form.addEventListener('submit', function (e) {
                     e.preventDefault();
 
-                    // Validación básica
+                    // ValidaciÃ³n bÃ¡sica
                     let isValid = true;
                     form.querySelectorAll('[required]').forEach(input => {
                         if (!input.value.trim()) {
@@ -666,11 +676,11 @@ const AdminDashboard = {
             }
         }
     },    /**
-     * Objeto para gestión de premios reclamados
+     * Objeto para gestiÃ³n de premios reclamados
      */
     PremisReclamats: {
         init: function () {
-            // Configurar botones de aprobación/rechazo
+            // Configurar botones de aprobaciÃ³n/rechazo
             document.querySelectorAll('.approveBtn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const id = btn.getAttribute('data-id');
@@ -685,7 +695,7 @@ const AdminDashboard = {
                 });
             });
 
-            // Botón de actualización de estado
+            // BotÃ³n de actualizaciÃ³n de estado
             document.querySelectorAll('.editStatusBtn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const id = btn.getAttribute('data-id');
@@ -697,7 +707,7 @@ const AdminDashboard = {
         handleAction: function (action, id) {
             const confirmMsg = action === 'approve' ? 'aprovar' : 'rebutjar';
 
-            if (confirm(`${window.translations?.admin?.claimed_prizes?.confirm_action?.replace(':action', confirmMsg) || `Estàs segur que vols ${confirmMsg} aquesta sol·licitud?`}`)) {
+            if (confirm(`${window.translations?.admin?.claimed_prizes?.confirm_action?.replace(':action', confirmMsg) || `EstÃ s segur que vols ${confirmMsg} aquesta solÂ·licitud?`}`)) {
                 const url = action === 'approve'
                     ? `/admin/premis-reclamats/${id}/approve`
                     : `/admin/premis-reclamats/${id}/reject`;
@@ -705,15 +715,15 @@ const AdminDashboard = {
                 fetch(url, {
                     method: 'POST',
                     headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-CSRF-TOKEN': window.getCsrfToken ? window.getCsrfToken() : '',
                         'Content-Type': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 })
-                    .then(response => response.json())
+                    .then(parseJsonResponse)
                     .then(data => {
                         if (data.success) {
-                            alert(`${window.translations?.admin?.claimed_prizes?.request_action_success?.replace(':action', confirmMsg + 'ada') || `Sol·licitud ${confirmMsg}ada correctament`}`);
+                            alert(`${window.translations?.admin?.claimed_prizes?.request_action_success?.replace(':action', confirmMsg + 'ada') || `SolÂ·licitud ${confirmMsg}ada correctament`}`);
 
                             if (typeof closeAnyModal === 'function') {
                                 closeAnyModal('detailModal');
@@ -728,13 +738,13 @@ const AdminDashboard = {
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert(`${window.translations?.admin?.claimed_prizes?.request_action_error?.replace(':action', confirmMsg) || `Error al ${confirmMsg} la sol·licitud`}`);
+                        alert(`${window.translations?.admin?.claimed_prizes?.request_action_error?.replace(':action', confirmMsg) || `Error al ${confirmMsg} la solÂ·licitud`}`);
                     });
             }
         },
 
         showStatusUpdateModal: function (id) {
-            // Crear el modal dinámicamente
+            // Crear el modal dinÃ¡micamente
             const modalHtml = `
                 <div class="modal fade" id="updateStatusModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog">
@@ -751,7 +761,7 @@ const AdminDashboard = {
                                             <option value="pendent">${window.translations?.admin?.claimed_prizes?.pending || 'Pendent'}</option>
                                             <option value="procesant">${window.translations?.admin?.claimed_prizes?.processing || 'Processant'}</option>
                                             <option value="entregat">${window.translations?.admin?.claimed_prizes?.delivered || 'Entregat'}</option>
-                                            <option value="cancelat">${window.translations?.admin?.claimed_prizes?.canceled || 'Cancel·lat'}</option>
+                                            <option value="cancelat">${window.translations?.admin?.claimed_prizes?.canceled || 'CancelÂ·lat'}</option>
                                         </select>
                                     </div>
                                     <div class="mb-3">
@@ -765,7 +775,7 @@ const AdminDashboard = {
                                 </form>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${window.translations?.common?.cancel || 'Cancel·lar'}</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${window.translations?.common?.cancel || 'CancelÂ·lar'}</button>
                                 <button type="button" class="btn btn-primary" id="saveStatusBtn">${window.translations?.common?.save || 'Guardar'}</button>
                             </div>
                         </div>
@@ -780,18 +790,20 @@ const AdminDashboard = {
             const modal = new bootstrap.Modal(document.getElementById('updateStatusModal'));
             modal.show();
 
-            document.getElementById('saveStatusBtn').addEventListener('click', function () {
+            const saveStatusBtn = document.getElementById('saveStatusBtn');
+            if (saveStatusBtn) {
+                saveStatusBtn.addEventListener('click', function () {
                 // Crear FormData con el formulario
                 const formData = new FormData(document.getElementById('updateStatusForm'));
                 formData.append('_method', 'PUT');
-                formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+                formData.append('_token', window.getCsrfToken ? window.getCsrfToken() : '');
 
                 // Mostrar indicador de carga
                 this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ' +
                     (window.translations?.common?.saving || 'Guardant...');
                 this.disabled = true;
 
-                // Realizar petición AJAX
+                // Realizar peticiÃ³n AJAX
                 fetch(`/admin/premis-reclamats/${id}`, {
                     method: 'POST',
                     body: formData,
@@ -799,14 +811,9 @@ const AdminDashboard = {
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(window.translations?.admin?.claimed_prizes?.server_error || 'Error en la resposta del servidor');
-                        }
-                        return response.json();
-                    })
+                    .then(parseJsonResponse)
                     .then(data => {
-                        // Mostrar mensaje de éxito
+                        // Mostrar mensaje de Ã©xito
                         alert(window.translations?.admin?.claimed_prizes?.status_updated || 'Estat actualitzat correctament');
 
                         // Cerrar modal y recargar
@@ -828,15 +835,21 @@ const AdminDashboard = {
                         this.innerHTML = window.translations?.common?.save || 'Guardar';
                         this.disabled = false;
                     });
-            });
+                });
+            }
 
-            document.getElementById('updateStatusModal').addEventListener('hidden.bs.modal', function () {
-                document.body.removeChild(modalContainer);
-            });
+            const updateStatusModal = document.getElementById('updateStatusModal');
+            if (updateStatusModal) {
+                updateStatusModal.addEventListener('hidden.bs.modal', function () {
+                    if (modalContainer.parentNode) {
+                        document.body.removeChild(modalContainer);
+                    }
+                });
+            }
         }
     },
     /**
- * Objeto para gestión de formularios de edición
+ * Objeto para gestiÃ³n de formularios de ediciÃ³n
  */
     EditForms: {
         init: function () {
@@ -865,12 +878,12 @@ const AdminDashboard = {
             }
         },
 
-        // Nuevo método base para reducir duplicación de código
+        // Nuevo mÃ©todo base para reducir duplicaciÃ³n de cÃ³digo
         setupBaseEditForm: function (form, submitBtnId, contentType) {
             form.addEventListener('submit', function (e) {
                 e.preventDefault();
 
-                // Validación básica
+                // ValidaciÃ³n bÃ¡sica
                 let isValid = true;
                 form.querySelectorAll('[required]').forEach(input => {
                     if (!input.value.trim()) {
@@ -900,11 +913,11 @@ const AdminDashboard = {
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-CSRF-TOKEN': window.getCsrfToken ? window.getCsrfToken() : '',
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 })
-                    .then(response => response.json())
+                    .then(parseJsonResponse)
                     .then(data => {
                         if (data.success) {
                             // Cerrar modal
@@ -919,7 +932,7 @@ const AdminDashboard = {
                                 else window.location.reload();
                             }, 300);
                         } else {
-                            // Restaurar botón
+                            // Restaurar botÃ³n
                             submitBtn.disabled = false;
                             submitBtn.innerHTML = submitBtn.getAttribute('data-original-text') || 'Actualitzar';
                             alert('Error: ' + (data.message || 'No s\'ha pogut actualitzar'));
@@ -933,13 +946,13 @@ const AdminDashboard = {
                     });
             });
 
-            // Guardar texto original del botón
+            // Guardar texto original del botÃ³n
             const submitBtn = document.getElementById(submitBtnId);
             if (submitBtn) {
                 submitBtn.setAttribute('data-original-text', submitBtn.innerHTML);
             }
 
-            // Botón cancelar
+            // BotÃ³n cancelar
             document.getElementById('cancelEditBtn')?.addEventListener('click', function () {
                 if (typeof closeAnyModal === 'function') {
                     closeAnyModal('detailModal');
@@ -947,7 +960,7 @@ const AdminDashboard = {
             });
         },
 
-        // Actualizar los métodos existentes para usar el método base
+        // Actualizar los mÃ©todos existentes para usar el mÃ©todo base
         setupAlertaEditForm: function (form) {
             this.setupBaseEditForm(form, 'updateAlertaBtn', 'alertes-punts');
         },
@@ -960,7 +973,7 @@ const AdminDashboard = {
             this.setupBaseEditForm(form, 'updateEventBtn', 'events');
         },
 
-        // Añadir los nuevos métodos que faltan
+        // AÃ±adir los nuevos mÃ©todos que faltan
         setupProducteEditForm: function (form) {
             this.setupBaseEditForm(form, 'updateProducteBtn', 'productes');
         },
@@ -994,11 +1007,11 @@ const AdminDashboard = {
         }
     },
     /**
- * Objeto para gestión de tablas administrativas
+ * Objeto para gestiÃ³n de tablas administrativas
  */
     AdminTables: {
         init: function () {
-            // Verificar si DataTables está disponible
+            // Verificar si DataTables estÃ¡ disponible
             if (typeof $.fn.DataTable === 'undefined') {
                 return;
             }
@@ -1020,16 +1033,16 @@ const AdminDashboard = {
                 'dynamicTable': { order: [[0, 'desc']], noOrderCols: [4] }
             };
 
-            // Inicializar cada tabla si existe en la página
+            // Inicializar cada tabla si existe en la pÃ¡gina
             for (const [tableId, config] of Object.entries(tables)) {
                 const table = document.getElementById(tableId);
                 if (table) {
-                    // Destruir cualquier inicialización existente
+                    // Destruir cualquier inicializaciÃ³n existente
                     if ($.fn.DataTable.isDataTable('#' + tableId)) {
                         $('#' + tableId).DataTable().destroy();
                     }
 
-                    // Configuración común para todas las tablas
+                    // ConfiguraciÃ³n comÃºn para todas las tablas
                     const tableConfig = {
                         language: defaultLanguage,
                         order: config.order || [[0, 'desc']],
@@ -1044,7 +1057,7 @@ const AdminDashboard = {
                     // Inicializar la tabla
                     const dataTable = $('#' + tableId).DataTable(tableConfig);
 
-                    // Configuraciones adicionales específicas para ciertas tablas
+                    // Configuraciones adicionales especÃ­ficas para ciertas tablas
                     if (tableId === 'premisReclamatsTable') {
                         this.setupPremisReclamatsFilters(dataTable);
                     }
@@ -1083,7 +1096,7 @@ const AdminDashboard = {
 
             // Filtro para cancelados
             $('#filterCanceledBtn').on('click', () => {
-                table.column(4).search('cancelat|Cancel·lat').draw();
+                table.column(4).search('cancelat|CancelÂ·lat').draw();
                 this.setActiveFilterButton('filterCanceledBtn');
             });
 
@@ -1101,7 +1114,7 @@ const AdminDashboard = {
         },
 
         setupActivityDetailsButtons: function () {
-            // Delegación de eventos para botones de detalle de actividad
+            // DelegaciÃ³n de eventos para botones de detalle de actividad
             document.querySelectorAll('.view-activity-details').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -1160,7 +1173,7 @@ const AdminDashboard = {
             document.querySelectorAll('.approveClaimBtn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const id = btn.dataset.id;
-                    if (confirm(window.translations?.admin?.claimed_prizes?.confirm_approve || 'Estàs segur que vols aprovar aquesta sol·licitud?')) {
+                    if (confirm(window.translations?.admin?.claimed_prizes?.confirm_approve || 'EstÃ s segur que vols aprovar aquesta solÂ·licitud?')) {
                         this.handleClaimAction(id, 'approve');
                     }
                 });
@@ -1169,7 +1182,7 @@ const AdminDashboard = {
             document.querySelectorAll('.rejectClaimBtn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const id = btn.dataset.id;
-                    if (confirm(window.translations?.admin?.claimed_prizes?.confirm_reject || 'Estàs segur que vols rebutjar aquesta sol·licitud?')) {
+                    if (confirm(window.translations?.admin?.claimed_prizes?.confirm_reject || 'EstÃ s segur que vols rebutjar aquesta solÂ·licitud?')) {
                         this.handleClaimAction(id, 'reject');
                     }
                 });
@@ -1197,7 +1210,7 @@ const AdminDashboard = {
                 '.editProducteBtn': { param: 'producte-id', type: 'producte' }
             };
 
-            // Configurar cada tipo de botón de edición
+            // Configurar cada tipo de botÃ³n de ediciÃ³n
             for (const [selector, config] of Object.entries(editButtonsMap)) {
                 document.querySelectorAll(selector).forEach(btn => {
                     btn.addEventListener('click', () => {
@@ -1214,7 +1227,7 @@ const AdminDashboard = {
             const modalLoader = document.getElementById('detail-modal-loader');
             const detailContent = document.getElementById('detail-content');
 
-            // Traducción del título según tipo
+            // TraducciÃ³n del tÃ­tulo segÃºn tipo
             const titleKeys = {
                 'codi': 'messages.admin.codes.edit_title',
                 'alerta-punt': 'messages.admin.alerts.edit_title',
@@ -1256,7 +1269,7 @@ const AdminDashboard = {
                 bsModal.show();
             }
 
-            // Cargar formulario de edición
+            // Cargar formulario de ediciÃ³n
             fetch(`/admin/edit-form/${type}/${id}`)
                 .then(response => {
                     if (!response.ok) throw new Error('Error al cargar el formulario');
@@ -1268,7 +1281,7 @@ const AdminDashboard = {
                         detailContent.innerHTML = html;
                         detailContent.classList.remove('d-none');
 
-                        // Inicializar formulario de edición
+                        // Inicializar formulario de ediciÃ³n
                         if (AdminDashboard.EditForms && typeof AdminDashboard.EditForms.init === 'function') {
                             AdminDashboard.EditForms.init();
                         }
@@ -1290,14 +1303,14 @@ const AdminDashboard = {
         },
 
         setupDeleteButtons: function () {
-            // Manejar botones de eliminación
+            // Manejar botones de eliminaciÃ³n
             document.querySelectorAll('.deleteBtn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const id = btn.dataset.itemId;
                     const name = btn.dataset.itemName;
                     const type = btn.dataset.itemType;
 
-                    if (confirm(`${window.translations?.admin?.common?.confirm_delete || 'Estàs segur que vols eliminar'} ${name}?`)) {
+                    if (confirm(`${window.translations?.admin?.common?.confirm_delete || 'EstÃ s segur que vols eliminar'} ${name}?`)) {
                         this.deleteItem(id, type);
                     }
                 });
@@ -1312,17 +1325,17 @@ const AdminDashboard = {
             fetch(url, {
                 method: 'POST',
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-CSRF-TOKEN': window.getCsrfToken ? window.getCsrfToken() : '',
                     'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             })
-                .then(response => response.json())
+                .then(parseJsonResponse)
                 .then(data => {
                     if (data.success) {
                         alert(action === 'approve'
-                            ? (window.translations?.admin?.claimed_prizes?.approved_success || 'Sol·licitud aprovada correctament')
-                            : (window.translations?.admin?.claimed_prizes?.rejected_success || 'Sol·licitud rebutjada correctament'));
+                            ? (window.translations?.admin?.claimed_prizes?.approved_success || 'SolÂ·licitud aprovada correctament')
+                            : (window.translations?.admin?.claimed_prizes?.rejected_success || 'SolÂ·licitud rebutjada correctament'));
 
                         // Recargar la tabla
                         setTimeout(() => {
@@ -1335,8 +1348,8 @@ const AdminDashboard = {
                 .catch(error => {
                     console.error('Error:', error);
                     alert(action === 'approve'
-                        ? (window.translations?.admin?.claimed_prizes?.approve_error || 'Error al aprovar la sol·licitud')
-                        : (window.translations?.admin?.claimed_prizes?.reject_error || 'Error al rebutjar la sol·licitud'));
+                        ? (window.translations?.admin?.claimed_prizes?.approve_error || 'Error al aprovar la solÂ·licitud')
+                        : (window.translations?.admin?.claimed_prizes?.reject_error || 'Error al rebutjar la solÂ·licitud'));
                 });
         },
 
@@ -1344,15 +1357,15 @@ const AdminDashboard = {
             fetch(`/admin/destroy/${type}/${id}`, {
                 method: 'DELETE',
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-CSRF-TOKEN': window.getCsrfToken ? window.getCsrfToken() : '',
                     'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             })
-                .then(response => response.json())
+                .then(parseJsonResponse)
                 .then(data => {
                     if (data.success) {
-                        // Mostrar mensaje de éxito
+                        // Mostrar mensaje de Ã©xito
                         alert(window.translations?.admin?.common?.delete_success || 'Element eliminat correctament');
 
                         // Recargar la tabla
@@ -1375,11 +1388,11 @@ const AdminDashboard = {
 
 
     /**
-     * Inicialización general del dashboard
+     * InicializaciÃ³n general del dashboard
      */
     init: function () {
 
-        // Inicializar módulos según el contenido de la página
+        // Inicializar mÃ³dulos segÃºn el contenido de la pÃ¡gina
         if (document.getElementById('createCodiForm') || document.getElementById('editCodiForm')) {
             this.Codis.init();
         }
@@ -1416,7 +1429,7 @@ const AdminDashboard = {
             this.Users.init();
         }
 
-        // Inicialización de tooltips
+        // InicializaciÃ³n de tooltips
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         if (tooltipTriggerList.length && typeof bootstrap !== 'undefined') {
             tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -1449,7 +1462,7 @@ const AdminDashboard = {
                 const forms = this.querySelectorAll('form');
                 forms.forEach(form => form.reset());
 
-                // Quitar clases de validación
+                // Quitar clases de validaciÃ³n
                 this.querySelectorAll('.is-invalid').forEach(el => {
                     el.classList.remove('is-invalid');
                 });
@@ -1458,7 +1471,7 @@ const AdminDashboard = {
     }
 };
 
-// Inicialización cuando el DOM está listo
+// InicializaciÃ³n cuando el DOM estÃ¡ listo
 document.addEventListener('DOMContentLoaded', function () {
     AdminDashboard.init();
 });

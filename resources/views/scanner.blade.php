@@ -147,6 +147,19 @@
         document.addEventListener('DOMContentLoaded', function () {
             // Elementos UI
             const cameraPermissionBtn = document.getElementById('camera-permission');
+                // Helper function to safely escape HTML in JavaScript
+                function escapeHtml(text) {
+                    if (!text) return '';
+                    const map = {
+                        '&': '&amp;',
+                        '<': '&lt;',
+                        '>': '&gt;',
+                        '"': '&quot;',
+                        "'": '&#039;',
+                        '/': '&#x2F;'
+                    };
+                    return String(text).replace(/[&<>"'/]/g, char => map[char]);
+                }
             const startButton = document.getElementById('start-button');
             const stopButton = document.getElementById('stop-button');
             const cameraError = document.getElementById('camera-error');
@@ -490,7 +503,7 @@
                 const csrfToken = document.createElement('input');
                 csrfToken.type = 'hidden';
                 csrfToken.name = '_token';
-                csrfToken.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                csrfToken.value = window.getCsrfToken ? window.getCsrfToken() : '';
                 form.appendChild(csrfToken);
 
                 // Código
@@ -624,7 +637,7 @@
 
                                         ${product.image_front_url ?
                         `<div class="text-center mb-3">
-                                             <img src="${product.image_front_url}" alt="${product.product_name}" 
+                                             <img src="${escapeHtml(product.image_front_url)}" alt="${escapeHtml(product.product_name)}"
                                               class="img-fluid rounded" style="max-height: 200px;">
                                            </div>` : ''}
 

@@ -14,6 +14,11 @@ var filesToCache = [
     '/images/offline.svg'
 ];
 
+function shouldCacheRequest(request) {
+    return ['style', 'script', 'image', 'font'].includes(request.destination)
+        || filesToCache.includes(new URL(request.url).pathname);
+}
+
 // Cache on install
 self.addEventListener("install", event => {
     this.skipWaiting();
@@ -50,15 +55,31 @@ self.addEventListener('activate', event => {
     );
 });
 
-// Serve from Cache
+// Serve static assets from cache, but always try the network for document navigations.
 self.addEventListener("fetch", event => {
+    if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+        event.respondWith(
+            fetch(event.request).catch(() => caches.match('/offline'))
+        );
+        return;
+    }
+
     event.respondWith(
-        caches.match(event.request)
-            .then(response => {
-                return response || fetch(event.request);
-            })
-            .catch(() => {
-                return caches.match('offline');
-            })
-    )
+        caches.match(event.request).then(response => {
+            if (response) {
+                return response;
+            }
+
+            return fetch(event.request).then(networkResponse => {
+                if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic' && shouldCacheRequest(event.request)) {
+                    const responseToCache = networkResponse.clone();
+                    caches.open(staticCacheName).then(cache => {
+                        cache.put(event.request, responseToCache);
+                    });
+                }
+
+                return networkResponse;
+            });
+        }).catch(() => caches.match('/offline'))
+    );
 });

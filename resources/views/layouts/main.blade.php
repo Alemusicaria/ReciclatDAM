@@ -11,6 +11,39 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script>
+        window.getCsrfToken = function () {
+            const meta = document.querySelector('meta[name="csrf-token"]');
+            return meta ? meta.getAttribute('content') : null;
+        };
+
+        (function () {
+            if (window.__safeCsrfQuerySelectorPatched) {
+                return;
+            }
+
+            const originalQuerySelector = Document.prototype.querySelector;
+
+            Document.prototype.querySelector = function (selector) {
+                if (selector === 'meta[name="csrf-token"]') {
+                    const meta = originalQuerySelector.call(this, selector);
+                    if (meta) {
+                        return meta;
+                    }
+
+                    return {
+                        getAttribute: function () {
+                            return null;
+                        }
+                    };
+                }
+
+                return originalQuerySelector.call(this, selector);
+            };
+
+            window.__safeCsrfQuerySelectorPatched = true;
+        })();
+    </script>
 </head>
 
 <body class="light">
@@ -38,6 +71,16 @@
     <script src="{{ asset('js/language.js') }}" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            const parseJsonResponse = async (response) => {
+                const payload = await response.json().catch(() => null);
+
+                if (!response.ok) {
+                    throw new Error((payload && payload.message) || 'Network response was not ok');
+                }
+
+                return payload;
+            };
+
             // Detectar el mode de color del sistema
             const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
             const currentTheme = localStorage.getItem('theme') || (prefersDarkScheme ? 'dark' : 'light');
@@ -73,14 +116,10 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    'X-CSRF-TOKEN': window.getCsrfToken ? window.getCsrfToken() : ''
                 },
                 body: JSON.stringify(info)
-            }).then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
+            }).then(parseJsonResponse)
             }).then(data => {/* Datos recibidos correctamente */ })
                 .catch((error) => {
                     // Manejo silencioso de errores o usa un log solo en desarrollo

@@ -9,13 +9,13 @@
                     <div class="card-body text-center">
                         <div class="position-relative mb-4">
                             <!-- Imagen de perfil -->
-                            @if(Auth::user()->foto_perfil)
-                                @if(str_starts_with(Auth::user()->foto_perfil, 'https://'))
-                                    <img src="{{ Auth::user()->foto_perfil }}" alt="Foto de perfil"
+                            @if($user->foto_perfil)
+                                @if(str_starts_with($user->foto_perfil, 'https://'))
+                                    <img src="{{ e($user->foto_perfil) }}" alt="Foto de perfil"
                                         class="rounded-circle img-thumbnail shadow" id="profile-image"
                                         style="width: 150px; height: 150px; object-fit: cover;">
-                                @elseif(file_exists(public_path('storage/' . Auth::user()->foto_perfil)))
-                                    <img src="{{ asset('storage/' . Auth::user()->foto_perfil) }}" alt="Foto de perfil"
+                                @elseif(file_exists(public_path('storage/' . e($user->foto_perfil))))
+                                    <img src="{{ asset('storage/' . e($user->foto_perfil)) }}" alt="Foto de perfil"
                                         class="rounded-circle img-thumbnail shadow" id="profile-image"
                                         style="width: 150px; height: 150px; object-fit: cover;">
                                 @else
@@ -180,7 +180,7 @@
                                             </tr>
 
                                             <!-- Modal para este premio -->
-                                            <div class="modal fade" id="premiModal-{{ $premi->id }}" tabindex="-1" aria-labelledby="premiModalLabel-{{ $premi->id }}" aria-hidden="true">
+                                            <div class="modal fade" id="premiModal-{{ $premi->id }}" tabindex="-1" aria-labelledby="premiModalLabel-{{ $premi->id }}" aria-hidden="true" data-bs-backdrop="false">
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
@@ -562,7 +562,6 @@
         </div>
     </div>
 @endsection
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts@3.35.3/dist/apexcharts.min.css">
 <style>
     .profile-container {
@@ -600,6 +599,27 @@
         background: linear-gradient(145deg, #f8f9fa, #e9ecef);
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         transition: all 0.3s ease;
+    }
+
+    .stats-counter h3 {
+        color: #111111;
+        font-weight: 800;
+    }
+
+    .stats-counter p {
+        color: #1f1f1f;
+        font-weight: 600;
+    }
+
+    #pointsDistributionChart .apexcharts-legend-text,
+    #pointsDistributionChart .apexcharts-datalabel-label,
+    #pointsDistributionChart .apexcharts-datalabel-value,
+    #pointsDistributionChart .apexcharts-datalabel,
+    #pointsDistributionChart .apexcharts-donut-label,
+    #pointsDistributionChart .apexcharts-donut-total,
+    #pointsDistributionChart .apexcharts-donut-value {
+        fill: #111111 !important;
+        color: #111111 !important;
     }
 
     .stats-counter:hover {
@@ -1225,15 +1245,67 @@
 <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.35.3/dist/apexcharts.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () { 
+        function cleanupModalArtifacts() {
+            document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+            document.body.classList.remove('modal-open');
+            document.body.style.removeProperty('padding-right');
+            document.body.style.removeProperty('overflow');
+        }
+
+        const parseJsonResponse = async (response, defaultMessage = 'Error en la resposta del servidor') => {
+            const payload = await response.json().catch(() => null);
+
+            if (!response.ok) {
+                throw new Error((payload && payload.message) || `${defaultMessage}: ${response.statusText}`);
+            }
+
+            return payload;
+        };
+
+        // Modals inside table markup can produce invalid DOM behavior.
+        // Move claimed-prize modals to <body> and open them explicitly via JS.
+        document.querySelectorAll('[id^="premiModal-"]').forEach(function (modalEl) {
+            document.body.appendChild(modalEl);
+        });
+
+        document.querySelectorAll('tr[data-bs-target^="#premiModal-"]').forEach(function (row) {
+            row.removeAttribute('data-bs-toggle');
+            row.addEventListener('click', function () {
+                const targetSelector = row.getAttribute('data-bs-target');
+                const modalEl = targetSelector ? document.querySelector(targetSelector) : null;
+
+                cleanupModalArtifacts();
+
+                if (!modalEl || typeof bootstrap === 'undefined') {
+                    return;
+                }
+
+                bootstrap.Modal.getOrCreateInstance(modalEl, {
+                    backdrop: false,
+                    keyboard: true
+                }).show();
+            });
+        });
+
+        document.querySelectorAll('.modal').forEach(function (modalEl) {
+            modalEl.addEventListener('hidden.bs.modal', function () {
+                cleanupModalArtifacts();
+                this.remove();
+                setTimeout(cleanupModalArtifacts, 50);
+            });
+        });
+
+        cleanupModalArtifacts();
+
         // Variables con datos del usuario
-        const puntsActuals = {{ Auth::user()->punts_actuals ?? 0 }};
-        const puntsGastats = {{ Auth::user()->punts_gastats ?? 0 }};
-        const puntsTotals = {{ Auth::user()->punts_totals ?? 0 }};
-        const userId = {{ Auth::user()->id }};
+        const puntsActuals = {{ $user->punts_actuals ?? 0 }};
+        const puntsGastats = {{ $user->punts_gastats ?? 0 }};
+        const puntsTotals = {{ $user->punts_totals ?? 0 }};
+        const userId = {{ $user->id }};
 
         // Configurar el tema de ApexCharts según el modo oscuro/claro
         const isDarkMode = document.body.classList.contains('dark');
-        const textColor = isDarkMode ? '#e2e8f0' : '#e2e8f0';
+        const textColor = '#111111';
         const gridColor = isDarkMode ? '#4a5568' : '#e9e9e9';
 
         // Gráfico de distribución de puntos (donut chart)
@@ -1256,12 +1328,14 @@
                             name: {
                                 show: true,
                                 fontSize: '14px',
-                                fontWeight: 500
+                                fontWeight: 600,
+                                color: '#111111'
                             },
                             value: {
                                 show: true,
                                 fontSize: '20px',
                                 fontWeight: 600,
+                                color: '#111111',
                                 formatter: function (val) {
                                     return val;
                                 }
@@ -1269,6 +1343,7 @@
                             total: {
                                 show: true,
                                 label: 'Total',
+                                color: '#111111',
                                 formatter: function (w) {
                                     return puntsTotals;
                                 }
@@ -1282,7 +1357,10 @@
             },
             legend: {
                 position: 'bottom',
-                fontSize: '14px'
+                fontSize: '14px',
+                labels: {
+                    colors: '#111111'
+                }
             },
             responsive: [{
                 breakpoint: 480,
@@ -1560,26 +1638,14 @@
                 changePhotoBtn.disabled = true;
 
                 // En show.blade.php - en la función photoUpload.addEventListener('change', ...)
-                fetch('{{ route('users.update', Auth::user()->id) }}', {
+                fetch('{{ route('users.update', $user->id) }}', {
                     method: 'POST',
                     body: formData,
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest' // Añadir esta cabecera para identificar peticiones AJAX
                     }
                 })
-                    .then(response => {
-                        // Si la respuesta no es OK, vamos a intentar analizar el mensaje de error
-                        if (!response.ok) {
-                            return response.json().then(errorData => {
-                                throw new Error(errorData.message || 'Error del servidor: ' + response.status);
-                            }).catch(e => {
-                                // Si no podemos parsear JSON, lanzamos el error genérico
-                                throw new Error('Error en la respuesta del servidor: ' + response.statusText);
-                            });
-                        }
-
-                        return response.json();
-                    })
+                    .then(response => parseJsonResponse(response, 'Error en la resposta del servidor'))
                     .then(data => {
                         // Eliminar indicador de carga
                         loadingOverlay.remove();

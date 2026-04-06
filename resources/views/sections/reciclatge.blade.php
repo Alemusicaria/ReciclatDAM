@@ -195,6 +195,19 @@
     document.addEventListener('DOMContentLoaded', function () {
         // Initialize category cards
         const cards = document.querySelectorAll('.category-card');
+            // Helper function to safely escape HTML in JavaScript
+            function escapeHtml(text) {
+                if (!text) return '';
+                const map = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;',
+                    '/': '&#x2F;'
+                };
+                return String(text).replace(/[&<>"'/]/g, char => map[char]);
+            }
         cards.forEach(card => {
             const color = card.getAttribute('data-color');
             card.style.setProperty('--hover-color', color);
@@ -362,7 +375,7 @@
                                 data-product-category="${hit.categoria}" 
                                 data-product-image="${hit.imatge}">
                                 <div class="flex-shrink-0 me-3">
-                                    <img src="/${hit.imatge}" alt="${hit.nom}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+                                    <img src="${escapeHtml(hit.imatge ? '/' + hit.imatge : '')}" alt="${escapeHtml(hit.nom)}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
                                 </div>
                                 <div class="flex-grow-1 ms-3 text-start">
                                     <strong>${hit.nom}</strong><br>
@@ -497,7 +510,7 @@
                             data-product-name="${product.nom}" 
                             data-product-category="${product.categoria}" 
                             data-product-image="${product.imatge}">
-                            <img src="/${product.imatge}" alt="${product.nom}" class="card-img-top">
+                            <img src="${escapeHtml(product.imatge ? '/' + product.imatge : '')}" alt="${escapeHtml(product.nom)}" class="card-img-top">
                             <div class="product-card-body">
                                 <h6>${product.nom}</h6>
                                 <p class="text-muted">${product.categoria}</p>
@@ -524,7 +537,7 @@
             $('#product-list').html(`
                 <div class="product-info-container">
                     <div class="product-image">
-                        <img src="${productImage}" alt="${productName}" class="product-img">
+                        <img src="${escapeHtml(productImage)}" alt="${escapeHtml(productName)}" class="product-img">
                     </div>
                     <div class="product-details">
                         <h4>${productName}</h4>

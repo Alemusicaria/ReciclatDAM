@@ -49,12 +49,64 @@
     </div>
 </section>
 
+<style>
+    .canje-modal-actions {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        justify-content: flex-end;
+        flex-wrap: nowrap;
+    }
+
+    .canje-modal-form {
+        display: inline-flex;
+        margin: 0;
+        width: auto;
+    }
+
+    .canje-modal-btn {
+        min-width: 150px;
+        border-radius: 999px;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+        padding: 0.55rem 1.1rem;
+        transition: all 0.2s ease;
+    }
+
+    .canje-cancel-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 14px rgba(108, 117, 125, 0.2);
+    }
+
+    .canje-confirm-btn {
+        box-shadow: 0 8px 18px rgba(25, 135, 84, 0.25);
+    }
+
+    .canje-confirm-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 20px rgba(25, 135, 84, 0.35);
+    }
+</style>
+
 <script>
     $(document).ready(function () {
         const opinionsIndex = window.opinionsIndex; // Usa la variable global
 
         // Definir al inicio del script
-        const userLoggedIn = {{ Auth::check() ? 'true' : 'false' }};
+        const userLoggedIn = @json(Auth::check());
+            // Helper function to safely escape HTML in JavaScript
+            function escapeHtml(text) {
+                if (!text) return '';
+                const map = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;',
+                    '/': '&#x2F;'
+                };
+                return String(text).replace(/[&<>"'/]/g, char => map[char]);
+            }
 
         // DOM elements
         const galleryInner = $('.gallery-inner');
@@ -117,7 +169,7 @@
                     const globalIndex = pageStart + premisIndex;
                     const awardCard = $(`
                         <div class="award-card ${globalIndex === currentAwardIndex ? 'selected' : ''}" data-index="${globalIndex}">
-                            <img src="${award.imatge}" alt="${award.nom}">
+                            <img src="${escapeHtml(award.imatge)}" alt="${escapeHtml(award.nom)}">
                             <div class="award-overlay">
                                 <div class="award-name">${award.nom}</div>
                             </div>
@@ -187,7 +239,7 @@
                 let actionButtonHtml = '';
 
                 if (userLoggedIn) {
-                    const userPoints = {{ Auth::check() ? Auth::user()->punts_actuals : 0 }};
+                    const userPoints = @json(Auth::check() ? Auth::user()->punts_actuals : 0);
                     const cost = award.cost || award.punts_requerits;
 
                     if (userPoints >= cost) {
@@ -226,7 +278,13 @@
                 if (userLoggedIn) {
                     $(`#open-modal-btn-${awardId}`).on('click', function () {
                         updateCanjeModal(award, awardId);  // Pasar awardId como argumento
-                        $(`#canjeModal-${awardId}`).modal('show');
+                        const modalElement = document.getElementById(`canjeModal-${awardId}`);
+                        if (modalElement && window.bootstrap) {
+                            bootstrap.Modal.getOrCreateInstance(modalElement, {
+                                backdrop: false,
+                                keyboard: true
+                            }).show();
+                        }
                     });
                 }
             });
@@ -244,6 +302,22 @@
 
         // Modificar también la función updateCanjeModal para recibir awardId
         function updateCanjeModal(award, awardId) {
+            function cleanupModalArtifacts() {
+                $('.modal-backdrop').remove();
+                $('body').removeClass('modal-open');
+                $('body').css('padding-right', '');
+            }
+
+            const parseJsonResponse = async (response) => {
+                const payload = await response.json().catch(() => null);
+
+                if (!response.ok) {
+                    throw new Error((payload && payload.message) || 'Error en la resposta del servidor');
+                }
+
+                return payload;
+            };
+
             // Si no recibimos awardId, lo calculamos
             if (!awardId) {
                 if (typeof award.id === 'string' && award.id.includes('::')) {
@@ -255,6 +329,8 @@
 
             // Eliminar modales anteriores de forma segura
             try {
+                cleanupModalArtifacts();
+
                 // Eliminar todos los modales existentes
                 $('[id^="canjeModal-"]').each(function () {
                     $(this).remove();
@@ -266,16 +342,16 @@
             // Solo crear modal si el usuario está logeado
             if (!userLoggedIn) return;
 
-            const userPoints = {{ Auth::check() ? Auth::user()->punts_actuals : 0 }};
+            const userPoints = @json(Auth::check() ? Auth::user()->punts_actuals : 0);
             const cost = award.cost || award.punts_requerits;
             const remainingPoints = userPoints - cost;
 
             // Obtener el token CSRF de la página
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            const csrfToken = window.getCsrfToken ? window.getCsrfToken() : '';
 
             // Crear el modal COMPLETO
             const modalHtml = `
-                <div class="modal fade" id="canjeModal-${awardId}" tabindex="-1" aria-labelledby="canjeModalLabel-${awardId}" aria-hidden="true" style="z-index: 10001;">
+                <div class="modal fade" id="canjeModal-${awardId}" tabindex="-1" aria-labelledby="canjeModalLabel-${awardId}" aria-hidden="true" data-bs-backdrop="false" style="z-index: 10001;">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -285,7 +361,7 @@
                             <div class="modal-body">
                                 <div class="d-flex align-items-center mb-4">
                                     ${award.imatge ?
-                    `<img src="${award.imatge}" alt="${award.nom}" 
+                    `<img src="${escapeHtml(award.imatge)}" alt="${escapeHtml(award.nom)}"
                                                                 class="me-3" style="width: 70px; height: 70px; object-fit: cover; border-radius: 8px;">` :
                     `<div class="bg-light d-flex align-items-center justify-content-center me-3" 
                                                                 style="width: 70px; height: 70px; border-radius: 8px;">
@@ -308,12 +384,14 @@
                                 
                                 <p>Estàs segur que vols bescanviar els teus punts per aquest premi?</p>
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
-                                    <form id="canje-form-${awardId}" action="{{ url('/premis') }}/${awardId}/canjear" method="POST">
+                            <div class="modal-footer canje-modal-actions">
+                                <button type="button" class="btn btn-outline-secondary canje-modal-btn canje-cancel-btn" data-bs-dismiss="modal">
+                                    <i class="fas fa-xmark me-2"></i>Cancel·lar
+                                </button>
+                                    <form id="canje-form-${awardId}" action="{{ url('/premis') }}/${awardId}/canjear" method="POST" class="m-0 canje-modal-form">
                                         <input type="hidden" name="_token" value="${csrfToken}">
-                                        <button type="submit" class="btn btn-success">
-                                            <i class="fas fa-check me-1"></i> Confirmar bescanvi
+                                        <button type="submit" class="btn btn-success canje-modal-btn canje-confirm-btn">
+                                            <i class="fas fa-check me-1"></i>Confirmar
                                         </button>
                                 </form>
                             </div>
@@ -325,7 +403,17 @@
             $('body').append(modalHtml);
 
             // AÑADIR ESTA LÍNEA: Mostrar el modal después de crearlo
-            $(`#canjeModal-${awardId}`).modal('show');
+            const modalElement = document.getElementById(`canjeModal-${awardId}`);
+            const canjeModal = bootstrap.Modal.getOrCreateInstance(modalElement, {
+                backdrop: false,
+                keyboard: true
+            });
+            canjeModal.show();
+
+            $(`#canjeModal-${awardId}`).on('hidden.bs.modal', function () {
+                $(this).remove();
+                cleanupModalArtifacts();
+            });
 
             // Verificar que el formulario existe y está configurado correctamente
             // Agrega este código para manejar el envío del formulario
@@ -346,15 +434,11 @@
                     },
                     body: new URLSearchParams(new FormData(this))
                 })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Error en la resposta del servidor');
-                        }
-                        return response.json();
-                    })
+                    .then(parseJsonResponse)
                     .then(data => {
                         // Cerrar el modal
-                        $(`#canjeModal-${awardId}`).modal('hide');
+                        canjeModal.hide();
+                        cleanupModalArtifacts();
 
                         // Mostrar notificación de éxito
                         showNotification('success', 'Premi bescanviat amb èxit!');
@@ -379,9 +463,19 @@
                     .catch(error => {
                         console.error('Error:', error);
                         showNotification('error', 'Error al bescanviar el premi. Torna-ho a intentar més tard.');
+                        if (modalElement && window.bootstrap) {
+                            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                            if (modalInstance) {
+                                modalInstance.hide();
+                            }
+                        }
+                        $(`#canjeModal-${awardId}`).remove();
+                        cleanupModalArtifacts();
+
+                        setTimeout(cleanupModalArtifacts, 50);
 
                         // Reactivar el botón
-                        submitBtn.prop('disabled', false).html('<i class="fas fa-check me-1"></i> Confirmar bescanvi');
+                        submitBtn.prop('disabled', false).html('<i class="fas fa-check me-1"></i> Confirmar');
                     });
             });
 

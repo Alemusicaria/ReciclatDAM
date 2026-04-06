@@ -27,8 +27,8 @@
                         <form id="alerta-form" action="{{ route('alertes_punts_de_recollida.store') }}" method="POST"
                             enctype="multipart/form-data" class="d-none">
                             @csrf
-                            <input type="hidden" name="lat" id="lat" value="{{ request()->get('lat') }}">
-                            <input type="hidden" name="lng" id="lng" value="{{ request()->get('lng') }}">
+                            <input type="hidden" name="lat" id="lat" value="{{ e(request()->get('lat')) }}">
+                            <input type="hidden" name="lng" id="lng" value="{{ e(request()->get('lng')) }}">
 
                             <div class="mb-3">
                                 <label for="punt_de_recollida_id" class="form-label">Punt de recollida:</label>
@@ -85,15 +85,20 @@
             const alertaForm = document.getElementById('alerta-form');
             const puntRecollida = document.getElementById('punt_de_recollida_id');
 
+            const parseJsonResponse = async (response) => {
+                const payload = await response.json().catch(() => null);
+
+                if (!response.ok) {
+                    throw new Error((payload && payload.message) || `Error del servidor: ${response.status}`);
+                }
+
+                return payload;
+            };
+
             if (lat && lng) {
                 // Cargar puntos de recogida cercanos
                 fetch(`/punts-recollida/nearby?lat=${lat}&lng=${lng}&distance=100`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`Error del servidor: ${response.status}`);
-                        }
-                        return response.json();
-                    })
+                    .then(parseJsonResponse)
                     .then(data => {
                         loadingContainer.classList.add('d-none');
 

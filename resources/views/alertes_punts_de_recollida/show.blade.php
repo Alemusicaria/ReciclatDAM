@@ -11,12 +11,12 @@
                 <div class="card-body">
                     <div class="mb-4">
                         <h6 class="fw-bold">Punt de recollida:</h6>
-                        <p>{{ $alertaPuntDeRecollida->puntDeRecollida->nom }}</p>
+                        <p>{{ $alertaPuntDeRecollida->puntDeRecollida->nom ?? 'No disponible' }}</p>
                     </div>
                     
                     <div class="mb-4">
                         <h6 class="fw-bold">Tipus de problema:</h6>
-                        <p>{{ $alertaPuntDeRecollida->tipus->nom }}</p>
+                        <p>{{ $alertaPuntDeRecollida->tipus->nom ?? 'No disponible' }}</p>
                     </div>
                     
                     <div class="mb-4">
@@ -33,13 +33,13 @@
                     
                     <div class="mb-4">
                         <h6 class="fw-bold">Data de creació:</h6>
-                        <p>{{ $alertaPuntDeRecollida->created_at->format('d/m/Y H:i') }}</p>
+                        <p>{{ $alertaPuntDeRecollida->created_at ? $alertaPuntDeRecollida->created_at->format('d/m/Y H:i') : 'No disponible' }}</p>
                     </div>
                     
                     @if($alertaPuntDeRecollida->user)
                     <div class="mb-4">
                         <h6 class="fw-bold">Reportat per:</h6>
-                        <p>{{ $alertaPuntDeRecollida->user->name }}</p>
+                        <p>{{ trim(($alertaPuntDeRecollida->user->nom ?? '') . ' ' . ($alertaPuntDeRecollida->user->cognoms ?? '')) ?: 'Usuari' }}</p>
                     </div>
                     @endif
                     

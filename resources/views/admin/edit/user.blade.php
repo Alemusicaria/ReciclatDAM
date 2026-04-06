@@ -17,18 +17,18 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label for="nom" class="form-label">{{ __('messages.admin.users.name') }} <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="nom" name="nom" value="{{ $user->nom }}" required>
+                                    <input type="text" class="form-control" id="nom" name="nom" value="{{ e($user->nom) }}" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="cognoms" class="form-label">{{ __('messages.admin.users.surname') }} <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="cognoms" name="cognoms" value="{{ $user->cognoms }}" required>
+                                    <input type="text" class="form-control" id="cognoms" name="cognoms" value="{{ e($user->cognoms) }}" required>
                                 </div>
                             </div>
 
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label for="email" class="form-label">{{ __('messages.admin.users.email') }} <span class="text-danger">*</span></label>
-                                    <input type="email" class="form-control" id="email" name="email" value="{{ $user->email }}" required>
+                                    <input type="email" class="form-control" id="email" name="email" value="{{ e($user->email) }}" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="password" class="form-label">{{ __('messages.admin.users.password') }} 
@@ -53,12 +53,12 @@
                                 </div>
                                 <div class="col-md-4">
                                     <label for="telefon" class="form-label">{{ __('messages.admin.users.phone') }}</label>
-                                    <input type="tel" class="form-control" id="telefon" name="telefon" value="{{ $user->telefon }}">
+                                    <input type="tel" class="form-control" id="telefon" name="telefon" value="{{ e($user->telefon) }}">
                                 </div>
                                 <div class="col-md-4">
                                     <label for="ubicacio" class="form-label">{{ __('messages.admin.users.location') }}</label>
                                     <input type="text" class="form-control" id="ubicacio" name="ubicacio"
-                                        placeholder="{{ __('messages.admin.users.location_placeholder') }}" value="{{ $user->ubicacio }}">
+                                        placeholder="{{ __('messages.admin.users.location_placeholder') }}" value="{{ e($user->ubicacio) }}">
                                 </div>
                             </div>
 
@@ -72,9 +72,9 @@
                                         <label>{{ __('messages.admin.users.current_photo') }}:</label>
                                         <div>
                                             @if(str_starts_with($user->foto_perfil, 'https://'))
-                                                <img src="{{ $user->foto_perfil }}" class="preview-image rounded" alt="{{ __('messages.admin.profile_photo') }}">
+                                                <img src="{{ e($user->foto_perfil) }}" class="preview-image rounded" alt="{{ __('messages.admin.profile_photo') }}">
                                             @else
-                                                <img src="{{ asset('storage/' . $user->foto_perfil) }}" class="preview-image rounded" alt="{{ __('messages.admin.profile_photo') }}">
+                                                <img src="{{ asset('storage/' . e($user->foto_perfil)) }}" class="preview-image rounded" alt="{{ __('messages.admin.profile_photo') }}">
                                             @endif
                                         </div>
                                     </div>

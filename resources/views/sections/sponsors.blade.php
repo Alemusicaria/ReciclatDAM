@@ -5,27 +5,27 @@
             <!-- Primera fila: 5 sponsors -->
             <div class="col-md-2 col-4">
                 <div class="sponsor-logo">
-                    {!! file_get_contents(public_path('images/sponsors/svg/la_salle.svg')) !!}
+                    <img src="{{ asset('images/sponsors/svg/la_salle.svg') }}" alt="La Salle" class="sponsor-img" />
                 </div>
             </div>
             <div class="col-md-2 col-4">
                 <div class="sponsor-logo">
-                    {!! file_get_contents(public_path('images/sponsors/svg/ecoembes.svg')) !!}
+                    <img src="{{ asset('images/sponsors/svg/ecoembes.svg') }}" alt="Ecoembes" class="sponsor-img" />
                 </div>
             </div>
             <div class="col-md-2 col-4">
                 <div class="sponsor-logo">
-                    {!! file_get_contents(public_path('images/sponsors/svg/repsol.svg')) !!}
+                    <img src="{{ asset('images/sponsors/svg/repsol.svg') }}" alt="Repsol" class="sponsor-img" />
                 </div>
             </div>
             <div class="col-md-2 col-4">
                 <div class="sponsor-logo">
-                    {!! file_get_contents(public_path('images/sponsors/svg/generalitat_de_catalunya.svg')) !!}
+                    <img src="{{ asset('images/sponsors/svg/generalitat_de_catalunya.svg') }}" alt="Generalitat de Catalunya" class="sponsor-img" />
                 </div>
             </div>
             <div class="col-md-2 col-4">
                 <div class="sponsor-logo logo-alsa">
-                    {!! file_get_contents(public_path('images/sponsors/svg/alsa.svg')) !!}
+                    <img src="{{ asset('images/sponsors/svg/alsa.svg') }}" alt="ALSA" class="sponsor-img" />
                 </div>
             </div>
         </div>
@@ -33,32 +33,32 @@
             <!-- Segunda fila: 6 sponsors -->
             <div class="col-md-2 col-4">
                 <div class="sponsor-logo">
-                    {!! file_get_contents(public_path('images/sponsors/svg/ferrovial.svg')) !!}
+                    <img src="{{ asset('images/sponsors/svg/ferrovial.svg') }}" alt="Ferrovial" class="sponsor-img" />
                 </div>
             </div>
             <div class="col-md-2 col-4">
                 <div class="sponsor-logo">
-                    {!! file_get_contents(public_path('images/sponsors/svg/nestle.svg')) !!}
+                    <img src="{{ asset('images/sponsors/svg/nestle.svg') }}" alt="Nestlé" class="sponsor-img" />
                 </div>
             </div>
             <div class="col-md-2 col-4">
                 <div class="sponsor-logo">
-                    {!! file_get_contents(public_path('images/sponsors/svg/caixabank.svg')) !!}
+                    <img src="{{ asset('images/sponsors/svg/caixabank.svg') }}" alt="CaixaBank" class="sponsor-img" />
                 </div>
             </div>
             <div class="col-md-2 col-4">
                 <div class="sponsor-logo">
-                    {!! file_get_contents(public_path('images/sponsors/svg/tetra_pak.svg')) !!}
+                    <img src="{{ asset('images/sponsors/svg/tetra_pak.svg') }}" alt="Tetra Pak" class="sponsor-img" />
                 </div>
             </div>
             <div class="col-md-2 col-4">
                 <div class="sponsor-logo">
-                    {!! file_get_contents(public_path('images/sponsors/svg/endesa.svg')) !!}
+                    <img src="{{ asset('images/sponsors/svg/endesa.svg') }}" alt="Endesa" class="sponsor-img" />
                 </div>
             </div>
             <div class="col-md-2 col-4">
                 <div class="sponsor-logo logo-mercadona">
-                    {!! file_get_contents(public_path('images/sponsors/svg/mercadona.svg')) !!}
+                    <img src="{{ asset('images/sponsors/svg/mercadona.svg') }}" alt="Mercadona" class="sponsor-img" />
                 </div>
             </div>
         </div>
