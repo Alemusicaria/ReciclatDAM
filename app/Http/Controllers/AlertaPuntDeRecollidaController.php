@@ -14,6 +14,9 @@ class AlertaPuntDeRecollidaController extends Controller
     public function index()
     {
         $alertes = AlertaPuntDeRecollida::with('puntDeRecollida', 'tipus')->get();
+        if (!view()->exists('alertes_punts_de_recollida.index')) {
+            return redirect()->route('dashboard')->with('info', 'La vista de llistat d\'alertes no està disponible.');
+        }
         return view('alertes_punts_de_recollida.index', compact('alertes'));
     }
 
@@ -77,11 +80,11 @@ class AlertaPuntDeRecollidaController extends Controller
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error: ' . $e->getMessage()
+                    'message' => 'No s\'ha pogut crear l\'alerta.'
                 ], 422);
             }
 
-            return back()->withErrors(['error' => 'Error al crear l\'alerta: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'No s\'ha pogut crear l\'alerta.']);
         }
     }
 
@@ -94,6 +97,11 @@ class AlertaPuntDeRecollidaController extends Controller
     {
         $puntsDeRecollida = PuntDeRecollida::all();
         $tipusAlertes = TipusAlerta::all();
+
+        if (!view()->exists('alertes_punts_de_recollida.edit')) {
+            return redirect()->route('dashboard')->with('info', 'La vista d\'edició d\'alertes no està disponible.');
+        }
+
         return view('alertes_punts_de_recollida.edit', compact('alertaPuntDeRecollida', 'puntsDeRecollida', 'tipusAlertes'));
     }
 
@@ -159,11 +167,11 @@ class AlertaPuntDeRecollidaController extends Controller
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error: ' . $e->getMessage()
+                    'message' => 'No s\'ha pogut actualitzar l\'alerta.'
                 ], 422);
             }
 
-            return back()->withErrors(['error' => 'Error al actualitzar l\'alerta: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'No s\'ha pogut actualitzar l\'alerta.']);
         }
     }
 
@@ -199,11 +207,11 @@ class AlertaPuntDeRecollidaController extends Controller
             if (request()->expectsJson() || request()->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error: ' . $e->getMessage()
+                    'message' => 'No s\'ha pogut eliminar l\'alerta.'
                 ], 500);
             }
 
-            return back()->withErrors(['error' => 'Error al eliminar l\'alerta: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'No s\'ha pogut eliminar l\'alerta.']);
         }
     }
 }

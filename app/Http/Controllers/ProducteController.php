@@ -11,13 +11,33 @@ class ProducteController extends Controller
     public function index()
     {
         $productes = Producte::all();
+
+        if (!view()->exists('productes.index')) {
+            return redirect()->route('dashboard')->with('info', 'La vista pública de productes no està disponible.');
+        }
+
         return view('productes.index', compact('productes'));
     }
 
     // Mostrar el formulari per crear un nou producte
     public function create()
     {
+        if (!view()->exists('productes.create')) {
+            return redirect()->route('dashboard')->with('info', 'La vista de creació de productes no està disponible.');
+        }
+
         return view('productes.create');
+    }
+
+    public function show($id)
+    {
+        $producte = Producte::findOrFail($id);
+
+        if (!view()->exists('productes.show')) {
+            return redirect()->route('dashboard')->with('info', 'La vista de detall de productes no està disponible.');
+        }
+
+        return view('productes.show', compact('producte'));
     }
 
     // Crear un nou producte
@@ -62,6 +82,11 @@ class ProducteController extends Controller
     public function edit($id)
     {
         $producte = Producte::findOrFail($id);
+
+        if (!view()->exists('productes.edit')) {
+            return redirect()->route('dashboard')->with('info', 'La vista d\'edició de productes no està disponible.');
+        }
+
         return view('productes.edit', compact('producte'));
     }
 
@@ -78,9 +103,15 @@ class ProducteController extends Controller
 
         // Si hi ha una nova imatge, desa-la al directori corresponent
         if ($request->hasFile('imatge')) {
-            // Elimina la imatge antiga si existeix
-            if ($producte->imatge && file_exists(public_path($producte->imatge))) {
-                unlink(public_path($producte->imatge));
+            // Elimina la imatge antiga si existeix usando Storage facade (más seguro que unlink)
+            if ($producte->imatge) {
+                // Asegurar que solo se eliminen paths dentro de la carpeta pública/images
+                $imagePath = $producte->imatge;
+                if (strpos($imagePath, 'images/') === 0) {
+                    if (file_exists(public_path($imagePath))) {
+                        \Illuminate\Support\Facades\Storage::disk('public')->delete(str_replace('images/', 'public/', $imagePath));
+                    }
+                }
             }
 
             // Obté la categoria actual o la nova
@@ -94,8 +125,14 @@ class ProducteController extends Controller
                 mkdir($directori, 0755, true);
             }
 
-            // Genera el nom de la imatge basat en el nom del producte
-            $nomImatge = str_replace(' ', '_', $validated['nom'] ?? $producte->nom) . '.' . $request->file('imatge')->getClientOriginalExtension();
+            // Genera el nom de la imatge basat en el nom del producte - usar timestamp per a evitar collisions
+            $timestamp = time() . '_';
+            $nomImatge = $timestamp . str_replace(' ', '_', $validated['nom'] ?? $producte->nom) . '.' . $request->file('imatge')->getClientOriginalExtension();
+
+            // Valida el nom de la imatge
+            if (!preg_match('/^[a-zA-Z0-9_\-\.]+$/', $nomImatge)) {
+                return back()->with('error', 'Nom de imatge invàlid.');
+            }
 
             // Desa la nova imatge al directori especificat
             $request->file('imatge')->move($directori, $nomImatge);

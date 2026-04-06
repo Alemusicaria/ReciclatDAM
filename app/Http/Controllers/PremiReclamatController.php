@@ -7,13 +7,18 @@ use App\Models\Premi;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use App\Models\Activity;
+use Illuminate\Support\Facades\DB;
 
 class PremiReclamatController extends Controller
 {
     public function index()
     {
         $premisReclamats = PremiReclamat::with(['user', 'premi'])->latest()->paginate(10);
+        if (!view()->exists('premis_reclamats.index')) {
+            return redirect()->route('dashboard')->with('info', 'La vista de premis reclamats no està disponible.');
+        }
         return view('premis_reclamats.index', compact('premisReclamats'));
     }
 
@@ -21,12 +26,15 @@ class PremiReclamatController extends Controller
     {
         $premis = Premi::all();
         $users = User::all();
+        if (!view()->exists('premis_reclamats.create')) {
+            return redirect()->route('dashboard')->with('info', 'La vista de creació de premis reclamats no està disponible.');
+        }
         return view('premis_reclamats.create', compact('premis', 'users'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'premi_id' => 'required|exists:premis,id',
             'punts_gastats' => 'required|integer|min:0',
@@ -35,28 +43,33 @@ class PremiReclamatController extends Controller
             'comentaris' => 'nullable|string',
         ]);
 
-        // Verificar si el usuario tiene suficientes puntos
-        $user = User::findOrFail($request->user_id);
-        $premi = Premi::findOrFail($request->premi_id);
+        return DB::transaction(function () use ($validated) {
+            // Verificar si el usuario tiene suficientes puntos
+            $user = User::query()->whereKey($validated['user_id'])->lockForUpdate()->firstOrFail();
+            $premi = Premi::findOrFail($validated['premi_id']);
 
-        if ($user->punts_actuals < $request->punts_gastats) {
-            return back()->with('error', 'L\'usuari no té suficients punts per reclamar aquest premi.');
-        }
+            if ($user->punts_actuals < $validated['punts_gastats']) {
+                return back()->with('error', 'L\'usuari no té suficients punts per reclamar aquest premi.');
+            }
 
-        // Descontar puntos al usuario
-        $user->punts_actuals -= $request->punts_gastats;
-        $user->punts_gastats += $request->punts_gastats;
-        $user->save();
+            // Descontar puntos al usuario
+            $user->punts_actuals -= $validated['punts_gastats'];
+            $user->punts_gastats += $validated['punts_gastats'];
+            $user->save();
 
-        // Crear el registro
-        $premiReclamat = PremiReclamat::create($request->all());
+            // Crear el registro
+            PremiReclamat::create($validated);
 
-        return redirect()->route('premis_reclamats.index')
-            ->with('success', 'Premi reclamat amb èxit.');
+            return redirect()->route('premis_reclamats.index')
+                ->with('success', 'Premi reclamat amb èxit.');
+        });
     }
 
     public function show(PremiReclamat $premiReclamat)
     {
+        if (!view()->exists('premis_reclamats.show')) {
+            return redirect()->route('dashboard')->with('info', 'La vista de detall de premis reclamats no està disponible.');
+        }
         return view('premis_reclamats.show', compact('premiReclamat'));
     }
 
@@ -90,9 +103,9 @@ class PremiReclamatController extends Controller
             $premiReclamat->save();
 
             // Registrar actividad
-            if (auth()->check()) {
+            if (Auth::check()) {
                 Activity::create([
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                     'action' => 'Ha actualitzat l\'estat del premi reclamat #' . $id . ' a ' . $request->estat
                 ]);
             }
@@ -110,39 +123,47 @@ class PremiReclamatController extends Controller
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error: ' . $e->getMessage()
+                    'message' => 'S\'ha produït un error en actualitzar el premi reclamat.'
                 ], 422);
             }
 
-            return back()->withErrors(['error' => 'Error: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'S\'ha produït un error en actualitzar el premi reclamat.']);
         }
     }
 
     public function destroy(PremiReclamat $premiReclamat)
     {
         try {
-            // Si el premio no ha sido entregado, devolver puntos al usuario
-            if ($premiReclamat->estat != 'entregat' && $premiReclamat->user) {
-                $user = $premiReclamat->user;
-                $user->punts_actuals += $premiReclamat->punts_gastats;
-                $user->punts_gastats -= $premiReclamat->punts_gastats;
-                $user->save();
-            }
+            DB::transaction(function () use ($premiReclamat) {
+                $lockedPremiReclamat = PremiReclamat::query()
+                    ->with(['user', 'premi'])
+                    ->whereKey($premiReclamat->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
 
-            // Guardar información antes de eliminar
-            $premiId = $premiReclamat->id;
-            $premiNom = $premiReclamat->premi ? $premiReclamat->premi->nom : 'Premi #' . $premiId;
-            $userName = $premiReclamat->user ? $premiReclamat->user->nom : 'usuari desconegut';
+                // Si el premio no ha sido entregado, devolver puntos al usuario
+                if ($lockedPremiReclamat->estat != 'entregat' && $lockedPremiReclamat->user) {
+                    $user = User::query()->whereKey($lockedPremiReclamat->user_id)->lockForUpdate()->firstOrFail();
+                    $user->punts_actuals += $lockedPremiReclamat->punts_gastats;
+                    $user->punts_gastats -= $lockedPremiReclamat->punts_gastats;
+                    $user->save();
+                }
 
-            $premiReclamat->delete();
+                // Guardar información antes de eliminar
+                $premiId = $lockedPremiReclamat->id;
+                $premiNom = $lockedPremiReclamat->premi ? $lockedPremiReclamat->premi->nom : 'Premi #' . $premiId;
+                $userName = $lockedPremiReclamat->user ? $lockedPremiReclamat->user->nom : 'usuari desconegut';
 
-            // Registrar actividad
-            if (auth()->check()) {
-                Activity::create([
-                    'user_id' => auth()->id(),
-                    'action' => 'Ha eliminat el premi reclamat #' . $premiId . ' (' . $premiNom . ') per a ' . $userName
-                ]);
-            }
+                $lockedPremiReclamat->delete();
+
+                // Registrar actividad
+                if (Auth::check()) {
+                    Activity::create([
+                        'user_id' => Auth::id(),
+                        'action' => 'Ha eliminat el premi reclamat #' . $premiId . ' (' . $premiNom . ') per a ' . $userName
+                    ]);
+                }
+            });
 
             if (request()->expectsJson() || request()->ajax()) {
                 return response()->json([
@@ -154,21 +175,32 @@ class PremiReclamatController extends Controller
             return redirect()->route('admin.dashboard')
                 ->with('success', 'Premi reclamat eliminat correctament.');
         } catch (\Exception $e) {
-            \Log::error('Error al eliminar premi reclamat: ' . $e->getMessage());
+            Log::error('Error al eliminar premi reclamat: ' . $e->getMessage());
 
             if (request()->expectsJson() || request()->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error: ' . $e->getMessage()
+                    'message' => 'S\'ha produït un error en eliminar el premi reclamat.'
                 ], 500);
             }
 
-            return back()->withErrors(['error' => 'Error: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'S\'ha produït un error en eliminar el premi reclamat.']);
         }
     }
 
     public function userClaims($userId)
     {
+        $authUser = Auth::user();
+        $userId = (int) $userId;
+
+        // Check authorization: must be admin or the user themselves
+        $isAdmin = $authUser->rol && $authUser->rol->nom === 'Administrador';
+        $isOwner = (int) $authUser->id === $userId;
+
+        if (!$isAdmin && !$isOwner) {
+            abort(403, 'No tens permisos per consultar aquestes reclamacions.');
+        }
+
         $user = User::findOrFail($userId);
         $premisReclamats = $user->premisReclamats()->with('premi')->get();
 
@@ -177,23 +209,24 @@ class PremiReclamatController extends Controller
     public function approve($id)
     {
         try {
-            $premiReclamat = PremiReclamat::findOrFail($id);
-            $premiReclamat->estat = 'procesant';
+            DB::transaction(function () use ($id) {
+                $premiReclamat = PremiReclamat::query()->with('user')->whereKey($id)->lockForUpdate()->firstOrFail();
+                $premiReclamat->estat = 'procesant';
 
-            // Generar código de seguimiento único
-            $codiSeguiment = $this->generarCodiSeguimentUnic();
-            $premiReclamat->codi_seguiment = $codiSeguiment;
+                // Generar código de seguimiento único
+                $premiReclamat->codi_seguiment = $this->generarCodiSeguimentUnic();
 
-            $premiReclamat->save();
+                $premiReclamat->save();
 
-            // Registrar actividad
-            if (auth()->check()) {
-                Activity::create([
-                    'user_id' => auth()->id(),
-                    'action' => 'Ha aprovat la sol·licitud de premi #' . $premiReclamat->id . ' per a ' .
-                        ($premiReclamat->user ? $premiReclamat->user->nom : 'usuari desconegut')
-                ]);
-            }
+                // Registrar actividad
+                if (Auth::check()) {
+                    Activity::create([
+                        'user_id' => Auth::id(),
+                        'action' => 'Ha aprovat la sol·licitud de premi #' . $premiReclamat->id . ' per a ' .
+                            ($premiReclamat->user ? $premiReclamat->user->nom : 'usuari desconegut')
+                    ]);
+                }
+            });
 
             if (request()->expectsJson() || request()->ajax()) {
                 return response()->json([
@@ -204,16 +237,107 @@ class PremiReclamatController extends Controller
 
             return redirect()->back()->with('success', 'Sol·licitud aprovada correctament');
         } catch (\Exception $e) {
-            \Log::error('Error al aprovar premi reclamat: ' . $e->getMessage());
+            Log::error('Error al aprovar premi reclamat: ' . $e->getMessage());
 
             if (request()->expectsJson() || request()->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error: ' . $e->getMessage()
+                    'message' => 'S\'ha produït un error en aprovar el premi reclamat.'
                 ], 500);
             }
 
-            return back()->withErrors(['error' => 'Error: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'S\'ha produït un error en aprovar el premi reclamat.']);
+        }
+    }
+
+    public function approveAllPending()
+    {
+        try {
+            $pendingClaims = PremiReclamat::where('estat', 'pendent')->get();
+
+            if ($pendingClaims->isEmpty()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'No hi ha sol·licituds pendents.'
+                ]);
+            }
+
+            DB::transaction(function () use ($pendingClaims) {
+                PremiReclamat::query()
+                    ->whereKey($pendingClaims->pluck('id')->all())
+                    ->lockForUpdate()
+                    ->get()
+                    ->each(function (PremiReclamat $premiReclamat) {
+                        $premiReclamat->estat = 'procesant';
+                        $premiReclamat->codi_seguiment = $this->generarCodiSeguimentUnic();
+                        $premiReclamat->save();
+
+                        if (Auth::check()) {
+                            Activity::create([
+                                'user_id' => Auth::id(),
+                                'action' => 'Ha aprovat la sol·licitud de premi #' . $premiReclamat->id . ' per a ' .
+                                    ($premiReclamat->user ? $premiReclamat->user->nom : 'usuari desconegut')
+                            ]);
+                        }
+                    });
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Totes les sol·licituds pendents s\'han aprovat correctament.'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al aprovar totes les sol·licituds pendents: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'S\'ha produït un error en aprovar les sol·licituds pendents.'
+            ], 500);
+        }
+    }
+
+    public function deliver($id)
+    {
+        try {
+            $response = DB::transaction(function () use ($id) {
+                $premiReclamat = PremiReclamat::query()->with('user')->whereKey($id)->lockForUpdate()->firstOrFail();
+
+                if ($premiReclamat->estat !== 'procesant') {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Només es pot marcar com entregat quan està en procés.'
+                    ], 422);
+                }
+
+                $premiReclamat->estat = 'entregat';
+                $premiReclamat->save();
+
+                if (Auth::check()) {
+                    Activity::create([
+                        'user_id' => Auth::id(),
+                        'action' => 'Ha marcat com entregat el premi reclamat #' . $premiReclamat->id . ' per a ' .
+                            ($premiReclamat->user ? $premiReclamat->user->nom : 'usuari desconegut')
+                    ]);
+                }
+
+                return null;
+            });
+
+            if ($response instanceof \Illuminate\Http\JsonResponse) {
+                return $response;
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Premi marcat com entregat correctament'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al marcar premi com entregat: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'S\'ha produït un error en marcar el premi com entregat.'
+            ], 500);
         }
     }
 
@@ -241,28 +365,30 @@ class PremiReclamatController extends Controller
 
     public function reject($id)
     {
-        $premiReclamat = PremiReclamat::findOrFail($id);
+        DB::transaction(function () use ($id) {
+            $premiReclamat = PremiReclamat::query()->with('user')->whereKey($id)->lockForUpdate()->firstOrFail();
 
-        // Si se rechaza, devolver puntos al usuario
-        $user = $premiReclamat->user;
-        if ($user) {
-            $user->punts_actuals += $premiReclamat->punts_gastats;
-            $user->punts_gastats -= $premiReclamat->punts_gastats;
-            $user->save();
-        }
+            // Si se rechaza, devolver puntos al usuario
+            if ($premiReclamat->user) {
+                $user = User::query()->whereKey($premiReclamat->user_id)->lockForUpdate()->firstOrFail();
+                $user->punts_actuals += $premiReclamat->punts_gastats;
+                $user->punts_gastats -= $premiReclamat->punts_gastats;
+                $user->save();
+            }
 
-        $premiReclamat->estat = 'cancelat';
-        $premiReclamat->comentaris = ($premiReclamat->comentaris ? $premiReclamat->comentaris . "\n" : '') .
-            'Sol·licitud rebutjada el ' . now()->format('d/m/Y H:i') . ' per ' . auth()->user()->nom;
-        $premiReclamat->save();
+            $premiReclamat->estat = 'cancelat';
+            $premiReclamat->comentaris = ($premiReclamat->comentaris ? $premiReclamat->comentaris . "\n" : '') .
+                'Sol·licitud rebutjada el ' . now()->format('d/m/Y H:i') . ' per ' . Auth::user()->nom;
+            $premiReclamat->save();
 
-        // Registrar actividad
-        if (auth()->check()) {
-            Activity::create([
-                'user_id' => auth()->id(),
-                'action' => 'Ha rebutjat la sol·licitud de premi #' . $premiReclamat->id . ' per a ' . $premiReclamat->user->nom
-            ]);
-        }
+            // Registrar actividad
+            if (Auth::check()) {
+                Activity::create([
+                    'user_id' => Auth::id(),
+                    'action' => 'Ha rebutjat la sol·licitud de premi #' . $premiReclamat->id . ' per a ' . $premiReclamat->user->nom
+                ]);
+            }
+        });
 
         return response()->json(['success' => true]);
     }

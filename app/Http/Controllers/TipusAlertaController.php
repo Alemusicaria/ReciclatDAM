@@ -12,11 +12,17 @@ class TipusAlertaController extends Controller
     public function index()
     {
         $tipusAlertes = TipusAlerta::all();
+        if (!view()->exists('tipus_alertes.index')) {
+            return redirect()->route('dashboard')->with('info', 'La vista de tipus d\'alertes no està disponible.');
+        }
         return view('tipus_alertes.index', compact('tipusAlertes'));
     }
 
     public function create()
     {
+        if (!view()->exists('tipus_alertes.create')) {
+            return redirect()->route('dashboard')->with('info', 'La vista de creació de tipus d\'alertes no està disponible.');
+        }
         return view('tipus_alertes.create');
     }
 
@@ -52,21 +58,27 @@ class TipusAlertaController extends Controller
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error: ' . $e->getMessage()
+                    'message' => 'No s\'ha pogut crear el tipus d\'alerta.'
                 ], 422);
             }
             
-            return back()->withErrors(['error' => 'Error al crear el tipus d\'alerta: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'No s\'ha pogut crear el tipus d\'alerta.']);
         }
     }
 
     public function show(TipusAlerta $tipusAlerta)
     {
+        if (!view()->exists('tipus_alertes.show')) {
+            return redirect()->route('dashboard')->with('info', 'La vista de detall de tipus d\'alertes no està disponible.');
+        }
         return view('tipus_alertes.show', compact('tipusAlerta'));
     }
 
     public function edit(TipusAlerta $tipusAlerta)
     {
+        if (!view()->exists('tipus_alertes.edit')) {
+            return redirect()->route('dashboard')->with('info', 'La vista d\'edició de tipus d\'alertes no està disponible.');
+        }
         return view('tipus_alertes.edit', compact('tipusAlerta'));
     }
 
@@ -102,11 +114,11 @@ class TipusAlertaController extends Controller
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error: ' . $e->getMessage()
+                    'message' => 'No s\'ha pogut actualitzar el tipus d\'alerta.'
                 ], 422);
             }
             
-            return back()->withErrors(['error' => 'Error al actualitzar el tipus d\'alerta: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'No s\'ha pogut actualitzar el tipus d\'alerta.']);
         }
     }
 
@@ -144,11 +156,11 @@ class TipusAlertaController extends Controller
             if (request()->expectsJson() || request()->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error: ' . $e->getMessage()
+                    'message' => 'No s\'ha pogut eliminar el tipus d\'alerta.'
                 ], 500);
             }
             
-            return back()->withErrors(['error' => 'Error al eliminar el tipus d\'alerta: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'No s\'ha pogut eliminar el tipus d\'alerta.']);
         }
     }
 }

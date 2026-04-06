@@ -6,8 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\Event;
 use App\Models\TipusEvent;
 use Carbon\Carbon;
-use Auth;
 use App\Models\Activity;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class EventsController extends Controller
@@ -22,7 +24,14 @@ class EventsController extends Controller
         // Si el usuario está autenticado, obtener sus eventos registrados
         $userEvents = [];
         if (Auth::check()) {
-            $userEvents = Auth::user()->events()->pluck('events.id')->toArray();
+            $userEvents = DB::table('event_user')
+                ->where('user_id', Auth::id())
+                ->pluck('event_id')
+                ->toArray();
+        }
+
+        if (!view()->exists('events')) {
+            return redirect()->route('dashboard')->with('info', 'La vista pública d\'events no està disponible.');
         }
 
         return view('events', compact('tipusEvents', 'userEvents'));
@@ -33,28 +42,32 @@ class EventsController extends Controller
      */
     public function getEvents(Request $request)
     {
-        $start = $request->start;
-        $end = $request->end;
+        $query = Event::with('tipus')->withCount('participants');
 
-        $events = Event::with('tipus')
-            ->where('data_inici', '>=', $start)
-            ->where('data_inici', '<=', $end)
-            ->get()
+        if ($request->filled('start')) {
+            $query->where('data_inici', '>=', $request->input('start'));
+        }
+
+        if ($request->filled('end')) {
+            $query->where('data_inici', '<=', $request->input('end'));
+        }
+
+        $events = $query->get()
             ->map(function ($event) {
                 return [
                     'id' => $event->id,
-                    'title' => $event->nom,
-                    'start' => $event->data_inici->format('Y-m-d H:i:s'),
+                    'title' => e($event->nom),
+                    'start' => $event->data_inici ? $event->data_inici->format('Y-m-d H:i:s') : null,
                     'end' => $event->data_fi ? $event->data_fi->format('Y-m-d H:i:s') : null,
                     'color' => $event->tipus->color ?? '#3788d8',
-                    'description' => $event->descripcio,
-                    'location' => $event->lloc,
+                    'description' => e($event->descripcio),
+                    'location' => e($event->lloc),
                     'extendedProps' => [
-                        'tipus' => $event->tipus ? $event->tipus->nom : null,
+                        'tipus' => $event->tipus ? e($event->tipus->nom) : null,
                         'capacitat' => $event->capacitat,
                         'punts_disponibles' => $event->punts_disponibles,
-                        'participants' => $event->participants()->count(),
-                        'imatge' => $event->imatge
+                        'participants' => $event->participants_count,
+                        'imatge' => e($event->imatge)
                     ]
                 ];
             });
@@ -104,6 +117,11 @@ class EventsController extends Controller
     public function show($id)
     {
         $event = Event::with(['tipus', 'participants'])->findOrFail($id);
+
+        if (!view()->exists('events.show')) {
+            return redirect()->route('dashboard')->with('info', 'La vista de detall d\'events no està disponible.');
+        }
+
         return view('events.show', compact('event'));
     }
 
@@ -112,18 +130,18 @@ class EventsController extends Controller
      */
     public function register(Request $request, $id)
     {
-        $event = Event::findOrFail($id);
+        $response = DB::transaction(function () use ($id, $request) {
+            $event = Event::query()->with('tipus')->whereKey($id)->lockForUpdate()->firstOrFail();
 
-        // Verificar si ya está registrado
-        if ($event->participants()->where('user_id', auth()->id())->exists()) {
-            if ($request->expectsJson()) {
+            // Verificar si ya está registrado
+            if ($event->participants()->where('user_id', Auth::id())->exists()) {
                 return response()->json([
                     'success' => false,
                     'registered' => true,
                     'event' => [
-                        'title' => $event->nom,
-                        'date' => $event->data_inici->format('d/m/Y'),
-                        'time' => $event->data_inici->format('H:i')
+                        'title' => e($event->nom),
+                        'date' => $event->data_inici ? $event->data_inici->format('d/m/Y') : null,
+                        'time' => $event->data_inici ? $event->data_inici->format('H:i') : null
                     ],
                     'html' => '
                         <div class="alert alert-success mt-2 small">
@@ -133,18 +151,15 @@ class EventsController extends Controller
                                 </div>
                                 <div>
                                     <strong>¡Fantàstic!</strong> 
-                                    <p class="mb-0">Ja formes part d\'aquest event! T\'esperem el dia ' . $event->data_inici->format('d/m/Y') . ' a les ' . $event->data_inici->format('H:i') . '.</p>
+                                    <p class="mb-0">Ja formes part d\'aquest event! T\'esperem el dia ' . ($event->data_inici ? $event->data_inici->format('d/m/Y') : '') . ' a les ' . ($event->data_inici ? $event->data_inici->format('H:i') : '') . '.</p>
                                 </div>
                             </div>
                         </div>'
                 ]);
             }
-            return back()->with('error', '✓ Ja formes part d\'aquest event! T\'esperem el dia ' . $event->data_inici->format('d/m/Y'));
-        }
 
-        // Verificar disponibilidad - solo si capacitat NO es NULL
-        if ($event->capacitat !== null && $event->participants()->count() >= $event->capacitat) {
-            if ($request->expectsJson()) {
+            // Verificar disponibilidad - solo si capacitat NO es NULL
+            if ($event->capacitat !== null && $event->participants()->count() >= $event->capacitat) {
                 return response()->json([
                     'success' => false,
                     'full' => true,
@@ -162,43 +177,45 @@ class EventsController extends Controller
                         </div>'
                 ]);
             }
-            return back()->with('error', 'Aquest event ja ha arribat a la seva capacitat màxima.');
-        }
 
-        // Registrar al usuario
-        $event->participants()->attach(auth()->id(), [
-            'punts' => 0,
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        // Volver a indexar el evento en Algolia para actualizar la información de participantes
-        $event->searchable();
-
-        if ($request->expectsJson()) {
-            return response()->json([
-                'success' => true,
-                'registered' => true,
-                'event' => [
-                    'title' => $event->nom,
-                    'date' => $event->data_inici->format('d/m/Y'),
-                    'time' => $event->data_inici->format('H:i')
-                ],
-                'html' => '
-                    <div class="alert alert-success mt-2 small">
-                        <div class="d-flex align-items-center">
-                            <div class="me-3">
-                                <i class="fas fa-check-circle fa-2x text-success"></i>
-                            </div>
-                            <div>
-                                <strong>¡Fantàstic!</strong> 
-                                <p class="mb-0">T\'has registrat correctament a l\'event! T\'esperem el dia ' . $event->data_inici->format('d/m/Y') . ' a les ' . $event->data_inici->format('H:i') . '.</p>
-                            </div>
-                        </div>
-                    </div>'
+            // Registrar al usuario
+            $event->participants()->attach(Auth::id(), [
+                'punts' => 0,
+                'created_at' => now(),
+                'updated_at' => now()
             ]);
-        }
-        return back()->with('success', 'T\'has registrat correctament a l\'event!');
+
+            // Volver a indexar el evento en Algolia para actualizar la información de participantes
+            $event->searchable();
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'registered' => true,
+                    'event' => [
+                        'title' => e($event->nom),
+                        'date' => $event->data_inici ? $event->data_inici->format('d/m/Y') : null,
+                        'time' => $event->data_inici ? $event->data_inici->format('H:i') : null
+                    ],
+                    'html' => '
+                        <div class="alert alert-success mt-2 small">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="fas fa-check-circle fa-2x text-success"></i>
+                                </div>
+                                <div>
+                                    <strong>¡Fantàstic!</strong> 
+                                    <p class="mb-0">T\'has registrat correctament a l\'event! T\'esperem el dia ' . ($event->data_inici ? $event->data_inici->format('d/m/Y') : '') . ' a les ' . ($event->data_inici ? $event->data_inici->format('H:i') : '') . '.</p>
+                                </div>
+                            </div>
+                        </div>'
+                ]);
+            }
+
+            return back()->with('success', 'T\'has registrat correctament a l\'event!');
+        }, 3);
+
+        return $response;
     }
     /**
      * Verificar si el usuario está registrado en un evento
@@ -208,7 +225,7 @@ class EventsController extends Controller
         $event = Event::findOrFail($id);
 
         // Verificar si está registrado
-        $isRegistered = $event->participants()->where('user_id', auth()->id())->exists();
+        $isRegistered = $event->participants()->where('user_id', Auth::id())->exists();
 
         // Verificar si está lleno
         $isFull = $event->capacitat !== null && $event->participants()->count() >= $event->capacitat;
@@ -225,7 +242,7 @@ class EventsController extends Controller
                         </div>
                         <div>
                             <strong>¡Fantàstic!</strong> 
-                            <p class="mb-0">Ja formes part d\'aquest event! T\'esperem el dia ' . $event->data_inici->format('d/m/Y') . ' a les ' . $event->data_inici->format('H:i') . '.</p>
+                            <p class="mb-0">Ja formes part d\'aquest event! T\'esperem el dia ' . ($event->data_inici ? $event->data_inici->format('d/m/Y') : '') . ' a les ' . ($event->data_inici ? $event->data_inici->format('H:i') : '') . '.</p>
                         </div>
                     </div>
                 </div>';
@@ -249,7 +266,7 @@ class EventsController extends Controller
             'full' => $isFull,
             'html' => $html,
             'event' => [
-                'title' => $event->nom,
+                'title' => e($event->nom),
                 'date' => $event->data_inici->format('d/m/Y'),
                 'time' => $event->data_inici->format('H:i')
             ]
@@ -302,9 +319,9 @@ class EventsController extends Controller
             $event->save();
 
             // Registrar actividad
-            if (auth()->check()) {
+            if (Auth::check()) {
                 Activity::create([
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                     'action' => 'Ha creat un nou event: ' . $event->nom
                 ]);
             }
@@ -319,16 +336,16 @@ class EventsController extends Controller
 
             return redirect()->route('admin.dashboard')->with('success', 'Event creat correctament');
         } catch (\Exception $e) {
-            \Log::error('Error al crear l\'event: ' . $e->getMessage());
+            Log::error('Error al crear l\'event: ' . $e->getMessage());
 
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error al crear l\'event: ' . $e->getMessage()
+                    'message' => 'No s\'ha pogut crear l\'event.'
                 ], 422);
             }
 
-            return back()->withErrors(['error' => 'Error al crear l\'event: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'No s\'ha pogut crear l\'event.']);
         }
     }
 
@@ -383,9 +400,9 @@ class EventsController extends Controller
             $event->save();
 
             // Registrar actividad
-            if (auth()->check()) {
+            if (Auth::check()) {
                 Activity::create([
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                     'action' => 'Ha actualitzat l\'event: ' . $event->nom
                 ]);
             }
@@ -400,16 +417,16 @@ class EventsController extends Controller
 
             return redirect()->route('admin.events.show', $event->id)->with('success', 'Event actualitzat correctament');
         } catch (\Exception $e) {
-            \Log::error('Error al actualitzar l\'event: ' . $e->getMessage());
+            Log::error('Error al actualitzar l\'event: ' . $e->getMessage());
 
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error al actualitzar l\'event: ' . $e->getMessage()
+                    'message' => 'No s\'ha pogut actualitzar l\'event.'
                 ], 500);
             }
 
-            return back()->withErrors(['error' => 'Error al actualitzar l\'event: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'No s\'ha pogut actualitzar l\'event.']);
         }
     }
 
@@ -429,9 +446,9 @@ class EventsController extends Controller
             $event->delete();
 
             // Registrar actividad
-            if (auth()->check()) {
+            if (Auth::check()) {
                 Activity::create([
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                     'action' => 'Ha eliminat l\'event: ' . $eventName
                 ]);
             }
@@ -445,16 +462,16 @@ class EventsController extends Controller
 
             return redirect()->route('admin.dashboard')->with('success', 'Event eliminat correctament');
         } catch (\Exception $e) {
-            \Log::error('Error al eliminar l\'event: ' . $e->getMessage());
+            Log::error('Error al eliminar l\'event: ' . $e->getMessage());
 
             if (request()->expectsJson() || request()->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error al eliminar l\'event: ' . $e->getMessage()
+                    'message' => 'No s\'ha pogut eliminar l\'event.'
                 ], 500);
             }
 
-            return back()->withErrors(['error' => 'Error al eliminar l\'event: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'No s\'ha pogut eliminar l\'event.']);
         }
     }
 }

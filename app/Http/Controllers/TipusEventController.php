@@ -75,11 +75,11 @@ class TipusEventController extends Controller
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error: ' . $e->getMessage()
+                    'message' => 'No s\'ha pogut crear el tipus d\'event.'
                 ], 422);
             }
             
-            return back()->withErrors(['error' => 'Error al crear el tipus d\'event: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'No s\'ha pogut crear el tipus d\'event.']);
         }
     }
     
@@ -137,11 +137,11 @@ class TipusEventController extends Controller
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error: ' . $e->getMessage()
+                    'message' => 'No s\'ha pogut actualitzar el tipus d\'event.'
                 ], 422);
             }
             
-            return back()->withErrors(['error' => 'Error al actualitzar el tipus d\'event: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'No s\'ha pogut actualitzar el tipus d\'event.']);
         }
     }
     
@@ -182,11 +182,11 @@ class TipusEventController extends Controller
             if (request()->expectsJson() || request()->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error: ' . $e->getMessage()
+                    'message' => 'No s\'ha pogut eliminar el tipus d\'event.'
                 ], 500);
             }
             
-            return back()->withErrors(['error' => 'Error al eliminar el tipus d\'event: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'No s\'ha pogut eliminar el tipus d\'event.']);
         }
     }
 }

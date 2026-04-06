@@ -5,10 +5,12 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\LogicCheckController;
 use App\Http\Controllers\CacheController;
 use App\Http\Controllers\CacheLockController;
 use App\Http\Controllers\CodiController;
 use App\Http\Controllers\EventsController;
+use App\Http\Controllers\MapController;
 use App\Http\Controllers\MigrationController;
 use App\Http\Controllers\NavigatorInfoController;
 use App\Http\Controllers\OpinionsController;
@@ -32,44 +34,46 @@ Route::localizedGroup(function () {
     Route::get('login/google', [SocialiteController::class, 'redirectToProvider'])->defaults('provider', 'google');
     Route::get('login/google/callback', [SocialiteController::class, 'handleProviderCallback'])->defaults('provider', 'google');
 
-    Route::post('/save-navigator-info', [NavigatorInfoController::class, 'store']);
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::post('/save-navigator-info', [NavigatorInfoController::class, 'store'])->middleware('throttle:30,1');
+    Route::post('/set-locale', [PageAndApiController::class, 'setLocale'])->name('set-locale')->middleware('throttle:30,1');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+    
+    // Map API endpoint (protected from frontend exposure of API key)
+    Route::post('/api/maps/static-map', [MapController::class, 'staticMap'])->name('map.static-map')->middleware('throttle:60,1');
 
-    Route::post('/clear-session', [PageAndApiController::class, 'clearSession'])->name('clear-session');
+    Route::post('/clear-session', [PageAndApiController::class, 'clearSession'])->name('clear-session')->middleware('auth');
 
-    Route::post('/users/{user}/photo', [UserController::class, 'updatePhoto'])->name('users.update.photo');
+    Route::post('/users/{user}/photo', [UserController::class, 'updatePhoto'])->name('users.update.photo')->middleware('auth');
 
     Route::get('/', [PageAndApiController::class, 'dashboard'])->name('dashboard');
 
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
     // En routes/web.php o habilitar en routes/auth.php
     Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
-    Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
+    Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email')->middleware('throttle:5,1');
     Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
-    Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('password.update');
+    Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('password.update')->middleware('throttle:5,1');
 
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
-    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
 
-    Route::resource('caches', CacheController::class);
-    Route::resource('cache-locks', CacheLockController::class);
-    Route::resource('codis', CodiController::class);
-    Route::resource('migrations', MigrationController::class);
-    Route::resource('password-reset-tokens', PasswordResetTokenController::class);
-    Route::resource('premis', PremiController::class);
-    Route::resource('sessions', SessionController::class);
-    Route::resource('users', UserController::class);
-    Route::resource('productes', ProducteController::class);
-
+    Route::resource('caches', CacheController::class)->middleware(['auth', 'admin']);
+    Route::resource('cache-locks', CacheLockController::class)->middleware(['auth', 'admin']);
+    Route::resource('codis', CodiController::class)->middleware(['auth', 'admin']);
+    Route::resource('migrations', MigrationController::class)->middleware(['auth', 'admin']);
+    Route::resource('password-reset-tokens', PasswordResetTokenController::class)->middleware(['auth', 'admin']);
     Route::get('/premis/search', [PremiController::class, 'search'])->name('premis.search');
-
-    Route::resource('opinions', OpinionsController::class);
+    Route::resource('premis', PremiController::class)->middleware('auth');
+    Route::resource('sessions', SessionController::class)->middleware(['auth', 'admin']);
+    Route::resource('users', UserController::class)->middleware('auth');
+    Route::resource('productes', ProducteController::class)->middleware('auth');
     Route::get('opinions/search', [OpinionsController::class, 'search'])->name('opinions.search');
+    Route::resource('opinions', OpinionsController::class)->middleware('auth');
 
-    Route::resource('punts_de_recollida', PuntDeRecollidaController::class);
-    Route::resource('tipus_alertes', TipusAlertaController::class);
-    Route::resource('alertes_punts_de_recollida', AlertaPuntDeRecollidaController::class);
+    Route::resource('punts_de_recollida', PuntDeRecollidaController::class)->middleware('auth');
+    Route::resource('tipus_alertes', TipusAlertaController::class)->middleware('auth');
+    Route::resource('alertes_punts_de_recollida', AlertaPuntDeRecollidaController::class)->middleware('auth');
 
     // Rutas para eventos con calendario
     Route::get('/events', [EventsController::class, 'index'])->name('events');
@@ -82,8 +86,8 @@ Route::localizedGroup(function () {
     Route::get('/tipus-events/search', [TipusEventController::class, 'search'])->name('tipus-events.search');
     Route::get('/events/{id}/check-registration', [EventsController::class, 'checkRegistration'])->name('events.checkRegistration')->middleware('auth');
 
-    Route::resource('premis_reclamats', PremiReclamatController::class);
-    Route::get('users/{user}/premis-reclamats', [PremiReclamatController::class, 'userClaims'])->name('users.premis_reclamats');
+    Route::resource('premis_reclamats', PremiReclamatController::class)->middleware('auth');
+    Route::get('users/{user}/premis-reclamats', [PremiReclamatController::class, 'userClaims'])->name('users.premis_reclamats')->middleware('auth');
 
     Route::post('/premis/{id}/canjear', [PremiController::class, 'canjear'])
         ->name('premis.canjear')
@@ -97,12 +101,18 @@ Route::localizedGroup(function () {
         Route::post('/process-code', [CodiController::class, 'processCode'])->name('process-code');
     });
 
-    Route::get('/punts-recollida/nearby', [PageAndApiController::class, 'nearbyCollectionPoints'])->name('punts-recollida.nearby');
+    Route::get('/punts-recollida/nearby', [PageAndApiController::class, 'nearbyCollectionPoints'])->name('punts-recollida.nearby')->middleware('throttle:60,1');
 
     Route::get('/tipus-alertes', [PageAndApiController::class, 'alertTypes'])->name('tipus-alertes.list');
 
     // Rutas para el panel de administración
-    Route::prefix('admin')->middleware(['auth'])->group(function () {
+    Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+        Route::get('/logic-checker', [LogicCheckController::class, 'index'])
+            ->name('admin.logic-checker');
+
+        Route::post('/logic-checker/run', [LogicCheckController::class, 'run'])
+            ->name('admin.logic-checker.run');
+
         // Aquí todas tus rutas de administrador
         Route::controller(AdminController::class)->group(function () {
             // Modales dinámicos
@@ -178,6 +188,8 @@ Route::localizedGroup(function () {
         Route::controller(PremiReclamatController::class)->group(function () {
             Route::post('/premis-reclamats/{id}/approve', 'approve')->name('admin.premis-reclamats.approve');
             Route::post('/premis-reclamats/{id}/reject', 'reject')->name('admin.premis-reclamats.reject');
+            Route::post('/premis-reclamats/{id}/deliver', 'deliver')->name('admin.premis-reclamats.deliver');
+            Route::post('/premis-reclamats/approve-all', 'approveAllPending')->name('admin.premis-reclamats.approve-all');
             Route::put('/premis-reclamats/{id}', 'update')->name('admin.premis-reclamats.update');
         });
     });

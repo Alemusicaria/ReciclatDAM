@@ -16,6 +16,15 @@ use Illuminate\Support\Str;
 
 class SocialiteController extends Controller
 {
+    public function showSetPasswordForm()
+    {
+        if (!session()->has('social_user')) {
+            return redirect('login')->withErrors(['msg' => 'No hi ha cap sessió social pendent per establir contrasenya.']);
+        }
+
+        return view('auth.set-password');
+    }
+
     public function redirectToProvider($provider)
     {
         if (!$this->isProviderSupported($provider)) {
@@ -31,7 +40,6 @@ class SocialiteController extends Controller
 
         Log::info('Social redirect generated', [
             'provider' => $provider,
-            'target_url' => $response->getTargetUrl(),
         ]);
 
         return $response;
@@ -62,14 +70,12 @@ class SocialiteController extends Controller
             // Registrar información detallada para depuración
             Log::info('Social login attempt', [
                 'provider' => $provider,
-                'email' => $email,
-                'user_exists' => $findUser ? 'yes' : 'no'
             ]);
     
             if ($findUser) {
                 // El usuario ya existe, solo inicia sesión
                 Auth::login($findUser, true); // Añadir "true" para "remember me"
-                Log::info('User logged in: ' . $findUser->email);
+                Log::info('Existing social user logged in', ['provider' => $provider]);
                 return redirect()->intended('/');
             } else {
                 // Crear nuevo usuario
@@ -108,8 +114,8 @@ class SocialiteController extends Controller
 
                 // Login con "remember me" activado
                 Auth::login($newUser, true);
-                
-                Log::info('New user created and logged in: ' . $newUser->email);
+
+                Log::info('New social user created and logged in', ['provider' => $provider]);
     
                 // Redirigir a home con flush de sesión
                 return redirect('/')->with('success', 'Benvingut/da a Reciclat DAM!');
@@ -165,7 +171,7 @@ class SocialiteController extends Controller
         $user->save();
 
         Auth::login($user);
-        Log::info('User logged in after setting password: ' . $user->email);
+        Log::info('User logged in after setting password');
 
         // Eliminar l'usuari de la sessió
         session()->forget('social_user');

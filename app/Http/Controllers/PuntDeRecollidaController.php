@@ -11,18 +11,24 @@ class PuntDeRecollidaController extends Controller
     public function index()
     {
         $puntsDeRecollida = PuntDeRecollida::all(); // Obtenim tots els punts de recollida
+        if (!view()->exists('punts_de_recollida.index')) {
+            return redirect()->route('dashboard')->with('info', 'La vista de punts de recollida no està disponible.');
+        }
         return view('punts_de_recollida.index', compact('puntsDeRecollida'));
     }
 
     public function create()
     {
+        if (!view()->exists('punts_de_recollida.create')) {
+            return redirect()->route('dashboard')->with('info', 'La vista de creació de punts de recollida no està disponible.');
+        }
         return view('punts_de_recollida.create');
     }
 
     public function store(Request $request)
     {
         try {
-            \Log::info('Recibida solicitud para crear punto de recogida', $request->all());
+            \Log::info('Recibida solicitud para crear punto de recogida');
 
             $validatedData = $request->validate([
                 'nom' => 'required|string|max:255',
@@ -70,21 +76,27 @@ class PuntDeRecollidaController extends Controller
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error: ' . $e->getMessage()
+                    'message' => 'No s\'ha pogut crear el punt de recollida.'
                 ], 422);
             }
 
-            return back()->withErrors(['error' => 'Error al crear el punt de recollida: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'No s\'ha pogut crear el punt de recollida.']);
         }
     }
 
     public function show(PuntDeRecollida $puntDeRecollida)
     {
+        if (!view()->exists('punts_de_recollida.show')) {
+            return redirect()->route('dashboard')->with('info', 'La vista de detall de punts de recollida no està disponible.');
+        }
         return view('punts_de_recollida.show', compact('puntDeRecollida'));
     }
 
     public function edit(PuntDeRecollida $puntDeRecollida)
     {
+        if (!view()->exists('punts_de_recollida.edit')) {
+            return redirect()->route('dashboard')->with('info', 'La vista d\'edició de punts de recollida no està disponible.');
+        }
         return view('punts_de_recollida.edit', compact('puntDeRecollida'));
     }
 
@@ -137,11 +149,11 @@ class PuntDeRecollidaController extends Controller
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error: ' . $e->getMessage()
+                    'message' => 'No s\'ha pogut actualitzar el punt de recollida.'
                 ], 422);
             }
 
-            return back()->withErrors(['error' => 'Error al actualitzar el punt de recollida: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'No s\'ha pogut actualitzar el punt de recollida.']);
         }
     }
 

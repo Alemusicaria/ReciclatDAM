@@ -62,11 +62,11 @@ class RolController extends Controller
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error: ' . $e->getMessage()
+                    'message' => 'No s\'ha pogut crear el rol.'
                 ], 422);
             }
             
-            return back()->withErrors(['error' => 'Error al crear el rol: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'No s\'ha pogut crear el rol.']);
         }
     }
 
@@ -123,11 +123,11 @@ class RolController extends Controller
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error: ' . $e->getMessage()
+                    'message' => 'No s\'ha pogut actualitzar el rol.'
                 ], 422);
             }
             
-            return back()->withErrors(['error' => 'Error al actualitzar el rol: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'No s\'ha pogut actualitzar el rol.']);
         }
     }
 
@@ -168,11 +168,11 @@ class RolController extends Controller
             if (request()->expectsJson() || request()->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error: ' . $e->getMessage()
+                    'message' => 'No s\'ha pogut eliminar el rol.'
                 ], 500);
             }
             
-            return back()->withErrors(['error' => 'Error al eliminar el rol: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'No s\'ha pogut eliminar el rol.']);
         }
     }
 }

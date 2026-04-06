@@ -19,6 +19,8 @@ use App\Models\TipusAlerta;
 use App\Models\AlertaPuntDeRecollida;
 use App\Models\Opinions;
 use App\Models\NavigatorInfo;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 
 class AdminController extends Controller
@@ -26,7 +28,7 @@ class AdminController extends Controller
     public function index()
     {
         // Comprovar si l'usuari és admin
-        if (auth()->user()->rol_id != 1) {
+        if (!Auth::check() || Auth::user()->rol_id != 1) {
             return redirect()->route('home')->with('error', 'No tens permís per accedir al panell d\'administració.');
         }
 
@@ -217,10 +219,15 @@ class AdminController extends Controller
                     $opinions = Opinions::latest()->get();
                     return view('admin.modals.opinions', compact('opinions'));
                 default:
-                    throw new \Exception('Modal no suportada');
+                    return response()->json([
+                        'error' => 'Modal no suportada',
+                    ], 400);
             }
         } catch (\Exception $e) {
-            return '<div class="alert alert-danger">Error: ' . $e->getMessage() . '</div>';
+            Log::error('Error en getModalContent: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Error intern carregant el contingut del modal.',
+            ], 500);
         }
     }
     public function getCreateForm($type)
@@ -245,10 +252,10 @@ class AdminController extends Controller
                     throw new \Exception('Formulario de creación no soportado');
             }
         } catch (\Exception $e) {
-            \Log::error('Error en getCreateForm: ' . $e->getMessage());
+            Log::error('Error en getCreateForm: ' . $e->getMessage());
             return '<div class="alert alert-danger">
                 <i class="fas fa-exclamation-triangle me-2"></i>
-                Error al cargar el formulario: ' . $e->getMessage() . '
+                Error al carregar el formulari.
             </div>';
         }
     }
@@ -336,8 +343,8 @@ class AdminController extends Controller
                     throw new \Exception('Tipus de detall no suportat');
             }
         } catch (\Exception $e) {
-            \Log::error('Error en getDetails: ' . $e->getMessage());
-            return '<div class="alert alert-danger">Error: ' . $e->getMessage() . '</div>';
+            Log::error('Error en getDetails: ' . $e->getMessage());
+            return '<div class="alert alert-danger">Error intern carregant els detalls.</div>';
         }
     }
 
@@ -400,10 +407,10 @@ class AdminController extends Controller
                     throw new \Exception('Formulario de edición no soportado');
             }
         } catch (\Exception $e) {
-            \Log::error('Error en getEditForm: ' . $e->getMessage());
+            Log::error('Error en getEditForm: ' . $e->getMessage());
             return '<div class="alert alert-danger">
                 <i class="fas fa-exclamation-triangle me-2"></i>
-                Error al cargar el formulario: ' . $e->getMessage() . '
+                Error al carregar el formulari.
             </div>';
         }
     }
@@ -516,9 +523,10 @@ class AdminController extends Controller
                 'message' => 'Actualitzat correctament'
             ]);
         } catch (\Exception $e) {
+            Log::error('Error en updateDetails: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Error: ' . $e->getMessage()
+                'message' => 'No s\'ha pogut actualitzar el registre.'
             ], 500);
         }
     }
@@ -606,9 +614,9 @@ class AdminController extends Controller
             $item->delete();
 
             // Registrar actividad
-            if (auth()->check()) {
+            if (Auth::check()) {
                 Activity::create([
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                     'action' => 'Ha eliminat ' . $type . ': ' . $itemName
                 ]);
             }
@@ -618,11 +626,11 @@ class AdminController extends Controller
                 'message' => 'Element eliminat correctament'
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error al eliminar ' . $type . ': ' . $e->getMessage());
+            Log::error('Error al eliminar ' . $type . ': ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error: ' . $e->getMessage()
+                'message' => 'No s\'ha pogut eliminar el registre.'
             ], 500);
         }
     }

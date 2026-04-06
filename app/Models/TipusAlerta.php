@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
 
 class TipusAlerta extends Model
 {
-    use Searchable;
+    use HasFactory, Searchable;
 
     protected $table = 'tipus_alertes';
 

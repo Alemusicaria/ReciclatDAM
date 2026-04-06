@@ -39,27 +39,34 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nom' => 'required|string|max:255',
             'cognoms' => 'required|string|max:255',
             'data_naixement' => 'nullable|date',
             'telefon' => 'nullable|string|max:15',
             'ubicacio' => 'nullable|string',
-            'punts_totals' => 'nullable|integer',
-            'punts_actuals' => 'nullable|integer',
-            'punts_gastats' => 'nullable|integer',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'rol_id' => 'nullable|integer|exists:rols,id',
             'foto_perfil' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        $user = new User($request->all());
+        $user = new User();
+        $user->nom = $validated['nom'];
+        $user->cognoms = $validated['cognoms'];
+        $user->data_naixement = $validated['data_naixement'] ?? null;
+        $user->telefon = $validated['telefon'] ?? null;
+        $user->ubicacio = $validated['ubicacio'] ?? null;
+        $user->email = $validated['email'];
+        $user->rol_id = 2;
+        $user->punts_totals = 0;
+        $user->punts_actuals = 0;
+        $user->punts_gastats = 0;
+
         if ($request->hasFile('foto_perfil')) {
             $path = $request->file('foto_perfil')->store('profile_photos', 'public');
             $user->foto_perfil = $path;
         }
-        $user->password = Hash::make($request->password);
+        $user->password = Hash::make($validated['password']);
         $user->save();
 
         Auth::login($user);

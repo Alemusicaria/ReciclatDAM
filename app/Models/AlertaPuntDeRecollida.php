@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
 
 class AlertaPuntDeRecollida extends Model
 {
-    use Searchable;
+    use HasFactory, Searchable;
 
     protected $table = 'alertes_punts_de_recollida';
 

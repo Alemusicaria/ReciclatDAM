@@ -6,6 +6,7 @@ use App\Models\PuntDeRecollida;
 use App\Models\TipusAlerta;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
@@ -17,6 +18,32 @@ class PageAndApiController extends Controller
         session()->forget('social_login');
 
         return response()->json(['status' => 'success']);
+    }
+
+    public function setLocale(Request $request): JsonResponse
+    {
+        $supportedLocales = array_keys(config('laravellocalization.supportedLocales') ?? []);
+
+        if ($supportedLocales === []) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Supported locales are not configured.',
+            ], 500);
+        }
+
+        $validated = $request->validate([
+            'locale' => ['required', 'string', 'in:' . implode(',', $supportedLocales)],
+        ]);
+
+        $locale = $validated['locale'];
+
+        session(['locale' => $locale]);
+        App::setLocale($locale);
+
+        return response()->json([
+            'status' => 'success',
+            'locale' => $locale,
+        ]);
     }
 
     public function dashboard(): View
@@ -36,9 +63,15 @@ class PageAndApiController extends Controller
 
     public function nearbyCollectionPoints(Request $request): JsonResponse
     {
-        $lat = $request->get('lat');
-        $lng = $request->get('lng');
-        $distance = $request->get('distance', 1);
+        $validated = $request->validate([
+            'lat' => 'required|numeric|between:-90,90',
+            'lng' => 'required|numeric|between:-180,180',
+            'distance' => 'nullable|numeric|min:0.1|max:100',
+        ]);
+
+        $lat = (float) $validated['lat'];
+        $lng = (float) $validated['lng'];
+        $distance = (float) ($validated['distance'] ?? 1);
 
         try {
             $points = PuntDeRecollida::where('disponible', true)
@@ -58,7 +91,7 @@ class PageAndApiController extends Controller
             return response()->json($points);
         } catch (\Exception $e) {
             Log::error('Error en punts-recollida/nearby: ' . $e->getMessage());
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Error intern en consultar punts propers.'], 500);
         }
     }
 
@@ -68,7 +101,7 @@ class PageAndApiController extends Controller
             return response()->json(TipusAlerta::all());
         } catch (\Exception $e) {
             Log::error('Error en tipus-alertes: ' . $e->getMessage());
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Error intern en consultar tipus d\'alerta.'], 500);
         }
     }
 }
