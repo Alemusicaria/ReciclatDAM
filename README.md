@@ -56,7 +56,7 @@ php artisan key:generate
 Edita `.env` i posa les teves dades de BD:
 
 ```env
-APP_URL=http://127.0.0.1:8000
+APP_URL=http://localhost:8000
 
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -68,11 +68,39 @@ DB_PASSWORD=
 
 ## 4) Base de dades completa (totes les taules + dades default)
 
-Aquest repo ja inclou el dump complet:
+Ara el projecte es pot inicialitzar de dues maneres:
+
+### Opcio recomanada: migracions + seeders
+
+El repo inclou una migracio que recrea l'esquema de la base de dades i un seeder que carrega dades ficticies i coherents per defecte.
+
+Executa:
+
+```bash
+php artisan migrate --seed
+```
+
+Per defecte, aquest flux carrega el mode `snapshot`.
+
+Si vols un mode `demo` amb factories i mes varietat de dades, executa per exemple a PowerShell:
+
+```powershell
+$env:SEED_MODE='demo'; php artisan migrate --seed
+```
+
+Aquesta opcio:
+
+- Crea totes les taules
+- Crea les relacions i claus foranes
+- Introdueix dades d'exemple netes i sense correus reals
+
+### Opcio alternativa: importar el dump complet
+
+El repo tambe inclou el dump complet:
 
 - `database-reciclatdam.sql`
 
-S'ha afegit un importador automatic:
+I un importador automatic:
 
 - `tools/import_sql_dump.php`
 - script Composer: `db:import`
@@ -87,7 +115,7 @@ Que fa:
 
 - Llegeix `.env`
 - Connecta a MySQL
-- Importa `database-reciclatdam.sql` (estructura + dades per defecte)
+- Importa `database-reciclatdam.sql` (estructura + dades originals del dump)
 
 Si falla la connexio:
 
@@ -110,7 +138,7 @@ php artisan serve
 
 URL local:
 
-- `http://127.0.0.1:8000`
+- `http://localhost:8000`
 
 ## 6) Com funciona (manual funcional)
 
@@ -177,6 +205,12 @@ php artisan test
 
 # auditoria i18n
 composer run-script i18n:audit
+
+# crear esquema i dades d'exemple netes
+php artisan migrate --seed
+
+# mode demo amb factories
+$env:SEED_MODE='demo'; php artisan migrate --seed
 
 # importar base de dades completa
 composer run-script db:import
