@@ -38,6 +38,9 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const puntsIndex = window.puntsIndex; // Usa la variable global
+        const fallbackSearchUrl = `{{ route('punts-recollida.search') }}`;
+        const algoliaAppId = '4JU9PG98CF';
+        const algoliaApiKey = 'd37ffd358dca40447584fb2ffdc28e03';
 
         const searchInput = document.getElementById('search-input');
         const searchResults = document.getElementById('search-results');
@@ -69,6 +72,99 @@
             }, 10);
         }
 
+        function renderHits(hits) {
+            searchResults.innerHTML = '';
+
+            if (!hits || hits.length === 0) {
+                searchResults.innerHTML = '<li class="list-group-item">{{ __("messages.hero.no_results") }}</li>';
+                showResults();
+                return;
+            }
+
+            hits.forEach(hit => {
+                const listItem = document.createElement('li');
+                listItem.className = 'list-group-item d-flex align-items-center';
+
+                const fraccioColor = fraccioColors[hit.fraccio] || '#ffffff';
+                const backgroundColor = document.body.classList.contains('dark')
+                    ? '#333'
+                    : 'white';
+
+                const mapId = (hit.objectID || `${hit.latitud}-${hit.longitud}`).toString().replace(/[^a-zA-Z0-9_-]/g, '');
+
+                listItem.style.borderLeft = `4px solid ${fraccioColor}`;
+                listItem.style.backgroundColor = backgroundColor;
+                listItem.style.position = 'relative';
+
+                listItem.innerHTML = `
+                    <div style="flex: 1; position: relative; z-index: 2; padding: 10px; border-radius: 5px; color: ${document.body.classList.contains('dark') ? '#f3f4f6' : 'black'};">
+                        <strong>${hit.nom}</strong><br>
+                        <span>${hit.ciutat}, ${hit.adreca}</span><br>
+                        <small><strong>{{ __("messages.hero.fraction") }}</strong> ${hit.fraccio}</small>
+                    </div>
+                    <div style="margin-left: 10px; z-index: 1;">
+                        <img id="map-${mapId}" src="{{ asset('images/offline.svg') }}" alt="{{ __("messages.hero.static_map_alt") }}" style="width: 150px; height: 100px; border-radius: 5px; object-fit: cover;">
+                    </div>
+                `;
+
+                const mapImage = listItem.querySelector(`#map-${mapId}`);
+                if (mapImage && hit.latitud != null && hit.longitud != null) {
+                    const mapUrl = `{{ route('map.static-map') }}?lat=${encodeURIComponent(hit.latitud)}&lng=${encodeURIComponent(hit.longitud)}&width=150&height=100`;
+                    mapImage.onerror = function () {
+                        // Avoid infinite error loops if fallback image also fails.
+                        mapImage.onerror = null;
+                        mapImage.src = "{{ asset('images/offline.svg') }}";
+                    };
+
+                    // Set directly to avoid issuing duplicate requests per result.
+                    mapImage.src = mapUrl;
+                }
+
+                searchResults.appendChild(listItem);
+            });
+
+            showResults();
+        }
+
+        async function searchWithFallback(query) {
+            const url = `${fallbackSearchUrl}?q=${encodeURIComponent(query)}&limit=10`;
+            const response = await fetch(url, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Fallback search failed with status ${response.status}`);
+            }
+
+            const payload = await response.json();
+            return payload.hits || [];
+        }
+
+        async function searchWithAlgoliaHttp(query) {
+            const response = await fetch(`https://${algoliaAppId}-dsn.algolia.net/1/indexes/punts_de_recollida/query`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Algolia-Application-Id': algoliaAppId,
+                    'X-Algolia-API-Key': algoliaApiKey
+                },
+                body: JSON.stringify({
+                    query,
+                    hitsPerPage: 10
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Algolia HTTP fallback failed with status ${response.status}`);
+            }
+
+            const payload = await response.json();
+            return payload.hits || [];
+        }
+
         // Funció per amagar resultats amb animació
         function hideResults() {
             searchResults.style.transition = 'opacity 0.3s, transform 0.3s';
@@ -92,71 +188,39 @@
 
             clearSearchBtn.style.display = 'block';
 
+            if (!puntsIndex || window.algoliaReady === false) {
+                searchWithAlgoliaHttp(query)
+                    .then(renderHits)
+                    .catch(() => {
+                        searchWithFallback(query)
+                            .then(renderHits)
+                            .catch(err => {
+                                console.error('Error de cerca (fallback):', err);
+                                searchResults.innerHTML = '<li class="list-group-item text-danger">{{ __("messages.hero.search_error") }}</li>';
+                                showResults();
+                            });
+                    });
+                return;
+            }
+
             puntsIndex.search(query, {
                 hitsPerPage: 10
             }).then(({ hits }) => {
-                searchResults.innerHTML = '';
-
-                if (hits.length === 0) {
-                    searchResults.innerHTML = '<li class="list-group-item">{{ __("messages.hero.no_results") }}</li>';
-                } else {
-                    hits.forEach(hit => {
-                        const listItem = document.createElement('li');
-                        listItem.className = 'list-group-item d-flex align-items-center';
-
-                        // Establir un color de fons lleuger segons la fracció
-                        const fraccioColor = fraccioColors[hit.fraccio] || '#ffffff';
-                        const backgroundColor = document.body.classList.contains('dark')
-                            ? '#333'
-                            : 'white';
-
-                        listItem.style.borderLeft = `4px solid ${fraccioColor}`;
-                        listItem.style.backgroundColor = backgroundColor;
-                        listItem.style.position = 'relative';
-
-                        listItem.innerHTML = `
-                            <div style="flex: 1; position: relative; z-index: 2; padding: 10px; border-radius: 5px; color: ${document.body.classList.contains('dark') ? '#f3f4f6' : 'black'};">
-                                <strong>${hit.nom}</strong><br>
-                                <span>${hit.ciutat}, ${hit.adreca}</span><br>
-                                <small><strong>{{ __("messages.hero.fraction") }}</strong> ${hit.fraccio}</small>
-                            </div>
-                            <div style="margin-left: 10px; z-index: 1;">
-                                <img id="map-${hit.objectID}" src="{{ asset('images/loading.gif') }}" alt="{{ __("messages.hero.static_map_alt") }}" style="width: 150px; height: 100px; border-radius: 5px;">
-                                <script>
-                                    // Cargar mapa de forma segura sin exponer API key en frontend
-                                    fetch('{{ route("map.static-map") }}', {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                                        },
-                                        body: JSON.stringify({
-                                            lat: ${hit.latitud},
-                                            lng: ${hit.longitud},
-                                            width: 150,
-                                            height: 100
-                                        })
-                                    })
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        if (data.url) {
-                                            document.getElementById('map-${hit.objectID}').src = data.url;
-                                        }
-                                    })
-                                    .catch(err => console.error('Map load error:', err));
-                                </script>
-                            </div>
-                        `;
-
-                        searchResults.appendChild(listItem);
-                    });
-                }
-
-                showResults();
+                renderHits(hits);
             }).catch(err => {
-                console.error('Error de cerca:', err);
-                searchResults.innerHTML = '<li class="list-group-item text-danger">{{ __("messages.hero.search_error") }}</li>';
-                showResults();
+                console.warn('Algolia no disponible, activant fallback DB:', err);
+
+                searchWithAlgoliaHttp(query)
+                    .then(renderHits)
+                    .catch(() => {
+                        searchWithFallback(query)
+                            .then(renderHits)
+                            .catch(fallbackErr => {
+                                console.error('Error de cerca:', fallbackErr);
+                                searchResults.innerHTML = '<li class="list-group-item text-danger">{{ __("messages.hero.search_error") }}</li>';
+                                showResults();
+                            });
+                    });
             });
         });
 

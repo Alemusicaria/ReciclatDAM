@@ -5,15 +5,12 @@ namespace Tests\Feature;
 use App\Models\Nivell;
 use App\Models\Rol;
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class UserPhotoUpdateTest extends TestCase
 {
-    use DatabaseTransactions;
-
     public function test_user_can_update_profile_photo(): void
     {
         Storage::fake('public');

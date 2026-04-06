@@ -3473,6 +3473,48 @@ body.dark .social-icon:hover {
     }
 }
 
+/* Sponsors: force a consistent logo box and keep every logo inside the card */
+#sponsors .sponsor-logo {
+    align-items: center;
+    display: flex;
+    height: 100px;
+    justify-content: center;
+    margin: 15px 0;
+    overflow: hidden;
+    width: 100%
+}
+
+#sponsors .sponsor-logo .sponsor-img {
+    display: block;
+    height: 68px !important;
+    max-height: 68px !important;
+    max-width: 140px !important;
+    object-fit: contain;
+    width: 140px !important
+}
+
+#sponsors .logo-alsa .sponsor-img,
+#sponsors .logo-mercadona .sponsor-img {
+    height: 68px !important;
+    margin-top: 0 !important;
+    width: 140px !important
+}
+
+@media (max-width: 767px) {
+    #sponsors .sponsor-logo {
+        height: 88px
+    }
+
+    #sponsors .sponsor-logo .sponsor-img,
+    #sponsors .logo-alsa .sponsor-img,
+    #sponsors .logo-mercadona .sponsor-img {
+        height: 56px !important;
+        max-height: 56px !important;
+        max-width: 120px !important;
+        width: 120px !important
+    }
+}
+
 #opinion-carousel {
     background-color: #fff;
     border-radius: 12px;
@@ -4209,6 +4251,12 @@ button#next-selected-award:focus {
     padding: 25px;
     position: relative;
     width: 80%
+}
+
+#product-modal,
+#product-modal .modal-content,
+#product-list {
+    scroll-behavior: auto !important;
 }
 
 .product-card {

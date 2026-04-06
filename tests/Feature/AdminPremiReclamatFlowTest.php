@@ -7,14 +7,11 @@ use App\Models\Premi;
 use App\Models\PremiReclamat;
 use App\Models\Rol;
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
 class AdminPremiReclamatFlowTest extends TestCase
 {
-    use DatabaseTransactions;
-
     protected function setUp(): void
     {
         parent::setUp();

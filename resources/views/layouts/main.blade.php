@@ -112,7 +112,7 @@
 
 
             // Enviar les dades al servidor
-            fetch('/save-navigator-info', {
+            fetch("{{ route('save-navigator-info') }}", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -120,10 +120,10 @@
                 },
                 body: JSON.stringify(info)
             }).then(parseJsonResponse)
-            }).then(data => {/* Datos recibidos correctamente */ })
+            .then(data => {/* Datos recibidos correctamente */ })
                 .catch((error) => {
                     // Manejo silencioso de errores o usa un log solo en desarrollo
-                    if (process.env.NODE_ENV === 'development') {
+                    if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'development') {
                         console.error('Error:', error);
                     }
                 });

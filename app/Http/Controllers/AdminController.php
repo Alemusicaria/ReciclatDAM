@@ -29,7 +29,7 @@ class AdminController extends Controller
     {
         // Comprovar si l'usuari és admin
         if (!Auth::check() || Auth::user()->rol_id != 1) {
-            return redirect()->route('home')->with('error', 'No tens permís per accedir al panell d\'administració.');
+            return redirect()->route('dashboard')->with('error', 'No tens permís per accedir al panell d\'administració.');
         }
 
         // Estadístiques bàsiques

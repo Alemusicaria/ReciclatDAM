@@ -5,18 +5,18 @@ namespace Tests\Feature;
 use App\Models\Nivell;
 use App\Models\Rol;
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
 class SecuritySweepTest extends TestCase
 {
-    use DatabaseTransactions;
-
     protected function setUp(): void
     {
         parent::setUp();
         Config::set('scout.driver', 'null');
+        // Ensure clean state for Rol and Nivell creation
+        Rol::truncate();
+        Nivell::truncate();
     }
 
     public function test_unauthorized_user_cannot_access_admin_dashboard(): void
@@ -195,17 +195,15 @@ class SecuritySweepTest extends TestCase
 
     private function createAdminUser(): User
     {
-        $rol = Rol::query()->firstOrCreate(['id' => 1], ['nom' => 'admin']);
-        $nivell = Nivell::query()->firstOrCreate(
-            ['id' => 1],
-            [
-                'nom' => 'Inicial',
-                'punts_requerits' => 0,
-                'descripcio' => 'Nivell inicial',
-                'icona' => null,
-                'color' => '#000000',
-            ]
-        );
+        $rol = Rol::find(1) ?? Rol::create(['id' => 1, 'nom' => 'admin']);
+        $nivell = Nivell::find(1) ?? Nivell::create([
+            'id' => 1,
+            'nom' => 'Inicial',
+            'punts_requerits' => 0,
+            'descripcio' => 'Nivell inicial',
+            'icona' => null,
+            'color' => '#000000',
+        ]);
 
         return User::query()->create([
             'nom' => 'Admin',
@@ -222,17 +220,15 @@ class SecuritySweepTest extends TestCase
 
     private function createRegularUser(string $prefix = 'User'): User
     {
-        $rol = Rol::query()->firstOrCreate(['id' => 2], ['nom' => 'usuari']);
-        $nivell = Nivell::query()->firstOrCreate(
-            ['id' => 1],
-            [
-                'nom' => 'Inicial',
-                'punts_requerits' => 0,
-                'descripcio' => 'Nivell inicial',
-                'icona' => null,
-                'color' => '#000000',
-            ]
-        );
+        $rol = Rol::find(2) ?? Rol::create(['id' => 2, 'nom' => 'usuari']);
+        $nivell = Nivell::find(1) ?? Nivell::create([
+            'id' => 1,
+            'nom' => 'Inicial',
+            'punts_requerits' => 0,
+            'descripcio' => 'Nivell inicial',
+            'icona' => null,
+            'color' => '#000000',
+        ]);
 
         return User::query()->create([
             'nom' => $prefix,

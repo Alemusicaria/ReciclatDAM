@@ -218,6 +218,35 @@ composer run-script db:import
 
 ## 9) Resolucio de problemes frequents
 
+### Mapa static a la cerca (Google + fallback gratis)
+
+La miniatura del mapa funciona amb aquest ordre:
+
+1. Google Static Maps (nomes si esta habilitat)
+2. Proveidors OSM (gratis)
+3. Fallback SVG intern (sempre disponible)
+
+Per activar Google Maps quan el teu projecte Google Cloud ho permeti:
+
+```env
+GOOGLE_MAPS_ENABLED=true
+GOOGLE_MAPS_API_KEY=la_teva_key
+```
+
+Requisits de Google:
+
+- Static Maps API habilitada
+- Billing actiu al projecte
+- Restriccions d'API key ben configurades
+
+Si no vols dependre de Google, deixa:
+
+```env
+GOOGLE_MAPS_ENABLED=false
+```
+
+I el sistema continuara amb OSM/fallback automticament.
+
 ### Error: "could not find driver"
 
 - Activa `pdo_mysql` a `php.ini`

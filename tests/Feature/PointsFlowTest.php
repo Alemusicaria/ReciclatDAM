@@ -9,13 +9,10 @@ use App\Models\Premi;
 use App\Models\Rol;
 use App\Models\TipusEvent;
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class PointsFlowTest extends TestCase
 {
-    use DatabaseTransactions;
-
     public function test_user_can_redeem_premi_and_points_are_updated(): void
     {
         $user = $this->createUserWithPoints(100);

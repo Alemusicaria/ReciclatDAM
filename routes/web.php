@@ -34,12 +34,12 @@ Route::localizedGroup(function () {
     Route::get('login/google', [SocialiteController::class, 'redirectToProvider'])->defaults('provider', 'google');
     Route::get('login/google/callback', [SocialiteController::class, 'handleProviderCallback'])->defaults('provider', 'google');
 
-    Route::post('/save-navigator-info', [NavigatorInfoController::class, 'store'])->middleware('throttle:30,1');
+    Route::post('/save-navigator-info', [NavigatorInfoController::class, 'store'])->name('save-navigator-info')->middleware('throttle:30,1');
     Route::post('/set-locale', [PageAndApiController::class, 'setLocale'])->name('set-locale')->middleware('throttle:30,1');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
     
     // Map API endpoint (protected from frontend exposure of API key)
-    Route::post('/api/maps/static-map', [MapController::class, 'staticMap'])->name('map.static-map')->middleware('throttle:60,1');
+    Route::get('/api/maps/static-map', [MapController::class, 'staticMap'])->name('map.static-map')->middleware('throttle:60,1');
 
     Route::post('/clear-session', [PageAndApiController::class, 'clearSession'])->name('clear-session')->middleware('auth');
 
@@ -102,6 +102,7 @@ Route::localizedGroup(function () {
     });
 
     Route::get('/punts-recollida/nearby', [PageAndApiController::class, 'nearbyCollectionPoints'])->name('punts-recollida.nearby')->middleware('throttle:60,1');
+    Route::get('/punts-recollida/search', [PageAndApiController::class, 'searchCollectionPoints'])->name('punts-recollida.search')->middleware('throttle:60,1');
 
     Route::get('/tipus-alertes', [PageAndApiController::class, 'alertTypes'])->name('tipus-alertes.list');
 

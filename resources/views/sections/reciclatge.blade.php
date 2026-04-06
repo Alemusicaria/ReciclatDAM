@@ -445,8 +445,27 @@
 
 
         // CATEGORY MODAL FUNCTIONALITY
+        function resetProductModalScroll() {
+            const modalOverlay = document.getElementById('product-modal');
+            if (modalOverlay) {
+                modalOverlay.scrollTop = 0;
+            }
+
+            const modalContent = document.querySelector('#product-modal .modal-content');
+            if (modalContent) {
+                modalContent.scrollTop = 0;
+            }
+
+            const productListEl = document.getElementById('product-list');
+            if (productListEl) {
+                productListEl.scrollTop = 0;
+            }
+        }
+
         // Open modal with products for a category
         $('.category-card').on('click', function () {
+            resetProductModalScroll();
+
             const categoria = $(this).data('category');
             const color = $(this).data('color');
             const info = recyclingInfo[categoria];
@@ -465,7 +484,8 @@
                 console.error("Error searching for products:", err);
                 $('#product-title').text(`{{ __('messages.recycling.error_search') }} ${categoria}`);
                 $('#product-list').html(`<p>{{ __('messages.recycling.error_details') }}: ${err.message}</p>`);
-                $('#product-modal').fadeIn();
+                resetProductModalScroll();
+                $('#product-modal').stop(true, true).show();
             });
         });
 
@@ -521,11 +541,19 @@
                 });
             }
 
-            $('#product-modal').fadeIn();
+            resetProductModalScroll();
+            $('#product-modal').stop(true, true).show();
+
+            // Force again after DOM paint to avoid restoring previous scroll position.
+            requestAnimationFrame(() => {
+                resetProductModalScroll();
+            });
         }
 
         // Function to show a modal with product information and map
         function showProductModal(productName, productCategory, productImage) {
+            resetProductModalScroll();
+
             // Get recycling text for the fraction
             const info = recyclingInfo[productCategory] || {};
             const recyclingText = info.instruccions || "{{ __('messages.recycling.no_info') }}";
@@ -549,8 +577,11 @@
                 <button class="btn btn-primary mt-3 back-button">{{ __('messages.recycling.close') }}</button>
             `);
 
-            // First show the modal
-            $('#product-modal').fadeIn(function () {
+            // Show instantly, then initialize map once the modal is visible.
+            $('#product-modal').stop(true, true).show();
+            requestAnimationFrame(function () {
+                resetProductModalScroll();
+
                 // Initialize map centered on Catalonia AFTER the modal is visible
                 const productMap = L.map('product-map');
 
@@ -619,6 +650,11 @@
                 }).catch(err => {
                     console.error('Error loading collection points:', err);
                 });
+
+                // Ensure final position is top even after map/content layout settles.
+                setTimeout(() => {
+                    resetProductModalScroll();
+                }, 0);
             });
         }
 

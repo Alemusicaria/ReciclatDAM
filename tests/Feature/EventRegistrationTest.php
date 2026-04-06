@@ -7,13 +7,10 @@ use App\Models\Nivell;
 use App\Models\Rol;
 use App\Models\TipusEvent;
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class EventRegistrationTest extends TestCase
 {
-    use DatabaseTransactions;
-
     public function test_calendar_json_returns_event_rows(): void
     {
         $tipus = $this->createTipusEvent();

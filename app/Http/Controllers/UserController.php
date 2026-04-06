@@ -158,11 +158,12 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        try {
-            if (!$this->canManageUser($user)) {
-                abort(403, 'No tens permisos per actualitzar aquest perfil.');
-            }
+        // Check authorization first, before try/catch, so it's not swallowed
+        if (!$this->canManageUser($user)) {
+            abort(403, 'No tens permisos per actualitzar aquest perfil.');
+        }
 
+        try {
             $isAdmin = (int) Auth::user()->rol_id === 1;
 
             $request->validate([
