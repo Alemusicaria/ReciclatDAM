@@ -34,6 +34,7 @@ class User extends Authenticatable implements CanResetPassword
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'data_naixement' => 'date',
     ];
 
     public function codis()

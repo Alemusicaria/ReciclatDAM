@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use App\Models\Activity;
 use App\Mail\WelcomeMail;
 use Illuminate\Support\Facades\Mail;
@@ -176,7 +177,7 @@ class UserController extends Controller
                 'rol_id' => $isAdmin ? 'required|exists:rols,id' : 'prohibited',
                 'punts_actuals' => $isAdmin ? 'nullable|integer|min:0' : 'prohibited',
                 'foto_perfil' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB
-                'password' => 'nullable|min:8',
+                'password' => 'nullable|string|min:8|confirmed',
             ]);
 
             // Determinar si és una sol·licitud AJAX
@@ -255,9 +256,20 @@ class UserController extends Controller
 
             // Per a sol·licituds AJAX (com la del modal)
             if ($isAjax) {
+                // Preparar la ruta de la foto per a la resposta AJAX
+                $photoPath = null;
+                if ($user->foto_perfil) {
+                    if (str_starts_with($user->foto_perfil, 'https://')) {
+                        $photoPath = $user->foto_perfil;
+                    } else {
+                        $photoPath = Storage::url($user->foto_perfil);
+                    }
+                }
+                
                 return response()->json([
                     'success' => true,
                     'message' => 'Usuari actualitzat correctament',
+                    'path' => $photoPath,
                     'user' => $user
                 ]);
             }
@@ -265,6 +277,8 @@ class UserController extends Controller
             // Per a sol·licituds normals
             return redirect()->route('users.show', $user->id)
                 ->with('success', 'Usuari actualitzat correctament');
+        } catch (ValidationException $e) {
+            throw $e;
         } catch (\Exception $e) {
             Log::error('Error al actualitzar usuari', [
                 'user_id' => $user->id,

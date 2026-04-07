@@ -128,20 +128,20 @@
                                 role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 @if(Auth::user()->foto_perfil)
                                     @if(str_starts_with(Auth::user()->foto_perfil, 'https://'))
-                                        <img src="{{ Auth::user()->foto_perfil }}" alt="Foto de perfil" class="rounded-circle "
-                                            id="profile-image" style="width: 30px; height: 30px; margin-right: 5px; ">
-                                    @elseif(file_exists(public_path('storage/' . Auth::user()->foto_perfil)))
-                                        <img src="{{ asset('storage/' . Auth::user()->foto_perfil) }}" alt="Foto de perfil"
-                                            class="rounded-circle " id="profile-image"
+                                        <img src="{{ Auth::user()->foto_perfil }}" alt="Foto de perfil" class="rounded-circle js-user-avatar"
+                                            id="navbar-profile-image" style="width: 30px; height: 30px; margin-right: 5px; ">
+                                    @elseif(\Illuminate\Support\Facades\Storage::disk('public')->exists(Auth::user()->foto_perfil))
+                                        <img src="{{ \Illuminate\Support\Facades\Storage::url(Auth::user()->foto_perfil) }}" alt="Foto de perfil"
+                                            class="rounded-circle js-user-avatar" id="navbar-profile-image"
                                             style="width: 30px; height: 30px; object-fit: cover; margin-right: 5px; ">
                                     @else
                                         <img src="{{ asset('images/default-profile.png') }}" alt="Foto de perfil"
-                                            class="rounded-circle " id="profile-image"
+                                            class="rounded-circle js-user-avatar" id="navbar-profile-image"
                                             style="width: 30px; height: 30px; object-fit: cover; margin-right: 5px; ">
                                     @endif
                                 @else
                                     <img src="{{ asset('images/default-profile.png') }}" alt="Foto de perfil"
-                                        class="rounded-circle " id="profile-image"
+                                        class="rounded-circle js-user-avatar" id="navbar-profile-image"
                                         style="width: 30px; height: 30px; object-fit: cover; margin-right: 5px; ">
                                 @endif
                                 <span>{{ Auth::user()->nom }} ({{ Auth::user()->punts_actuals }} ECODAMS)</span>
@@ -326,9 +326,14 @@
             const currentTheme = localStorage.getItem('theme') || (prefersDarkScheme ? 'dark' : 'light');
             const themeIcon = document.getElementById('theme-icon');
             const themeToggle = document.getElementById('theme-toggle');
+            const navElement = document.querySelector('nav.navbar');
 
             // Inicializar navegación suave por secciones
-            const navLinks = document.querySelectorAll('.navbar-nav .nav-link[href^="#"]');
+            const navLinks = document.querySelectorAll('.navbar-nav .nav-link[data-section]');
+            const sectionIds = Array.from(navLinks)
+                .map(link => link.dataset.section)
+                .filter(Boolean);
+            let navSyncLockUntil = 0;
 
             // Función para actualizar el icono del tema
             function updateThemeIcon(theme) {
@@ -342,7 +347,12 @@
             }
 
             // Inicializa el tema y la icona
+            document.body.classList.remove('light', 'dark');
             document.body.classList.add(currentTheme);
+            if (navElement) {
+                navElement.classList.remove('light', 'dark');
+                navElement.classList.add(currentTheme);
+            }
             updateThemeIcon(currentTheme);
 
             // Actualizar imágenes de tiendas según el tema
@@ -368,8 +378,12 @@
             themeToggle.addEventListener('click', function () {
                 const isDarkMode = document.body.classList.contains('dark');
                 const newTheme = isDarkMode ? 'light' : 'dark';
-                document.body.classList.toggle('dark', !isDarkMode);
-                document.body.classList.toggle('light', isDarkMode);
+                document.body.classList.remove('light', 'dark');
+                document.body.classList.add(newTheme);
+                if (navElement) {
+                    navElement.classList.remove('light', 'dark');
+                    navElement.classList.add(newTheme);
+                }
                 localStorage.setItem('theme', newTheme);
                 updateImagesBasedOnTheme();
                 updateThemeIcon(newTheme);
@@ -419,9 +433,31 @@
                 activeLink.appendChild(line);
             }
 
+            function setActiveNavBySection(sectionId) {
+                if (!sectionId) return;
+
+                let hasMatch = false;
+                navLinks.forEach(link => {
+                    const isMatch = link.dataset.section === sectionId;
+                    link.classList.toggle('active', isMatch);
+                    if (isMatch) {
+                        hasMatch = true;
+                    }
+                });
+
+                if (hasMatch) {
+                    applyActiveStyles();
+                }
+            }
+
             // Navegación entre secciones
             navLinks.forEach(link => {
                 link.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href') || '';
+                    if (!href.startsWith('#')) {
+                        return;
+                    }
+
                     e.preventDefault();
                     const targetId = this.getAttribute('href').substring(1);
 
@@ -431,14 +467,11 @@
                     const targetElement = document.getElementById(targetId);
 
                     if (targetElement) {
+                        // Bloquejar la sincronització automàtica uns instants durant el scroll suau.
+                        navSyncLockUntil = Date.now() + 900;
+
                         // Quitar active de todos los enlaces
-                        navLinks.forEach(l => l.classList.remove('active'));
-
-                        // Añadir active al enlace clickeado
-                        this.classList.add('active');
-
-                        // Aplicar estilos al enlace activo
-                        applyActiveStyles();
+                        setActiveNavBySection(targetId);
 
                         // MÉTODO ALTERNATIVO: Usar scrollIntoView
                         targetElement.scrollIntoView({
@@ -459,43 +492,32 @@
 
             // Detectar sección visible al hacer scroll
             function updateActiveNavLink() {
-                const sections = document.querySelectorAll('section[id]');
-                if (sections.length === 0) return;
+                if (Date.now() < navSyncLockUntil) {
+                    return;
+                }
+
+                const sections = sectionIds
+                    .map(id => document.getElementById(id))
+                    .filter(Boolean);
+
+                if (sections.length === 0) {
+                    return;
+                }
 
                 const navbarHeight = document.querySelector('.navbar').offsetHeight;
-                const scrollPosition = window.scrollY + navbarHeight + 50;
+                const threshold = window.scrollY + navbarHeight + 120;
 
-                let currentSection = null;
+                // Sección activa = la última cuyo top ya ha quedado por encima del umbral.
+                let currentSection = sections[0];
                 sections.forEach(section => {
-                    const sectionTop = section.offsetTop;
-                    const sectionHeight = section.offsetHeight;
-                    const sectionBottom = sectionTop + sectionHeight;
-
-                    if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
+                    if (section.offsetTop <= threshold) {
                         currentSection = section;
                     }
                 });
 
-                // Si no encontramos sección y estamos cerca del inicio, usar la primera
-                if (!currentSection && window.scrollY < sections[0].offsetTop) {
-                    currentSection = sections[0];
-                }
-
                 if (currentSection) {
                     const sectionId = currentSection.getAttribute('id');
-
-                    // Actualizar enlaces activos
-                    navLinks.forEach(link => {
-                        link.classList.remove('active');
-                        const linkHref = link.getAttribute('href');
-
-                        if (linkHref === `#${sectionId}`) {
-                            link.classList.add('active');
-                        }
-                    });
-
-                    // Aplicar estilos al enlace activo
-                    applyActiveStyles();
+                    setActiveNavBySection(sectionId);
                 }
             }
 
@@ -505,17 +527,39 @@
             // Actualizar al hacer scroll
             window.addEventListener('scroll', updateActiveNavLink);
 
+            // Actualizar enlace activo cuando cambia el hash (incluye clicks desde footer)
+            window.addEventListener('hashchange', function () {
+                const targetId = window.location.hash.replace('#', '');
+                if (!targetId) return;
+
+                const targetLink = document.querySelector(`.navbar-nav .nav-link[data-section="${targetId}"]`);
+                if (!targetLink) return;
+
+                setActiveNavBySection(targetId);
+            });
+
+            // Marcar menú automáticamente al pasar el cursor por cada sección.
+            sectionIds.forEach(sectionId => {
+                const sectionEl = document.getElementById(sectionId);
+                if (!sectionEl) return;
+
+                sectionEl.addEventListener('mouseenter', function () {
+                    if (Date.now() < navSyncLockUntil) {
+                        return;
+                    }
+                    setActiveNavBySection(sectionId);
+                });
+            });
+
             // Si hay un hash en la URL al cargar
             if (window.location.hash) {
                 const targetId = window.location.hash.substring(1);
                 const targetElement = document.getElementById(targetId);
-                const targetLink = document.querySelector(`.navbar-nav .nav-link[href="#${targetId}"]`);
+                const targetLink = document.querySelector(`.navbar-nav .nav-link[data-section="${targetId}"]`);
 
                 if (targetElement && targetLink) {
                     setTimeout(() => {
-                        navLinks.forEach(l => l.classList.remove('active'));
-                        targetLink.classList.add('active');
-                        applyActiveStyles();
+                        setActiveNavBySection(targetId);
 
                         const navbarHeight = document.querySelector('.navbar').offsetHeight;
                         const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY - navbarHeight;

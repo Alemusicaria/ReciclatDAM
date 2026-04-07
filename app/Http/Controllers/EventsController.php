@@ -44,12 +44,23 @@ class EventsController extends Controller
     {
         $query = Event::with('tipus')->withCount('participants');
 
-        if ($request->filled('start')) {
-            $query->where('data_inici', '>=', $request->input('start'));
+        if ($request->boolean('upcoming')) {
+            $query->where('data_inici', '>=', now());
+        } else {
+            if ($request->filled('start')) {
+                $query->where('data_inici', '>=', $request->input('start'));
+            }
+
+            if ($request->filled('end')) {
+                $query->where('data_inici', '<=', $request->input('end'));
+            }
         }
 
-        if ($request->filled('end')) {
-            $query->where('data_inici', '<=', $request->input('end'));
+        $query->orderBy('data_inici', 'asc');
+
+        $limit = (int) $request->input('limit', 0);
+        if ($limit > 0) {
+            $query->limit($limit);
         }
 
         $events = $query->get()
@@ -132,6 +143,17 @@ class EventsController extends Controller
     {
         $response = DB::transaction(function () use ($id, $request) {
             $event = Event::query()->with('tipus')->whereKey($id)->lockForUpdate()->firstOrFail();
+
+            if ($event->data_inici && $event->data_inici->isPast()) {
+                return response()->json([
+                    'success' => false,
+                    'past' => true,
+                    'html' => '
+                        <div class="alert alert-info mt-2 small mb-0">
+                            Aquest event ja ha finalitzat i no admet noves inscripcions.
+                        </div>'
+                ], 422);
+            }
 
             // Verificar si ya está registrado
             if ($event->participants()->where('user_id', Auth::id())->exists()) {
@@ -224,6 +246,8 @@ class EventsController extends Controller
     {
         $event = Event::findOrFail($id);
 
+        $isPast = $event->data_inici && $event->data_inici->isPast();
+
         // Verificar si está registrado
         $isRegistered = $event->participants()->where('user_id', Auth::id())->exists();
 
@@ -233,7 +257,12 @@ class EventsController extends Controller
         // Preparar mensajes HTML según el estado
         $html = '';
 
-        if ($isRegistered) {
+        if ($isPast) {
+            $html = '
+                <div class="alert alert-info mt-2 small mb-0">
+                    Aquest event ja ha passat. El registre està tancat.
+                </div>';
+        } elseif ($isRegistered) {
             $html = '
                 <div class="alert alert-success mt-2 small">
                     <div class="d-flex align-items-center">
@@ -262,6 +291,7 @@ class EventsController extends Controller
         }
 
         return response()->json([
+            'past' => $isPast,
             'registered' => $isRegistered,
             'full' => $isFull,
             'html' => $html,

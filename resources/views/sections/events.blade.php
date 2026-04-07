@@ -16,7 +16,7 @@
     </div>
 
     <!-- Modal para detalles del evento -->
-    <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+    <div class="modal" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-md">
             <div class="modal-content" id="event-modal">
                 <!-- Asegurar que el botón de cerrar funcione correctamente en el modal -->
@@ -44,8 +44,6 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Utiliza los índices de Algolia ya inicializados en app.blade.php
-        const eventsIndex = window.eventsIndex;
         // Helper function to safely escape HTML in JavaScript
         function escapeHtml(text) {
             if (!text) return '';
@@ -59,18 +57,79 @@
             };
             return String(text).replace(/[&<>"'/]/g, char => map[char]);
         }
-        const tipusEventsIndex = window.tipusEventsIndex;
+
+        function buildEventPlaceholderImage(title, tipus) {
+            const safeTitle = String(title || 'Event').trim();
+            const safeTipus = String(tipus || 'Activitat').trim();
+            const initials = safeTitle
+                .split(/\s+/)
+                .slice(0, 2)
+                .map(word => (word[0] || '').toUpperCase())
+                .join('') || 'EV';
+
+            const splitLines = (text, maxCharsPerLine = 24, maxLines = 4) => {
+                const words = String(text || '').split(/\s+/).filter(Boolean);
+                const lines = [];
+                let currentLine = '';
+
+                words.forEach(word => {
+                    const candidate = currentLine ? `${currentLine} ${word}` : word;
+                    if (candidate.length <= maxCharsPerLine) {
+                        currentLine = candidate;
+                        return;
+                    }
+
+                    if (currentLine) {
+                        lines.push(currentLine);
+                    }
+
+                    currentLine = word;
+                });
+
+                if (currentLine) {
+                    lines.push(currentLine);
+                }
+
+                if (lines.length > maxLines) {
+                    const trimmed = lines.slice(0, maxLines);
+                    const last = trimmed[maxLines - 1];
+                    trimmed[maxLines - 1] = `${last.slice(0, Math.max(0, maxCharsPerLine - 1))}…`;
+                    return trimmed;
+                }
+
+                return lines;
+            };
+
+            const titleLines = splitLines(safeTitle, 24, 4);
+            const baseY = 620;
+            const lineHeight = 80;
+            const titleSvg = titleLines
+                .map((line, i) => `<text x="90" y="${baseY + (i * lineHeight)}" fill="#ffffffee" font-family="Arial, sans-serif" font-size="68" font-weight="600">${escapeHtml(line)}</text>`)
+                .join('');
+
+            const svg = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
+                    <defs>
+                        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stop-color="#1b5e20"/>
+                            <stop offset="100%" stop-color="#2e7d32"/>
+                        </linearGradient>
+                    </defs>
+                    <rect width="1080" height="1080" fill="url(#g)"/>
+                    <circle cx="950" cy="130" r="170" fill="#ffffff22"/>
+                    <circle cx="120" cy="980" r="220" fill="#ffffff18"/>
+                    <text x="90" y="140" fill="#ffffffcc" font-family="Arial, sans-serif" font-size="66" font-weight="700">${escapeHtml(safeTipus)}</text>
+                    <text x="90" y="340" fill="#ffffff" font-family="Arial, sans-serif" font-size="220" font-weight="800">${escapeHtml(initials)}</text>
+                    ${titleSvg}
+                </svg>`;
+
+            return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+        }
 
         // Obtener los IDs de eventos en los que el usuario está registrado
         const userRegisteredEvents = @json($userEvents ?? []);
-        // Cargar eventos
-        loadEvents().then(() => {
-            initCalendar();
-        }).catch(error => {
-            console.error('Error al cargar eventos:', error);
-            document.getElementById('calendar-loader').innerHTML =
-                '<div class="alert alert-danger">Error cargando eventos. Intenta recargar la página.</div>';
-        });
+        // Inicializar calendario (los eventos se cargan dinámicamente por rango)
+        initCalendar();
             const parseJsonResponse = async (response, defaultMessage = 'Error en la resposta del servidor') => {
                 const payload = await response.json().catch(() => null);
 
@@ -81,38 +140,173 @@
                 return payload;
             };
 
-        // Función para cargar eventos desde Algolia
-        async function loadEvents() {
+        function getCalendarEventById(eventId) {
+            const numericId = Number(eventId);
+            return (window.calendarEvents || []).find(calEvent => Number(calEvent.id) === numericId) || null;
+        }
+
+        function toCalendarUtc(date) {
+            if (!date) return '';
+            return new Date(date).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+        }
+
+        function escapeIcsText(text) {
+            return String(text || '')
+                .replace(/\\/g, '\\\\')
+                .replace(/;/g, '\\;')
+                .replace(/,/g, '\\,')
+                .replace(/\r?\n/g, '\\n');
+        }
+
+        function slugifyFileName(text) {
+            return String(text || 'event')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '')
+                .slice(0, 80) || 'event';
+        }
+
+        function formatFileDate(date) {
+            if (!date) return 'sense-data';
+            const d = new Date(date);
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
+        function getEventRangeForCalendar(calendarEvent) {
+            const start = calendarEvent && calendarEvent.start ? new Date(calendarEvent.start) : null;
+            if (!start) return { start: null, end: null };
+
+            const end = calendarEvent.end
+                ? new Date(calendarEvent.end)
+                : new Date(start.getTime() + (60 * 60 * 1000));
+
+            return { start, end };
+        }
+
+        function buildGoogleCalendarUrl(calendarEvent) {
+            const { start, end } = getEventRangeForCalendar(calendarEvent);
+            if (!start || !end) return '';
+
+            const params = new URLSearchParams({
+                action: 'TEMPLATE',
+                text: calendarEvent.title || 'Event',
+                dates: `${toCalendarUtc(start)}/${toCalendarUtc(end)}`,
+                details: calendarEvent.extendedProps?.description || '',
+                location: calendarEvent.extendedProps?.location || ''
+            });
+
+            return `https://calendar.google.com/calendar/render?${params.toString()}`;
+        }
+
+        function downloadIcs(calendarEvent) {
+            const { start, end } = getEventRangeForCalendar(calendarEvent);
+            if (!start || !end) return;
+
+            const ics = [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'PRODID:-//ReciclatDAM//Events//CA',
+                'CALSCALE:GREGORIAN',
+                'BEGIN:VEVENT',
+                `UID:event-${calendarEvent.id || Date.now()}@reciclatdam`,
+                `DTSTAMP:${toCalendarUtc(new Date())}`,
+                `DTSTART:${toCalendarUtc(start)}`,
+                `DTEND:${toCalendarUtc(end)}`,
+                `SUMMARY:${escapeIcsText(calendarEvent.title || 'Event')}`,
+                `DESCRIPTION:${escapeIcsText(calendarEvent.extendedProps?.description || '')}`,
+                `LOCATION:${escapeIcsText(calendarEvent.extendedProps?.location || '')}`,
+                'END:VEVENT',
+                'END:VCALENDAR'
+            ].join('\r\n');
+
+            const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            const fileName = `${slugifyFileName(calendarEvent.title)}-${formatFileDate(start)}.ics`;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        function renderCalendarButtons(eventId) {
+            const calendarEvent = getCalendarEventById(eventId);
+            if (!calendarEvent) return;
+
+            const detailsContainer = document.getElementById('event-details-content');
+            if (!detailsContainer) return;
+
+            const previousContainer = document.getElementById('calendar-actions-container');
+            if (previousContainer) {
+                previousContainer.remove();
+            }
+
+            detailsContainer.insertAdjacentHTML('beforeend', `
+                <div id="calendar-actions-container" class="calendar-actions-container mt-3">
+                    <a href="${buildGoogleCalendarUrl(calendarEvent)}" target="_blank" rel="noopener noreferrer" class="btn btn-sm calendar-action-btn calendar-action-btn-google text-nowrap">
+                        <i class="fas fa-calendar-plus me-1"></i>Google Calendar
+                    </a>
+                    <button type="button" id="iphone-calendar-btn" class="btn btn-sm calendar-action-btn calendar-action-btn-iphone text-nowrap">
+                        <i class="fas fa-mobile-alt me-1"></i>Calendari iPhone (.ics)
+                    </button>
+                </div>
+            `);
+
+            const iphoneButton = document.getElementById('iphone-calendar-btn');
+            if (iphoneButton) {
+                iphoneButton.addEventListener('click', function () {
+                    downloadIcs(calendarEvent);
+                });
+            }
+        }
+
+        // Cargar eventos des de backend per evitar desajustos amb l'index extern
+        async function loadEvents(startDate = null, endDate = null, limit = null, upcoming = false) {
             try {
-                // Asegúrate de obtener todos los campos relevantes
-                const { hits } = await eventsIndex.search('', {
-                    hitsPerPage: 100,
-                    attributesToRetrieve: [
-                        'id', 'nom', 'descripcio', 'data_inici', 'data_fi', 'lloc',
-                        'tipus_color', 'tipus_nom', 'tipus_event_id', 'capacitat',
-                        'punts_disponibles', 'imatge', 'participants_count', 'user_registered'
-                    ]
+                const params = new URLSearchParams();
+                if (upcoming) {
+                    params.set('upcoming', '1');
+                } else {
+                    if (startDate) params.set('start', startDate);
+                    if (endDate) params.set('end', endDate);
+                }
+                if (limit && Number(limit) > 0) params.set('limit', String(limit));
+
+                const response = await fetch(`{{ route('events.getEvents') }}?${params.toString()}`, {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
                 });
 
-                window.calendarEvents = hits.map(event => {
+                const events = await parseJsonResponse(response, 'No s\'han pogut carregar els events.');
+
+                window.calendarEvents = events.map(event => {
+                    const ext = event.extendedProps || {};
                     return {
                         id: event.id,
-                        title: event.nom,
-                        start: event.data_inici,
-                        end: event.data_fi || null,
-                        color: event.tipus_color || '#3788d8',
-                        allDay: !event.data_fi,
+                        title: event.title,
+                        start: event.start,
+                        end: event.end || null,
+                        color: event.color || '#3788d8',
+                        allDay: !event.end,
                         extendedProps: {
-                            description: event.descripcio,
-                            location: event.lloc,
-                            tipus: event.tipus_nom,
-                            tipus_id: event.tipus_event_id,
-                            capacitat: event.capacitat,
-                            punts: event.punts_disponibles,
-                            imatge: event.imatge,
-                            participants: event.participants_count || 0,
-                            userRegistered: event.user_registered || false, // Nuevo campo
-                            originalEvent: event
+                            description: event.description,
+                            location: event.location,
+                            tipus: ext.tipus,
+                            capacitat: ext.capacitat,
+                            punts: ext.punts_disponibles,
+                            imatge: ext.imatge,
+                            participants: ext.participants || 0,
+                            userRegistered: Array.isArray(userRegisteredEvents)
+                                ? userRegisteredEvents.includes(Number(event.id))
+                                : false
                         }
                     };
                 });
@@ -127,20 +321,67 @@
         // Inicializar el calendario
         function initCalendar() {
             const calendarEl = document.getElementById('calendar');
+            let calendar;
+
+            const syncMonthReferenceHeight = () => {
+                requestAnimationFrame(() => {
+                    const harness = calendarEl.querySelector('.fc-view-harness');
+                    if (!harness) {
+                        return;
+                    }
+
+                    const currentHeight = Math.ceil(harness.getBoundingClientRect().height);
+                    const currentCalendarHeight = Math.ceil(calendarEl.getBoundingClientRect().height);
+                    if (!currentHeight) {
+                        return;
+                    }
+
+                    if (calendar.view.type === 'dayGridMonth') {
+                        calendarEl.style.setProperty('--month-view-height', `${currentHeight}px`);
+                        if (currentCalendarHeight) {
+                            calendarEl.style.setProperty('--month-calendar-height', `${currentCalendarHeight}px`);
+                        }
+                        return;
+                    }
+
+                    const savedHeight = getComputedStyle(calendarEl).getPropertyValue('--month-view-height').trim();
+                    const savedCalendarHeight = getComputedStyle(calendarEl).getPropertyValue('--month-calendar-height').trim();
+                    if (!savedHeight) {
+                        calendarEl.style.setProperty('--month-view-height', `${currentHeight}px`);
+                    }
+                    if (!savedCalendarHeight && currentCalendarHeight) {
+                        calendarEl.style.setProperty('--month-calendar-height', `${currentCalendarHeight}px`);
+                    }
+                });
+            };
 
             // Ocultar loader y mostrar calendario
             document.getElementById('calendar-loader').style.display = 'none';
             document.getElementById('calendar').style.display = 'block';
 
-            const calendar = new FullCalendar.Calendar(calendarEl, {
+            calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 locale: 'ca',
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,listMonth'
+                    right: 'dayGridMonth'
                 },
-                events: window.calendarEvents || [],
+                buttonText: {
+                    today: 'Avui',
+                    month: 'Mes'
+                },
+                events: function (fetchInfo, successCallback, failureCallback) {
+                    loadEvents(fetchInfo.startStr, fetchInfo.endStr)
+                        .then(events => successCallback(events))
+                        .catch(error => {
+                            console.error('Error cargando eventos del calendario:', error);
+                            failureCallback(error);
+                        });
+                },
+                nowIndicator: true,
+                height: 'auto',
+                expandRows: true,
                 eventTimeFormat: {
                     hour: '2-digit',
                     minute: '2-digit',
@@ -150,16 +391,34 @@
                 eventClick: function (info) {
                     showEventDetails(info.event);
                 },
-                height: 'auto'
+                datesSet: function () {
+                    syncMonthReferenceHeight();
+                    requestAnimationFrame(() => calendar.updateSize());
+                }
             });
 
             calendar.render();
+            syncMonthReferenceHeight();
+
+            window.addEventListener('resize', function () {
+                if (calendar && calendar.view && calendar.view.type === 'dayGridMonth') {
+                    syncMonthReferenceHeight();
+                }
+            });
         }
 
         // Función para mostrar detalles del evento
         function showEventDetails(event) {
             // Actualizar título del modal
             document.getElementById('eventModalLabel').textContent = event.title;
+
+            const imagePath = event.extendedProps.imatge
+                ? `images/events/${event.extendedProps.imatge}`
+                : '';
+            const placeholderImage = buildEventPlaceholderImage(event.title, event.extendedProps.tipus || 'General');
+            const imageSrc = imagePath || placeholderImage;
+            const isPlaceholder = !imagePath;
+            const imageStyle = isPlaceholder ? 'object-fit: contain; background-color: #1b5e20; padding: 6px;' : '';
 
             // Formatear fechas
             const startDate = formatDate(event.start);
@@ -170,7 +429,9 @@
             const modalContent = `
                 <div class="row g-2">
                     <div class="col-md-5">
-                        <img src="${event.extendedProps.imatge ? 'images/events/' + event.extendedProps.imatge : '/images/event-default.jpg'}" 
+                            <img src="${imageSrc}"
+                                style="${imageStyle}"
+                                onerror="this.onerror=null;this.src='${placeholderImage}';this.style.objectFit='contain';this.style.backgroundColor='#1b5e20';this.style.padding='6px';"
                              alt="${escapeHtml(event.title)}" class="event-img mb-2">
                     </div>
                     <div class="col-md-7">
@@ -192,7 +453,6 @@
                 
                 <div class="mt-2">
                     <h6 class="mb-1">Descripció:</h6>
-                    <p class="small mb-0">${event.extendedProps.description || 'Sense descripció'}</p>
                     <p class="small mb-0">${escapeHtml(event.extendedProps.description || 'Sense descripció')}</p>
                 </div>
                 
@@ -209,13 +469,40 @@
             document.getElementById('event-details-content').innerHTML = modalContent;
 
             // Mostrar el modal antes de verificar el estado
-            const modal = new bootstrap.Modal(document.getElementById('eventModal'));
+            const eventModalElement = document.getElementById('eventModal');
+            const modal = new bootstrap.Modal(eventModalElement, {
+                backdrop: false
+            });
             modal.show();
+
+            // Permitir cerrar el modal al hacer clic fuera de él
+            eventModalElement.addEventListener('click', function (e) {
+                // Si el clic es en el modal mismo (no en el contenido), cerrar
+                if (e.target === eventModalElement) {
+                    modal.hide();
+                }
+            });
 
             // Configurar botón de registro (inicialmente deshabilitado mientras verificamos)
             const registerButton = document.getElementById('register-event-btn');
             registerButton.textContent = 'Verificant...';
             registerButton.disabled = true;
+
+            const eventStart = event.start ? new Date(event.start) : null;
+            const now = new Date();
+            const isPastEvent = eventStart ? eventStart < now : false;
+
+            if (isPastEvent) {
+                document.getElementById('registration-status-loading').style.display = 'none';
+                registerButton.textContent = 'Event finalitzat';
+                registerButton.disabled = true;
+                document.getElementById('event-details-content').insertAdjacentHTML('beforeend', `
+                    <div class="alert alert-info mt-2 small mb-0">
+                        Aquest event ja ha passat. Pots consultar-ne els detalls, però no registrar-t'hi.
+                    </div>
+                `);
+                return;
+            }
 
             @auth
                 // Verificar el estado de registro en tiempo real con el servidor
@@ -244,16 +531,25 @@
 
                         const isRegistered = data.registered;
                         const isFull = data.full;
+                        const isPast = data.past;
 
                         // Actualizar el estado en la memoria por si acaso
                         event.extendedProps.userRegistered = isRegistered;
 
-                        if (isRegistered) {
+                        if (isPast) {
+                            registerButton.textContent = 'Event finalitzat';
+                            registerButton.disabled = true;
+
+                            if (data.html) {
+                                document.getElementById('event-details-content').insertAdjacentHTML('beforeend', data.html);
+                            }
+                        } else if (isRegistered) {
                             registerButton.textContent = 'Ja estàs registrat';
                             registerButton.disabled = true;
 
                             // Añadir mensaje indicando que ya está registrado con más estilo
                             document.getElementById('event-details-content').insertAdjacentHTML('beforeend', data.html);
+                            renderCalendarButtons(event.id);
                         } else if (isFull) {
                             registerButton.textContent = 'Aforament complet';
                             registerButton.disabled = true;
@@ -336,6 +632,8 @@
                                     calEvent.extendedProps.userRegistered = true;
                                 }
                             });
+
+                            renderCalendarButtons(eventId);
                         }
                     })
                     .catch(error => {

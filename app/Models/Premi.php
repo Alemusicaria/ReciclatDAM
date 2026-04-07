@@ -17,7 +17,11 @@ class Premi extends Model
         'nom',
         'descripcio',
         'punts_requerits',
-        'imatge'
+        'imatge',
+        'categoria',
+        'stock',
+        'temps_enviament',
+        'rating'
     ];
 
     /**
@@ -31,6 +35,10 @@ class Premi extends Model
             'descripcio' => $this->descripcio,
             'punts_requerits' => $this->punts_requerits,
             'imatge' => $this->imatge,
+            'categoria' => $this->categoria ?? 'accessories',
+            'stock' => $this->stock ?? 10,
+            'temps_enviament' => $this->temps_enviament ?? '3-5 dies',
+            'rating' => $this->rating ?? 4.5,
         ];
     }
     public function premiReclamats()
