@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class ProfilePageTest extends TestCase
 {
-    public function test_profile_page_renders_single_claimed_prize_modal(): void
+    public function test_profile_page_does_not_render_claimed_prize_modal_or_summary_footer(): void
     {
         $user = $this->createUser();
 
@@ -19,12 +19,12 @@ class ProfilePageTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertSee('id="claimedPrizeModal"', false)
+            ->assertDontSee('id="claimedPrizeModal"', false)
             ->assertDontSee('id="premiModal-', false)
-            ->assertSee('id="profileSummaryFooter"', false);
+            ->assertDontSee('id="profileSummaryFooter"', false);
     }
 
-    public function test_profile_page_rows_embed_prize_payload_for_dynamic_modal(): void
+    public function test_profile_page_rows_use_inline_collapse_for_claim_details(): void
     {
         $user = $this->createUser();
         $premi = Premi::query()->create([
@@ -50,13 +50,15 @@ class ProfilePageTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertSee('data-premi=', false)
-            ->assertSee('data-bs-target="#claimedPrizeModal"', false);
+            ->assertDontSee('data-premi=', false)
+            ->assertDontSee('data-bs-target="#claimedPrizeModal"', false)
+            ->assertSee('data-bs-toggle="collapse"', false)
+            ->assertSee('id="claim-details-', false);
     }
 
     private function createUser(): User
     {
-        $rol = Rol::query()->firstOrCreate(['id' => 2], ['nom' => 'usuari']);
+        $rol = Rol::query()->firstOrCreate(['nom' => 'usuari']);
         Nivell::query()->firstOrCreate(
             ['id' => 1],
             [

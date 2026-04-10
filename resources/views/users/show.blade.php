@@ -103,8 +103,8 @@
                                     <i class="{{ $currentLevel->icona }} fa-2x text-white"></i>
                                 </div>
                                 <div>
-                                    <h5 class="mb-1">{{ $currentLevel->nom }}</h5>
-                                    <p class="mb-0 text-muted">{{ $currentLevel->descripcio }}</p>
+                                    <h5 class="mb-1">{{ $currentLevel->displayNom() }}</h5>
+                                    <p class="mb-0 text-muted">{{ $currentLevel->displayDescripcio() }}</p>
                                 </div>
                             </div>
                         @endif
@@ -112,8 +112,8 @@
                         @if($currentLevel && $nextLevel)
                             <div class="mt-4">
                                 <div class="d-flex justify-content-between mb-2">
-                                    <span>{{ __('messages.profile_page.level_progress', ['current' => $currentLevel->id, 'current_name' => $currentLevel->nom]) }}</span>
-                                    <span>{{ __('messages.profile_page.next_level', ['next' => $nextLevel->id, 'next_name' => $nextLevel->nom]) }}</span>
+                                    <span>{{ __('messages.profile_page.level_progress', ['current' => $currentLevel->id, 'current_name' => $currentLevel->displayNom()]) }}</span>
+                                    <span>{{ __('messages.profile_page.next_level', ['next' => $nextLevel->id, 'next_name' => $nextLevel->displayNom()]) }}</span>
                                 </div>
                                 <div class="progress" style="height: 10px;">
                                     <div class="progress-bar" role="progressbar" 
@@ -155,7 +155,7 @@
                         <h5 class="card-title mb-3">
                             <i class="fas fa-gift me-2 text-success" style="margin-right: 5px;"></i>{{ __('messages.profile_page.claimed_prizes') }}
                         </h5>
-                        
+
                         @if($user->premisReclamats->count() > 0)
                             <div class="table-responsive" style="max-height: none; overflow-y: visible;">
                                 <table class="table table-hover table-sm">
@@ -168,39 +168,39 @@
                                     </thead>
                                     <tbody>
                                         @foreach($user->premisReclamats->sortByDesc('data_reclamacio') as $premi)
-                                            <?php
+                                            @php
                                                 $claimDateShort = \App\Support\LocalizedDate::format($premi->data_reclamacio, $locale, 'd/m/Y');
-                                                $claimDate = \App\Support\LocalizedDate::format($premi->data_reclamacio, $locale, 'd/m/Y H:i');
-                                                $timelineClaimedDate = \App\Support\LocalizedDate::format($premi->created_at, $locale, 'd/m/Y');
-                                                $premiPayload = [
-                                                    'id' => $premi->id,
-                                                    'name' => $premi->premi->nom,
-                                                    'description' => $premi->premi->descripcio,
-                                                    'image' => $premi->premi->imatge ? asset($premi->premi->imatge) : null,
-                                                    'points' => (int) $premi->punts_gastats,
-                                                    'claimDate' => $claimDate,
-                                                    'claimDateShort' => $claimDateShort,
-                                                    'status' => $premi->estat,
-                                                    'trackingCode' => $premi->codi_seguiment,
-                                                    'comments' => $premi->comentaris,
-                                                    'timelineClaimedDate' => $timelineClaimedDate,
-                                                ];
-                                            ?>
-                                            <tr style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#claimedPrizeModal" data-premi="{{ e(json_encode($premiPayload)) }}">
+                                                $claimDateFull = \App\Support\LocalizedDate::format($premi->data_reclamacio, $locale, 'd/m/Y H:i');
+                                                $statusLabel = match($premi->estat) {
+                                                    'pendent' => __('messages.profile_page.status_pendent'),
+                                                    'procesant' => __('messages.profile_page.status_procesant'),
+                                                    'entregat' => __('messages.profile_page.status_entregat'),
+                                                    'cancelat' => __('messages.profile_page.status_cancelat'),
+                                                    default => $premi->estat,
+                                                };
+                                                $statusClass = match($premi->estat) {
+                                                    'pendent' => 'bg-warning text-dark',
+                                                    'procesant' => 'bg-info',
+                                                    'entregat' => 'bg-success',
+                                                    'cancelat' => 'bg-danger',
+                                                    default => 'bg-secondary',
+                                                };
+                                            @endphp
+                                            <tr>
                                                 <td>
                                                     <div class="d-flex align-items-center">
                                                         @if($premi->premi->imatge)
-                                                            <img src="{{ asset($premi->premi->imatge) }}" 
-                                                                alt="{{ $premi->premi->nom }}" 
+                                                            <img src="{{ asset($premi->premi->imatge) }}"
+                                                                alt="{{ $premi->premi->displayNom() }}"
                                                                 class="me-2" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 10px;">
                                                         @else
-                                                            <div class="me-2 bg-light d-flex align-items-center justify-content-center" 
+                                                            <div class="me-2 bg-light d-flex align-items-center justify-content-center"
                                                                 style="width: 40px; height: 40px; border-radius: 4px; margin-right: 10px;">
                                                                 <i class="fas fa-gift text-secondary"></i>
                                                             </div>
                                                         @endif
                                                         <div class="text-truncate" style="max-width: 150px;">
-                                                            <div class="fw-bold text-truncate">{{ $premi->premi->nom }}</div>
+                                                            <div class="fw-bold text-truncate">{{ $premi->premi->displayNom() }}</div>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -210,7 +210,49 @@
                                                     </span>
                                                 </td>
                                                 <td class="align-middle">
-                                                    {{ $claimDateShort }}
+                                                    <div class="d-flex align-items-center justify-content-between gap-2">
+                                                        <span>{{ $claimDateShort }}</span>
+                                                        <button
+                                                            type="button"
+                                                            class="btn btn-sm btn-outline-secondary"
+                                                            data-bs-toggle="collapse"
+                                                            data-bs-target="#claim-details-{{ $premi->id }}"
+                                                            aria-expanded="false"
+                                                            aria-controls="claim-details-{{ $premi->id }}"
+                                                            aria-label="{{ __('messages.profile_page.claim_details') }}"
+                                                        >
+                                                            <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                                                            <span class="ms-1">{{ __('messages.profile_page.claim_details') }}</span>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr class="collapse" id="claim-details-{{ $premi->id }}">
+                                                <td colspan="3" class="bg-light-subtle">
+                                                    <div class="p-3">
+                                                        <div class="row g-3">
+                                                            <div class="col-md-6">
+                                                                <div class="small text-muted">{{ __('messages.profile_page.claim_date') }}</div>
+                                                                <div class="fw-semibold">{{ $claimDateFull }}</div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="small text-muted">{{ __('messages.profile_page.status') }}</div>
+                                                                <div><span class="badge {{ $statusClass }}">{{ $statusLabel }}</span></div>
+                                                            </div>
+                                                            @if(!empty($premi->codi_seguiment))
+                                                                <div class="col-md-6">
+                                                                    <div class="small text-muted">{{ __('messages.profile_page.tracking_code') }}</div>
+                                                                    <div><code>{{ $premi->codi_seguiment }}</code></div>
+                                                                </div>
+                                                            @endif
+                                                            @if(!empty($premi->comentaris))
+                                                                <div class="col-md-12">
+                                                                    <div class="small text-muted">{{ __('messages.profile_page.comments') }}</div>
+                                                                    <div>{{ $premi->comentaris }}</div>
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -225,83 +267,6 @@
                             </div>
                         @endif
 
-                        <div class="modal fade" id="claimedPrizeModal" tabindex="-1" aria-labelledby="claimedPrizeModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="claimedPrizeModalLabel"></h5>
-                                        <button type="button" class="btn btn-sm rounded-circle boto-modal" data-bs-dismiss="modal" aria-label="{{ __('messages.profile_page.close') }}" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: bold;">X</button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="d-flex mb-4">
-                                            <img id="claimedPrizeModalImage" src="" alt="" class="me-3 d-none" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; margin-right: 15px;">
-                                            <div id="claimedPrizeModalImageFallback" class="me-3 bg-light d-flex align-items-center justify-content-center" style="width: 100px; height: 100px; border-radius: 8px;">
-                                                <i class="fas fa-gift fa-3x text-secondary"></i>
-                                            </div>
-                                            <div>
-                                                <h6 class="fw-bold mb-2" id="claimedPrizeModalName"></h6>
-                                                <p class="text-muted" id="claimedPrizeModalDescription"></p>
-                                                <div class="badge bg-success mb-2" id="claimedPrizeModalPoints"></div>
-                                            </div>
-                                        </div>
-
-                                        <div class="card mb-3">
-                                            <div class="card-header bg-light">
-                                                <i class="fas fa-info-circle me-2" style="margin-right: 5px;"></i>{{ __('messages.profile_page.claim_details') }}
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row mb-2">
-                                                    <div class="col-5 text-muted">{{ __('messages.profile_page.claim_date') }}:</div>
-                                                    <div class="col-7 fw-bold" id="claimedPrizeModalClaimDate"></div>
-                                                </div>
-
-                                                <div class="row mb-2">
-                                                    <div class="col-5 text-muted">{{ __('messages.profile_page.status') }}:</div>
-                                                    <div class="col-7" id="claimedPrizeModalStatus"></div>
-                                                </div>
-
-                                                <div class="row mb-2 d-none" id="claimedPrizeModalTrackingRow">
-                                                    <div class="col-5 text-muted">{{ __('messages.profile_page.tracking_code') }}:</div>
-                                                    <div class="col-7"><code id="claimedPrizeModalTrackingCode"></code></div>
-                                                </div>
-
-                                                <div class="row mb-2 d-none" id="claimedPrizeModalCommentsRow">
-                                                    <div class="col-5 text-muted">{{ __('messages.profile_page.comments') }}:</div>
-                                                    <div class="col-7" id="claimedPrizeModalComments"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="timeline mt-4">
-                                            <div class="timeline-item" id="claimedPrizeTimelineClaimed">
-                                                <div class="timeline-marker" style="margin-top: 2px;"></div>
-                                                <div class="timeline-content">
-                                                    <h6 class="mb-0">{{ __('messages.profile_page.timeline_claimed') }}</h6>
-                                                    <small id="claimedPrizeModalTimelineClaimedDate"></small>
-                                                </div>
-                                            </div>
-
-                                            <div class="timeline-item" id="claimedPrizeTimelineProcessing">
-                                                <div class="timeline-marker" style="margin-top: 1px;"></div>
-                                                <div class="timeline-content">
-                                                    <h6 class="mb-0">{{ __('messages.profile_page.timeline_processing') }}</h6>
-                                                </div>
-                                            </div>
-
-                                            <div class="timeline-item" id="claimedPrizeTimelineDelivered">
-                                                <div class="timeline-marker" style="margin-top: 1px;"></div>
-                                                <div class="timeline-content">
-                                                    <h6 class="mb-0">{{ __('messages.profile_page.timeline_delivered') }}</h6>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.profile_page.close') }}</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>                
             </div>
@@ -434,7 +399,7 @@
                                                             <div class="day">{{ \App\Support\LocalizedDate::format($event->data_inici, $locale, 'd') }}</div>
                                                         </div>
                                                         <div class="event-details">
-                                                            <h6 class="mb-1">{{ $event->nom }}</h6>
+                                                            <h6 class="mb-1">{{ $event->displayNom() }}</h6>
                                                             <p class="text-muted mb-1 small">
                                                                 <i class="fas fa-map-marker-alt me-1"></i> {{ $event->lloc }}
                                                             </p>
@@ -449,7 +414,7 @@
                                                                 <br>
                                                                 @if($event->tipus)
                                                                     <span class="badge" style="background-color: {{ $event->tipus->color }}; margin-top: 5px;">
-                                                                        {{ $event->tipus->nom }}
+                                                                        {{ $event->displayTipusNom() }}
                                                                     </span>
                                                                 @endif
                                                             </div>
@@ -481,7 +446,7 @@
                                                             <div class="day">{{ \App\Support\LocalizedDate::format($event->data_inici, $locale, 'd') }}</div>
                                                         </div>
                                                         <div class="event-details">
-                                                            <h6 class="mb-1">{{ $event->nom }}</h6>
+                                                            <h6 class="mb-1">{{ $event->displayNom() }}</h6>
                                                             <p class="text-muted mb-1 small">
                                                                 <i class="fas fa-map-marker-alt me-1"></i> {{ $event->lloc }}
                                                             </p>
@@ -511,7 +476,7 @@
                                                                 <br>
                                                                 @if($event->tipus)
                                                                     <span class="badge" style="background-color: {{ $event->tipus->color }}; margin-top: 5px;">
-                                                                        {{ $event->tipus->nom }}
+                                                                        {{ $event->displayTipusNom() }}
                                                                     </span>
                                                                 @endif
                                                             </div>
@@ -535,31 +500,8 @@
         </div>
     </div>
 
-    <div class="profile-summary-footer" id="profileSummaryFooter" role="contentinfo" aria-label="{{ __('messages.profile_page.profile_summary_footer') }}">
-        <div class="profile-summary-footer__item">
-            <span class="profile-summary-footer__label">{{ __('messages.profile_page.total_points') }}</span>
-            <span class="profile-summary-footer__value">{{ $user->punts_totals ?? 0 }}</span>
-        </div>
-        <div class="profile-summary-footer__item">
-            <span class="profile-summary-footer__label">{{ __('messages.profile_page.current_points') }}</span>
-            <span class="profile-summary-footer__value">{{ $user->punts_actuals ?? 0 }}</span>
-        </div>
-        <div class="profile-summary-footer__item">
-            <span class="profile-summary-footer__label">{{ __('messages.profile_page.spent_points') }}</span>
-            <span class="profile-summary-footer__value">{{ $user->punts_gastats ?? 0 }}</span>
-        </div>
-        <div class="profile-summary-footer__item">
-            <span class="profile-summary-footer__label">{{ __('messages.profile_page.current_level') }}</span>
-            <span class="profile-summary-footer__value">{{ $summaryLevel?->nom ?? __('messages.profile_page.not_specified') }}</span>
-        </div>
-        <div class="profile-summary-footer__item profile-summary-footer__item--meta">
-            <span class="profile-summary-footer__label">{{ __('messages.profile_page.last_updated') }}</span>
-            <span class="profile-summary-footer__value">{{ $summaryUpdatedAt }}</span>
-        </div>
-    </div>
-
     <!-- Modal de confirmación para eliminar cuenta -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" data-bs-backdrop="false" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal fade" id="deleteModal" tabindex="-1" data-bs-backdrop="true" data-bs-keyboard="true" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -626,7 +568,6 @@
         };
 
         function cleanupModalArtifacts() {
-            document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
             document.body.classList.remove('modal-open');
             document.body.style.removeProperty('padding-right');
             document.body.style.removeProperty('overflow');
@@ -639,15 +580,6 @@
             });
         });
 
-        const deleteModalEl = document.getElementById('deleteModal');
-        if (deleteModalEl && typeof bootstrap !== 'undefined') {
-            deleteModalEl.addEventListener('click', function (event) {
-                if (event.target === deleteModalEl) {
-                    bootstrap.Modal.getOrCreateInstance(deleteModalEl).hide();
-                }
-            });
-        }
-
         const parseJsonResponse = async (response, defaultMessage = i18nProfile.server_response_error) => {
             const payload = await response.json().catch(() => null);
 
@@ -657,121 +589,6 @@
 
             return payload;
         };
-
-        const claimedPrizeModalEl = document.getElementById('claimedPrizeModal');
-        const claimedPrizeRows = document.querySelectorAll('tr[data-premi]');
-        const statusClasses = {
-            pendent: 'bg-warning',
-            procesant: 'bg-info',
-            entregat: 'bg-success',
-            cancelat: 'bg-danger'
-        };
-        const statusIcons = {
-            pendent: 'fa-clock',
-            procesant: 'fa-cog',
-            entregat: 'fa-check-circle',
-            cancelat: 'fa-times-circle'
-        };
-        const statusLabels = {
-            pendent: i18nProfile.status_pendent,
-            procesant: i18nProfile.status_procesant,
-            entregat: i18nProfile.status_entregat,
-            cancelat: i18nProfile.status_cancelat
-        };
-
-        const setTimelineState = (timelineEl, markerEl, enabled) => {
-            timelineEl.classList.toggle('done', enabled);
-            markerEl.classList.toggle('bg-success', enabled);
-            markerEl.classList.toggle('bg-light', !enabled);
-        };
-
-        if (claimedPrizeModalEl && claimedPrizeRows.length > 0 && typeof bootstrap !== 'undefined') {
-            const claimedPrizeModal = bootstrap.Modal.getOrCreateInstance(claimedPrizeModalEl, {
-                backdrop: true,
-                keyboard: true
-            });
-
-            claimedPrizeRows.forEach(function (row) {
-                row.addEventListener('click', function () {
-                    const rawPayload = row.getAttribute('data-premi');
-                    if (!rawPayload) {
-                        return;
-                    }
-
-                    let prize;
-                    try {
-                        prize = JSON.parse(rawPayload);
-                    } catch (_) {
-                        return;
-                    }
-
-                    const modalTitle = document.getElementById('claimedPrizeModalLabel');
-                    const modalName = document.getElementById('claimedPrizeModalName');
-                    const modalDescription = document.getElementById('claimedPrizeModalDescription');
-                    const modalPoints = document.getElementById('claimedPrizeModalPoints');
-                    const modalClaimDate = document.getElementById('claimedPrizeModalClaimDate');
-                    const modalStatus = document.getElementById('claimedPrizeModalStatus');
-                    const modalTrackingRow = document.getElementById('claimedPrizeModalTrackingRow');
-                    const modalTrackingCode = document.getElementById('claimedPrizeModalTrackingCode');
-                    const modalCommentsRow = document.getElementById('claimedPrizeModalCommentsRow');
-                    const modalComments = document.getElementById('claimedPrizeModalComments');
-                    const modalTimelineClaimedDate = document.getElementById('claimedPrizeModalTimelineClaimedDate');
-                    const modalImage = document.getElementById('claimedPrizeModalImage');
-                    const modalImageFallback = document.getElementById('claimedPrizeModalImageFallback');
-
-                    modalTitle.textContent = prize.name || '';
-                    modalName.textContent = prize.name || '';
-                    modalDescription.textContent = prize.description || i18nProfile.not_specified;
-                    modalPoints.innerHTML = `<i class="fas fa-coins me-1"></i> ${prize.points} ${i18nProfile.points.toLowerCase()}`;
-                    modalClaimDate.textContent = prize.claimDate || '-';
-                    modalTimelineClaimedDate.textContent = prize.timelineClaimedDate || '-';
-
-                    const statusClass = statusClasses[prize.status] || 'bg-secondary';
-                    const statusIcon = statusIcons[prize.status] || 'fa-question-circle';
-                    const statusLabel = statusLabels[prize.status] || prize.status;
-                    modalStatus.innerHTML = `<span class="badge ${statusClass}"><i class="fas ${statusIcon} me-1"></i>${statusLabel}</span>`;
-
-                    if (prize.trackingCode) {
-                        modalTrackingRow.classList.remove('d-none');
-                        modalTrackingCode.textContent = prize.trackingCode;
-                    } else {
-                        modalTrackingRow.classList.add('d-none');
-                        modalTrackingCode.textContent = '';
-                    }
-
-                    if (prize.comments) {
-                        modalCommentsRow.classList.remove('d-none');
-                        modalComments.textContent = prize.comments;
-                    } else {
-                        modalCommentsRow.classList.add('d-none');
-                        modalComments.textContent = '';
-                    }
-
-                    if (prize.image) {
-                        modalImage.src = prize.image;
-                        modalImage.alt = prize.name || '';
-                        modalImage.classList.remove('d-none');
-                        modalImageFallback.classList.add('d-none');
-                    } else {
-                        modalImage.classList.add('d-none');
-                        modalImageFallback.classList.remove('d-none');
-                    }
-
-                    const timelineClaimed = document.getElementById('claimedPrizeTimelineClaimed');
-                    const timelineProcessing = document.getElementById('claimedPrizeTimelineProcessing');
-                    const timelineDelivered = document.getElementById('claimedPrizeTimelineDelivered');
-                    const timelineClaimedMarker = timelineClaimed.querySelector('.timeline-marker');
-                    const timelineProcessingMarker = timelineProcessing.querySelector('.timeline-marker');
-                    const timelineDeliveredMarker = timelineDelivered.querySelector('.timeline-marker');
-
-                    setTimelineState(timelineClaimed, timelineClaimedMarker, ['pendent', 'procesant', 'entregat'].includes(prize.status));
-                    setTimelineState(timelineProcessing, timelineProcessingMarker, ['procesant', 'entregat'].includes(prize.status));
-                    setTimelineState(timelineDelivered, timelineDeliveredMarker, prize.status === 'entregat');
-
-                    claimedPrizeModal.show();
-                });
-            });
-        }
 
         // Variables con datos del usuario
         const puntsActuals = {{ $user->punts_actuals ?? 0 }};

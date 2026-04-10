@@ -58,7 +58,7 @@ class UserProfileUpdateTest extends TestCase
 
     private function createUser(): User
     {
-        $rol = Rol::query()->firstOrCreate(['id' => 1], ['nom' => 'admin']);
+        $rol = Rol::query()->firstOrCreate(['nom' => 'admin']);
         $nivell = Nivell::query()->firstOrCreate(
             ['id' => 1],
             [

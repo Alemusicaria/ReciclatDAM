@@ -525,7 +525,7 @@
     </div>
     <!-- Modal para detalles -->
     <div class="modal" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true"
-        data-bs-backdrop="false" data-bs-keyboard="true">
+        data-bs-backdrop="true" data-bs-keyboard="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -577,6 +577,18 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Cargar la biblioteca de gráficos ApexCharts -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.35.3/dist/apexcharts.min.js"></script>
+    <script>
+        window.parseJsonResponse = async function (response) {
+            const payload = await response.json().catch(() => null);
+
+            if (!response.ok) {
+                const message = payload && payload.message ? payload.message : 'Error en la resposta del servidor';
+                throw new Error(message);
+            }
+
+            return payload;
+        };
+    </script>
     <script>
         // Script para el gráfico de usuarios por niveles
         document.addEventListener('DOMContentLoaded', function () {
@@ -896,16 +908,7 @@
             // 2. SISTEMA UNIFICADO DE GESTIÓN DE MODALES
             // -----------------------------------------
 
-            const parseJsonResponse = async (response) => {
-                const payload = await response.json().catch(() => null);
-
-                if (!response.ok) {
-                    const message = payload && payload.message ? payload.message : 'Error en la resposta del servidor';
-                    throw new Error(message);
-                }
-
-                return payload;
-            };
+            const parseJsonResponse = window.parseJsonResponse;
 
             const modalSystem = {
                 // Estado compartido
@@ -1012,7 +1015,6 @@
                     // Cuando se ha mostrado completamente el modal
                     dynamicModal.addEventListener('shown.bs.modal', function () {
                         self.activeModals++;
-                        self.cleanupExtraBackdrops();
                     });
 
                     // Para el modal dinámico
@@ -1276,45 +1278,13 @@
 
                 // Configurar listeners globales
                 setupGlobalListeners: function () {
-                    // Limpiar modales desde la consola si es necesario
-                    window.fixModals = this.cleanupModalEffects.bind(this);
-                },
-
-                // Limpiar backdrops extras
-                cleanupExtraBackdrops: function () {
-                    const backdrops = document.querySelectorAll('.modal-backdrop');
-                    if (backdrops.length > 1) {
-                        // Mantener solo un backdrop
-                        for (let i = 0; i < backdrops.length - 1; i++) {
-                            backdrops[i].remove();
-                        }
-                    }
-                },
-
-                // Limpiar todos los efectos de modales
-                cleanupModalEffects: function () {
-                    this.activeModals = 0;
-
-                    // Eliminar todos los backdrops
-                    document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
-                        backdrop.remove();
-                    });
-
-                    // Restaurar el scroll del body
-                    document.body.classList.remove('modal-open');
-                    document.body.style.overflow = '';
-                    document.body.style.paddingRight = '';
-
+                    // Sin limpieza manual de backdrops: Bootstrap gestiona el modal.
+                    window.fixModals = function () {};
+                }
                 }
             };
-            // Limpiar cualquier backdrop existente
-            document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
-
-            // Añadir esta función para asegurar que no se crean nuevos backdrops
-            window.addEventListener('shown.bs.modal', function () {
-                // Eliminar cualquier backdrop que se haya creado
-                document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
             });
+
             // Inicializar el sistema de modales
             modalSystem.init();
         });
@@ -1342,139 +1312,6 @@
 
                 }
             });
-            // Delegación de eventos para manejar clics en botones
-            document.addEventListener('click', function (e) {
-                // Evento para el botón de editar usuario
-                if (e.target.closest('.editUserBtn')) {
-                    const userId = e.target.closest('.editUserBtn').getAttribute('data-user-id');
-
-                    // IMPORTANTE: Cerrar el modal dinámico primero
-                    const dynamicModal = document.getElementById('dynamicModal');
-                    if (dynamicModal) {
-                        // Cerrar modal manualmente
-                        dynamicModal.classList.remove('show');
-                        dynamicModal.style.display = 'none';
-                        document.body.classList.remove('modal-open');
-                        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-
-                        // Pequeña pausa para asegurar que se completa la animación
-                        setTimeout(() => {
-                            // Ahora abrimos el modal de detalle
-                            const detailModal = document.getElementById('detailModal');
-                            const modalTitle = document.getElementById('detailModalLabel');
-                            const modalLoader = document.getElementById('detail-modal-loader');
-                            const detailContent = document.getElementById('detail-content');
-
-                            // Configurar modal
-                            modalTitle.textContent = "Editar Usuari";
-                            modalLoader.classList.remove('d-none');
-                            detailContent.classList.add('d-none');
-
-                            // Limpiar cualquier backdrop residual
-                            document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
-
-                            // Mostrar modal sin crear backdrop manual
-                            bootstrap.Modal.getOrCreateInstance(detailModal, {
-                                backdrop: false,
-                                keyboard: true
-                            }).show();
-
-                            // Cargar contenido
-                            fetch(`/admin/edit-form/user/${userId}`)
-                                .then(response => {
-                                    if (!response.ok) throw new Error('Error al cargar el formulario');
-                                    return response.text();
-                                })
-                                .then(html => {
-                                    modalLoader.classList.add('d-none');
-                                    detailContent.innerHTML = html;
-                                    detailContent.classList.remove('d-none');
-                                })
-                                .catch(error => {
-                                    console.error('Error:', error);
-                                    modalLoader.classList.add('d-none');
-                                    detailContent.innerHTML = `
-                                                                                                                                        <div class="alert alert-danger">
-                                                                                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                                                                                            Error al cargar el formulario: ${error.message}
-                                                                                                                                        </div>
-                                                                                                                                    `;
-                                    detailContent.classList.remove('d-none');
-                                });
-                        }, 300); // Esperar 300ms
-                    }
-                }
-
-                // Evento para guardar usuario
-                if (e.target.closest('#saveUserBtn')) {
-                    handleSaveUserBtn();
-                }
-            });
-
-
-            // Función para manejar el botón Editar Usuario
-            function handleEditUserBtn(btn) {
-                const userId = btn.getAttribute('data-user-id');
-                document.getElementById('userFormModalLabel').textContent = "Editar Usuari";
-                document.getElementById('userId').value = userId;
-
-                // Cargar datos del usuario
-                fetch(`/admin/users/${userId}/edit`)
-                    .then(parseJsonResponse)
-                    .then(data => {
-                        document.getElementById('nom').value = data.nom || '';
-                        document.getElementById('cognoms').value = data.cognoms || '';
-                        document.getElementById('email').value = data.email || '';
-                        document.getElementById('rol_id').value = data.rol_id || '';
-                        document.getElementById('punts_actuals').value = data.punts_actuals || 0;
-
-                        const userModal = new bootstrap.Modal(document.getElementById('userFormModal'));
-                        userModal.show();
-                    })
-                    .catch(error => {
-                        console.error('Error al cargar datos:', error);
-                        alert('No se pudieron cargar los datos del usuario');
-                    });
-            }
-            // Función para guardar el usuario (crear o actualizar)
-            function handleSaveUserBtn() {
-                const userId = document.getElementById('userId').value;
-                const formData = new FormData(document.getElementById('userForm'));
-
-                // Determinar URL y método según sea crear o actualizar
-                const url = userId ? `/admin/users/${userId}` : '/admin/users';
-                const method = userId ? 'PUT' : 'POST';
-
-                if (method === 'PUT') {
-                    formData.append('_method', 'PUT');
-                }
-
-                fetch(url, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': window.getCsrfToken ? window.getCsrfToken() : ''
-                    }
-                })
-                    .then(parseJsonResponse)
-                    .then(data => {
-                        if (data.success) {
-                            // Cerrar modal de formulario
-                            bootstrap.Modal.getInstance(document.getElementById('userFormModal')).hide();
-
-                            // Recargar contenido del modal principal
-                            setTimeout(() => {
-                                document.querySelector('[data-bs-toggle="modal"][data-bs-target="#dynamicModal"][data-content-type="users"]').click();
-                            }, 500);
-                        } else {
-                            alert('Error: ' + data.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Error al guardar: ' + (error.message || 'Error desconocido'));
-                    });
-            }
         });
     </script>
     <script>
@@ -1494,10 +1331,6 @@
                 document.body.classList.remove('modal-open');
                 document.body.style.overflow = '';
                 document.body.style.paddingRight = '';
-
-                // Eliminar todos los backdrops
-                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-
 
                 // Recargar lista si es necesario
                 if (modalId === 'detailModal') {
@@ -1555,8 +1388,6 @@
                         }
                     }
 
-                    // Eliminar backdrops manualmente
-                    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
                     document.body.style.overflow = '';
                     document.body.style.paddingRight = '';
 
@@ -1608,7 +1439,6 @@
                     modal.classList.remove('show');
                     modal.style.display = 'none';
                     document.body.classList.remove('modal-open');
-                    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
 
                     if (modalId === 'detailModal') {
                         setTimeout(() => {
@@ -1624,9 +1454,6 @@
             // =======================================
 
             // Eliminar backdrops existentes
-            document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-
-            // Controlador global de clics
             document.addEventListener('click', function (e) {
                 // Botones de cierre de modal
                 if (e.target.matches('.btn-close, [data-bs-dismiss="modal"], .cancel-btn')) {
@@ -1648,7 +1475,6 @@
                             safeDOM('#detail-content', el => el.classList.add('d-none'));
 
                             bootstrap.Modal.getOrCreateInstance(modal, {
-                                backdrop: false,
                                 keyboard: true
                             }).show();
 
@@ -1732,7 +1558,22 @@
 
                                         // Recargar tabla
                                         setTimeout(() => {
-                                            const contentType = itemType + 's';
+                                            const contentTypeMap = {
+                                                user: 'users',
+                                                event: 'events',
+                                                premi: 'premis',
+                                                codi: 'codis',
+                                                producte: 'productes',
+                                                'punt-reciclatge': 'punt-reciclatge',
+                                                rol: 'rols',
+                                                'tipus-alerta': 'tipus-alertes',
+                                                'tipus-event': 'tipus-events',
+                                                'alerta-punt': 'alertes-punts',
+                                                opinio: 'opinions',
+                                                'premi-reclamat': 'premis-reclamats'
+                                            };
+
+                                            const contentType = contentTypeMap[itemType] || itemType;
                                             const reloadBtn = document.querySelector(`[data-content-type="${contentType}"]`);
                                             if (reloadBtn) reloadBtn.click();
                                             else location.reload();
@@ -1771,7 +1612,6 @@
                         dynamicModal.classList.remove('show');
                         dynamicModal.style.display = 'none';
                         document.body.classList.remove('modal-open');
-                        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
                     }
 
                     // Pequeña pausa para asegurar que se completa la animación
@@ -1787,12 +1627,8 @@
                             if (modalLoader) modalLoader.classList.remove('d-none');
                             if (detailContent) detailContent.classList.add('d-none');
 
-                            // Limpiar cualquier backdrop residual
-                            document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
-
                             // Mostrar modal sin crear backdrop manual
                             bootstrap.Modal.getOrCreateInstance(detailModal, {
-                                backdrop: false,
                                 keyboard: true
                             }).show();
 
@@ -1849,12 +1685,8 @@
                             if (modalLoader) modalLoader.classList.remove('d-none');
                             if (detailContent) detailContent.classList.add('d-none');
 
-                            // Limpiar cualquier backdrop residual
-                            document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
-
                             // Mostrar modal sin crear backdrop manual
                             bootstrap.Modal.getOrCreateInstance(detailModal, {
-                                backdrop: false,
                                 keyboard: true
                             }).show();
 
@@ -1910,12 +1742,8 @@
                             if (modalLoader) modalLoader.classList.remove('d-none');
                             if (detailContent) detailContent.classList.add('d-none');
 
-                            // Limpiar cualquier backdrop residual
-                            document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
-
                             // Mostrar modal
                             bootstrap.Modal.getOrCreateInstance(detailModal, {
-                                backdrop: false,
                                 keyboard: true
                             }).show();
 
@@ -1968,7 +1796,6 @@
                             if (detailContent) detailContent.classList.add('d-none');
 
                             bootstrap.Modal.getOrCreateInstance(detailModal, {
-                                backdrop: false,
                                 keyboard: true
                             }).show();
 
@@ -2020,7 +1847,6 @@
                             if (detailContent) detailContent.classList.add('d-none');
 
                             bootstrap.Modal.getOrCreateInstance(detailModal, {
-                                backdrop: false,
                                 keyboard: true
                             }).show();
 
@@ -2072,7 +1898,6 @@
                             if (detailContent) detailContent.classList.add('d-none');
 
                             bootstrap.Modal.getOrCreateInstance(detailModal, {
-                                backdrop: false,
                                 keyboard: true
                             }).show();
 
@@ -2125,7 +1950,6 @@
                             if (detailContent) detailContent.classList.add('d-none');
 
                             bootstrap.Modal.getOrCreateInstance(detailModal, {
-                                backdrop: false,
                                 keyboard: true
                             }).show();
 
@@ -2177,7 +2001,6 @@
                             if (detailContent) detailContent.classList.add('d-none');
 
                             bootstrap.Modal.getOrCreateInstance(detailModal, {
-                                backdrop: false,
                                 keyboard: true
                             }).show();
 
@@ -2229,7 +2052,6 @@
                             if (detailContent) detailContent.classList.add('d-none');
 
                             bootstrap.Modal.getOrCreateInstance(detailModal, {
-                                backdrop: false,
                                 keyboard: true
                             }).show();
 
@@ -2285,13 +2107,7 @@
                 document.body.style.overflow = '';
                 document.body.style.paddingRight = '';
 
-                // Eliminar todos los backdrops
-                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-
-                // Recargar la última vista activa después de cerrar
-                if (modalId === 'detailModal') {
-                    setTimeout(() => {
-                        const contentBtn = document.querySelector(`[data-content-type="${window.lastActiveContentType}"]`);
+                // Recargar lista de usuarios después de cerrar
                         if (contentBtn) contentBtn.click();
                     }, 300);
                 }
@@ -2354,7 +2170,6 @@
                         if (modalContent) modalContent.classList.add('d-none');
 
                         bootstrap.Modal.getOrCreateInstance(dynamicModal, {
-                            backdrop: false,
                             keyboard: true
                         }).show();
 
@@ -2387,54 +2202,6 @@
                 });
             }
 
-            // Botones para ver detalles de actividad
-            document.querySelectorAll('.view-activity-details').forEach(button => {
-                button.addEventListener('click', function () {
-                    const activityId = this.getAttribute('data-activity-id');
-
-                    const detailModal = document.getElementById('detailModal');
-                    if (detailModal) {
-                        const modalTitle = document.getElementById('detailModalLabel');
-                        const modalLoader = document.getElementById('detail-modal-loader');
-                        const detailContent = document.getElementById('detail-content');
-
-                        if (modalTitle) modalTitle.textContent = "Detalls de l'Activitat";
-                        if (modalLoader) modalLoader.classList.remove('d-none');
-                        if (detailContent) detailContent.classList.add('d-none');
-
-                        bootstrap.Modal.getOrCreateInstance(detailModal, {
-                            backdrop: false,
-                            keyboard: true
-                        }).show();
-
-                        fetch(`/admin/detail/activitat/${activityId}`)
-                            .then(response => {
-                                if (!response.ok) throw new Error('Error al cargar los detalles');
-                                return response.text();
-                            })
-                            .then(html => {
-                                if (modalLoader) modalLoader.classList.add('d-none');
-                                if (detailContent) {
-                                    detailContent.innerHTML = html;
-                                    detailContent.classList.remove('d-none');
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                if (modalLoader) modalLoader.classList.add('d-none');
-                                if (detailContent) {
-                                    detailContent.innerHTML = `
-                                                                        <div class="alert alert-danger">
-                                                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                                                            Error al cargar los detalles: ${error.message}
-                                                                        </div>
-                                                                    `;
-                                    detailContent.classList.remove('d-none');
-                                }
-                            });
-                    }
-                });
-            });
         });
     </script>
     <script>
@@ -2443,15 +2210,15 @@
             // Configurar todos los modales para cerrarse al hacer clic fuera
             var modals = document.querySelectorAll('.modal');
             modals.forEach(function (modal) {
-                var modalInstance = new bootstrap.Modal(modal, {
-                    backdrop: true,
-                    keyboard: true
-                });
+                const backdropAttr = modal.getAttribute('data-bs-backdrop');
+                const keyboardAttr = modal.getAttribute('data-bs-keyboard');
+                const backdropOption = backdropAttr === null ? true : (backdropAttr === 'false' ? false : backdropAttr);
+                const keyboardOption = keyboardAttr === null ? true : keyboardAttr !== 'false';
 
-                // Añadir atributo de backdrop si no existe
-                if (!modal.hasAttribute('data-bs-backdrop')) {
-                    modal.setAttribute('data-bs-backdrop', 'true');
-                }
+                bootstrap.Modal.getOrCreateInstance(modal, {
+                    backdrop: backdropOption,
+                    keyboard: keyboardOption
+                });
             });
 
             // Para modal dinámico
@@ -2493,7 +2260,6 @@
                     if (modalContent) modalContent.classList.add('d-none');
 
                     bootstrap.Modal.getOrCreateInstance(dynamicModal, {
-                        backdrop: false,
                         keyboard: true
                     }).show();
 
@@ -2606,6 +2372,7 @@
                             alert(successMessage);
 
                             // Recargar contenido
+                            const detailModal = document.getElementById('detailModal');
                             if (detailModal && detailModal.classList.contains('show')) {
                                 // Si estamos en detalle, cerrar modal y recargar lista
                                 closeAnyModal('detailModal');
@@ -2653,7 +2420,6 @@
                 // Mostrar modal
                 if (detailModal) {
                     bootstrap.Modal.getOrCreateInstance(detailModal, {
-                        backdrop: false,
                         keyboard: true
                     }).show();
                 }
@@ -2718,9 +2484,6 @@
                 document.body.style.overflow = '';
                 document.body.style.paddingRight = '';
 
-                // Eliminar todos los backdrops
-                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-
                 // Recargar la última vista activa después de cerrar
                 if (modalId === 'detailModal' && window.lastActiveContentType) {
                     setTimeout(() => {
@@ -2764,21 +2527,15 @@
                 const hasVisibleModal = document.querySelector('.modal.show') !== null;
 
                 if (!hasVisibleModal) {
-                    document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
                     document.body.classList.remove('modal-open');
                     document.body.style.overflow = '';
-                    document.body.style.paddingRight = '';
-                }
+                    document.body.style.paddingRight = ''; 
             };
 
             cleanupOrphanModalLock();
 
             window.addEventListener('focus', cleanupOrphanModalLock);
             setInterval(cleanupOrphanModalLock, 500);
-
-            document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
-                backdrop.remove();
-            });
 
             // Restaurar el estado del body
             document.body.classList.remove('modal-open');

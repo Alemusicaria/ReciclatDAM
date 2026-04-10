@@ -22,7 +22,9 @@ class LogicCheckController extends Controller
 {
     public function index()
     {
-        if (!auth()->check() || (int) auth()->user()->rol_id !== 1) {
+        $user = Auth::user();
+
+        if (!$user instanceof User || !$user->isAdmin()) {
             abort(403, 'No tens permisos per executar comprovacions de lògica.');
         }
 
@@ -31,7 +33,9 @@ class LogicCheckController extends Controller
 
     public function run(Request $request)
     {
-        if (!auth()->check() || (int) auth()->user()->rol_id !== 1) {
+        $user = Auth::user();
+
+        if (!$user instanceof User || !$user->isAdmin()) {
             return response()->json([
                 'success' => false,
                 'message' => 'No tens permisos per executar comprovacions de lògica.',

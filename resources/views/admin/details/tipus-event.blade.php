@@ -10,7 +10,7 @@
                         </div>
                     </div>
                     <div>
-                        <h2 class="detail-name mb-1">{{ $tipusEvent->nom }}</h2>
+                        <h2 class="detail-name mb-1">{{ $tipusEvent->displayNom() }}</h2>
                         <div class="detail-badge mb-2">
                             <span class="badge py-1 px-2" style="background-color: {{ $tipusEvent->color }}">
                                 {{ $tipusEvent->color }}
@@ -44,7 +44,7 @@
     </div>
 
     <!-- Descripción del tipo de evento -->
-    @if($tipusEvent->descripcio)
+    @if($tipusEvent->displayDescripcio())
     <div class="row mt-4">
         <div class="col-lg-12">
             <div class="info-card mb-4">
@@ -52,7 +52,7 @@
                     <i class="fas fa-align-left text-primary me-2"></i>{{ __('messages.admin.tipus_events.description') }}
                 </h4>
                 <div class="tipus-event-description">
-                    <p class="mb-0">{{ $tipusEvent->descripcio ?: __('messages.admin.tipus_events.no_description') }}</p>
+                    <p class="mb-0">{{ $tipusEvent->displayDescripcio() ?: __('messages.admin.tipus_events.no_description') }}</p>
                 </div>
             </div>
         </div>
@@ -81,7 +81,7 @@
                             <tbody>
                                 @foreach($tipusEvent->events()->take(10)->get() as $event)
                                     <tr>
-                                        <td>{{ $event->nom }}</td>
+                                        <td>{{ $event->displayNom() }}</td>
                                         <td>{{ $event->data_inici->format('d/m/Y H:i') }}</td>
                                         <td>{{ $event->data_fi->format('d/m/Y H:i') }}</td>
                                         <td>

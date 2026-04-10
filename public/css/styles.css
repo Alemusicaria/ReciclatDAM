@@ -4508,6 +4508,7 @@ button#next-selected-award:focus {
 
 .product-info-container {
     display: flex;
+    align-items: center;
     gap: 20px;
     margin-bottom: 20px
 }
@@ -5024,6 +5025,7 @@ body.dark-mode .category-card:hover .category-title {
 /* Estilo para modal de producto */
 .product-info-container {
     display: flex;
+    align-items: center;
     gap: 20px;
     margin-bottom: 20px;
 }

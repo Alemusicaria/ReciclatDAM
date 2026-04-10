@@ -14,10 +14,10 @@
                         @endif
                     </div>
                     <div>
-                        <h2 class="event-name mb-1">{{ $event->nom }}</h2>
+                        <h2 class="event-name mb-1">{{ $event->displayNom() }}</h2>
                         <div class="event-type mb-2">
                             <span class="badge py-1 px-2" style="background-color: {{ $event->tipus ? $event->tipus->color : '#3f51b5' }};">
-                                <i class="fas fa-tag me-1"></i>{{ $event->tipus ? $event->tipus->nom : __('messages.admin.events.no_type') }}
+                                <i class="fas fa-tag me-1"></i>{{ $event->displayTipusNom() ?: __('messages.admin.events.no_type') }}
                             </span>
                         </div>
                         <div class="detail-date">
@@ -68,7 +68,7 @@
                             <i class="fas fa-map-marker-alt me-2"></i>{{ __('messages.admin.events.location') }}:
                         </div>
                         <div class="info-value fw-medium">
-                            {{ $event->lloc ?: __('messages.admin.events.not_specified') }}
+                            {{ $event->displayLloc() ?: __('messages.admin.events.not_specified') }}
                         </div>
                     </div>
                     <div class="info-item d-flex mb-3">
@@ -97,7 +97,7 @@
                     <i class="fas fa-align-left text-success me-2"></i>{{ __('messages.admin.events.description') }}
                 </h4>
                 <div class="event-description">
-                    <p class="mb-0">{{ $event->descripcio ?: __('messages.admin.events.no_description') }}</p>
+                    <p class="mb-0">{{ $event->displayDescripcio() ?: __('messages.admin.events.no_description') }}</p>
                 </div>
             </div>
         </div>

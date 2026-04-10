@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\AutoTranslator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
@@ -32,5 +33,15 @@ class TipusEvent extends Model
     public function events()
     {
         return $this->hasMany(Event::class, 'tipus_event_id');
+    }
+
+    public function displayNom(): string
+    {
+        return AutoTranslator::translate($this->getRawOriginal('nom'), 'events_db_types') ?? $this->getRawOriginal('nom');
+    }
+
+    public function displayDescripcio(): ?string
+    {
+        return AutoTranslator::translate($this->getRawOriginal('descripcio'), 'events_db_descriptions') ?? $this->getRawOriginal('descripcio');
     }
 }

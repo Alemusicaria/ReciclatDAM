@@ -107,7 +107,7 @@ Route::localizedGroup(function () {
     Route::get('/tipus-alertes', [PageAndApiController::class, 'alertTypes'])->name('tipus-alertes.list');
 
     // Rutas para el panel de administración
-    Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+    Route::prefix('admin')->middleware(['auth', 'admin', 'throttle:120,1'])->group(function () {
         Route::get('/logic-checker', [LogicCheckController::class, 'index'])
             ->name('admin.logic-checker');
 
@@ -118,7 +118,24 @@ Route::localizedGroup(function () {
         Route::controller(AdminController::class)->group(function () {
             // Modales dinámicos
             Route::get('/', 'index')->name('admin.dashboard');
-            Route::get('/modal-content/{type}', 'getModalContent')->name('admin.modal-content');
+            Route::get('/modal-content/{type}', 'getModalContent')
+                ->whereIn('type', [
+                    'users',
+                    'events',
+                    'premis',
+                    'codis',
+                    'productes',
+                    'punt-reciclatge',
+                    'rols',
+                    'alertes-punts',
+                    'tipus-alertes',
+                    'tipus-events',
+                    'premis-reclamats',
+                    'activitats',
+                    'users-ranking',
+                    'opinions',
+                ])
+                ->name('admin.modal-content');
 
             // Formularios
             Route::get('/create-form/{type}', 'getCreateForm')->name('admin.create-form');

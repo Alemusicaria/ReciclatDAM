@@ -19,45 +19,58 @@ use App\Models\TipusAlerta;
 use App\Models\AlertaPuntDeRecollida;
 use App\Models\Opinions;
 use App\Models\NavigatorInfo;
+use App\Services\AdminDashboardMetricsService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 
 class AdminController extends Controller
 {
-    public function index()
+    private const MODAL_MAX_RESULTS = 100;
+
+    private const ALLOWED_MODAL_TYPES = [
+        'users',
+        'events',
+        'premis',
+        'codis',
+        'productes',
+        'punt-reciclatge',
+        'rols',
+        'alertes-punts',
+        'tipus-alertes',
+        'tipus-events',
+        'premis-reclamats',
+        'activitats',
+        'users-ranking',
+        'opinions',
+    ];
+
+    public function index(AdminDashboardMetricsService $metricsService)
     {
-        // Comprovar si l'usuari és admin
-        if (!Auth::check() || Auth::user()->rol_id != 1) {
-            return redirect()->route('dashboard')->with('error', 'No tens permís per accedir al panell d\'administració.');
-        }
+        $cachedStats = $metricsService->getDashboardStats();
 
         // Estadístiques bàsiques
-        $totalUsers = User::count();
-        $totalEvents = Event::count();
-        $totalPremis = Premi::count();
-        $totalCodis = Codi::count();
+        $totalUsers = $cachedStats['totalUsers'];
+        $totalEvents = $cachedStats['totalEvents'];
+        $totalPremis = $cachedStats['totalPremis'];
+        $totalCodis = $cachedStats['totalCodis'];
 
-        // Estadístiques mensuals
-        $lastMonth = Carbon::now()->subMonth();
-
-        $usersLastMonth = User::where('created_at', '<', $lastMonth)->count();
-        $newUsersPercent = $usersLastMonth > 0
-            ? round((User::whereBetween('created_at', [$lastMonth, Carbon::now()])->count() / $usersLastMonth) * 100)
-            : 100;
-
-        $codisLastMonth = Codi::where('data_escaneig', '<', $lastMonth)->count();
-        $newCodisPercent = $codisLastMonth > 0
-            ? round((Codi::whereBetween('data_escaneig', [$lastMonth, Carbon::now()])->count() / $codisLastMonth) * 100)
-            : 100;
+        $monthlyPercentages = $metricsService->getMonthlyPercentages();
+        $newUsersPercent = $monthlyPercentages['newUsersPercent'];
+        $newCodisPercent = $monthlyPercentages['newCodisPercent'];
+        $newEventsPercent = $monthlyPercentages['newEventsPercent'];
 
         // Events actius
-        $activeEvents = Event::where('data_fi', '>=', Carbon::now())->count();
+        $activeEvents = $cachedStats['activeEvents'];
 
         // Premis pendents
-        $pendingRewards = PremiReclamat::where('estat', 'pendent')->count();
+        $pendingRewards = $cachedStats['pendingRewards'];
 
-        $topUsers = User::orderBy('punts_actuals', 'desc')->get();
+        $topUsers = User::select('id', 'nom', 'cognoms', 'email', 'punts_actuals')
+            ->orderBy('punts_actuals', 'desc')
+            ->limit(50)
+            ->get();
         $topUsersForDistribution = $topUsers
             ->take(6)
             ->map(function ($user) {
@@ -93,42 +106,14 @@ class AdminController extends Controller
             ->get();
 
         // Distribució de punts
-        $totalActivePoints = User::sum('punts_actuals');
-        $totalSpentPoints = User::sum('punts_gastats');
-        $totalEventPoints = DB::table('event_user')->sum('punts');
-        // Calcular porcentaje de nuevos eventos
-        $eventsLastMonth = Event::where('created_at', '<', $lastMonth)->count();
-        $newEventsPercent = $eventsLastMonth > 0
-            ? round((Event::whereBetween('created_at', [$lastMonth, Carbon::now()])->count() / $eventsLastMonth) * 100)
-            : 100;
-
-        // Dades per a gràfics - últims 6 mesos
-        $months = collect([]);
-        for ($i = 5; $i >= 0; $i--) {
-            $months->push(Carbon::now()->subMonths($i));
-        }
-
-        $activityChartLabels = $months->map(function ($month) {
-            return $month->format('M Y');
-        });
-
-        $newUsersData = $months->map(function ($month) {
-            $start = (clone $month)->startOfMonth();
-            $end = (clone $month)->endOfMonth();
-            return User::whereBetween('created_at', [$start, $end])->count();
-        });
-
-        $codisScannedData = $months->map(function ($month) {
-            $start = (clone $month)->startOfMonth();
-            $end = (clone $month)->endOfMonth();
-            return Codi::whereBetween('data_escaneig', [$start, $end])->count();
-        });
-
-        $premisClaimedData = $months->map(function ($month) {
-            $start = (clone $month)->startOfMonth();
-            $end = (clone $month)->endOfMonth();
-            return PremiReclamat::whereBetween('data_reclamacio', [$start, $end])->count();
-        });
+        $totalActivePoints = $cachedStats['totalActivePoints'];
+        $totalSpentPoints = $cachedStats['totalSpentPoints'];
+        $totalEventPoints = $cachedStats['totalEventPoints'];
+        $activitySeries = $metricsService->getActivitySeries(6);
+        $activityChartLabels = $activitySeries['activityChartLabels'];
+        $newUsersData = $activitySeries['newUsersData'];
+        $codisScannedData = $activitySeries['codisScannedData'];
+        $premisClaimedData = $activitySeries['premisClaimedData'];
 
         return view('admin.dashboard', compact(
             'totalUsers',
@@ -174,49 +159,61 @@ class AdminController extends Controller
     public function getModalContent($type)
     {
         try {
+            if (!in_array($type, self::ALLOWED_MODAL_TYPES, true)) {
+                return response()->json([
+                    'error' => 'Modal no suportada',
+                ], 404);
+            }
+
             switch ($type) {
                 case 'users':
-                    $users = User::with('rol')->latest()->get();
+                    $users = User::with('rol')->latest()->limit(self::MODAL_MAX_RESULTS)->get();
                     return view('admin.modals.users', compact('users'));
 
                 case 'events':
-                    $events = Event::with('tipus')->latest()->get();
+                    $events = Event::with('tipus')->latest()->limit(self::MODAL_MAX_RESULTS)->get();
                     return view('admin.modals.events', compact('events'));
                 case 'premis':
-                    $premis = Premi::with('premiReclamats.user')->orderBy('id', 'desc')->get();
+                    $premis = Premi::with('premiReclamats.user')->orderBy('id', 'desc')->limit(self::MODAL_MAX_RESULTS)->get();
                     return view('admin.modals.premis', compact('premis'));
                 case 'codis':
-                    $codis = Codi::with('user')->orderBy('id', 'desc')->get();
+                    $codis = Codi::with('user')->orderBy('id', 'desc')->limit(self::MODAL_MAX_RESULTS)->get();
                     return view('admin.modals.codis', compact('codis'));
                 case 'productes':
-                    $productes = Producte::orderBy('id', 'desc')->get();
+                    $productes = Producte::orderBy('id', 'desc')->limit(self::MODAL_MAX_RESULTS)->get();
                     return view('admin.modals.productes', compact('productes'));
                 case 'punt-reciclatge':
-                    $punts = PuntDeRecollida::latest()->get();
+                    $punts = PuntDeRecollida::latest()->limit(self::MODAL_MAX_RESULTS)->get();
                     return view('admin.modals.punt-reciclatge', compact('punts'));
                 case 'rols':
-                    $rols = Rol::orderBy('id', 'desc')->get();
+                    $rols = Cache::remember('admin.modal.rols', now()->addMinutes(10), function () {
+                        return Rol::orderBy('id', 'desc')->get();
+                    });
                     return view('admin.modals.rols', compact('rols'));
                 case 'alertes-punts':
-                    $alertes = AlertaPuntDeRecollida::with('puntDeRecollida', 'tipus')->latest()->get();
+                    $alertes = AlertaPuntDeRecollida::with('puntDeRecollida', 'tipus')->latest()->limit(self::MODAL_MAX_RESULTS)->get();
                     return view('admin.modals.alertes-punts', compact('alertes'));
                 case 'tipus-alertes':
-                    $tipusAlertes = TipusAlerta::with('alertes')->latest()->get();
+                    $tipusAlertes = Cache::remember('admin.modal.tipus-alertes', now()->addMinutes(10), function () {
+                        return TipusAlerta::with('alertes')->latest()->get();
+                    });
                     return view('admin.modals.tipus-alertes', compact('tipusAlertes'));
                 case 'tipus-events':
-                    $tipusEvents = TipusEvent::latest()->get();
+                    $tipusEvents = Cache::remember('admin.modal.tipus-events', now()->addMinutes(10), function () {
+                        return TipusEvent::latest()->get();
+                    });
                     return view('admin.modals.tipus-events', compact('tipusEvents'));
                 case 'premis-reclamats':
-                    $premisReclamats = PremiReclamat::with(['user', 'premi'])->latest()->get();
+                    $premisReclamats = PremiReclamat::with(['user', 'premi'])->latest()->limit(self::MODAL_MAX_RESULTS)->get();
                     return view('admin.modals.premis-reclamats', compact('premisReclamats'));
                 case 'activitats':
-                    $activitats = Activity::with('user')->latest()->get();
+                    $activitats = Activity::with('user')->latest()->limit(self::MODAL_MAX_RESULTS)->get();
                     return view('admin.modals.activitats', compact('activitats'));
                 case 'users-ranking':
-                    $users = User::orderBy('punts_totals', 'desc')->get();
+                    $users = User::orderBy('punts_totals', 'desc')->limit(self::MODAL_MAX_RESULTS)->get();
                     return view('admin.modals.users-ranking', compact('users'));
                 case 'opinions':
-                    $opinions = Opinions::latest()->get();
+                    $opinions = Opinions::latest()->limit(self::MODAL_MAX_RESULTS)->get();
                     return view('admin.modals.opinions', compact('opinions'));
                 default:
                     return response()->json([

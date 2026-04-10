@@ -68,7 +68,7 @@ class LogicCheckerPageTest extends TestCase
 
     private function createAdminUser(): User
     {
-        $rol = Rol::query()->firstOrCreate(['id' => 1], ['nom' => 'admin']);
+        $rol = Rol::query()->firstOrCreate(['nom' => 'admin']);
         $nivell = Nivell::query()->firstOrCreate(
             ['id' => 1],
             [

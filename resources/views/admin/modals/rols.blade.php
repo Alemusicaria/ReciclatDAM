@@ -27,7 +27,7 @@
                                     <i class="fas fa-user-tag"></i>
                                 </span>
                             </div>
-                            <span>{{ $rol->nom }}</span>
+                            <span>{{ $rol->displayNom() }}</span>
                         </div>
                     </td>
                     <td>
@@ -47,7 +47,7 @@
                             </button>
                             <button class="btn btn-danger btn-sm deleteBtn" 
                                 data-item-id="{{ $rol->id }}" 
-                                data-item-name="{{ $rol->nom }}"
+                                data-item-name="{{ $rol->displayNom() }}"
                                 data-item-type="rol"
                                 @if($rol->users()->count() > 0) disabled @endif
                                 title="@if($rol->users()->count() > 0) {{ __('messages.admin.roles.cannot_delete') }} @else {{ __('messages.admin.common.delete') }} @endif">

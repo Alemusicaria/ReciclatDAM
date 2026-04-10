@@ -3,14 +3,17 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class AdminMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
-        if (auth()->check() && auth()->user()->rol_id == 1) {
+        $user = Auth::user();
+
+        if ($user instanceof User && $user->isAdmin()) {
             return $next($request);
         }
         

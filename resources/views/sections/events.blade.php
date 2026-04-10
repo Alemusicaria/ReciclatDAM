@@ -1,6 +1,6 @@
 <section id="events" class="py-4">
     <div class="">
-        <h1 class="mb-3 fs-3">{{ __('Calendari d\'Events') }}</h1>
+        <h1 class="mb-3 fs-3">{{ __('messages.events_ui.calendar_title') }}</h1>
 
         <div class="row">
             <div class="col-md-8 mx-auto">
@@ -21,7 +21,7 @@
             <div class="modal-content" id="event-modal">
                 <!-- Asegurar que el botón de cerrar funcione correctamente en el modal -->
                 <div class="modal-header py-2">
-                    <h5 class="modal-title fs-5" id="eventModalLabel">{{ __('Detalls de l\'Event') }}</h5>
+                    <h5 class="modal-title fs-5" id="eventModalLabel">{{ __('messages.events_ui.details_title') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-3" id="event-details-content">
@@ -29,9 +29,9 @@
                 </div>
                 <div class="modal-footer py-2">
                     <button type="button" class="btn btn-sm btn-secondary"
-                        data-bs-dismiss="modal">{{ __('Tancar') }}</button>
+                        data-bs-dismiss="modal">{{ __('messages.events_ui.close') }}</button>
                     <button type="button" class="btn btn-sm btn-primary"
-                        id="register-event-btn">{{ __('Registrar-me') }}</button>
+                        id="register-event-btn">{{ __('messages.events_ui.register') }}</button>
                 </div>
             </div>
         </div>
@@ -44,6 +44,43 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        const appLocale = @json(app()->getLocale());
+        const eventCheckRegistrationUrlTemplate = @json(route('events.checkRegistration', ['id' => '__EVENT_ID__']));
+        const eventRegisterUrlTemplate = @json(route('events.register', ['id' => '__EVENT_ID__']));
+        const calendarLocaleMap = { ca: 'ca', es: 'es', en: 'en' };
+        const dateLocaleMap = { ca: 'ca-ES', es: 'es-ES', en: 'en-GB' };
+        const calendarLocale = calendarLocaleMap[appLocale] || 'en';
+        const browserLocale = dateLocaleMap[calendarLocale] || 'en-GB';
+
+        const i18n = {
+            serverResponseError: @json(__('messages.events_ui.server_response_error')),
+            loadError: @json(__('messages.events_ui.load_error')),
+            notSpecified: @json(__('messages.events_ui.not_specified')),
+            general: @json(__('messages.events_ui.general')),
+            capacity: @json(__('messages.events_ui.capacity')),
+            unlimited: @json(__('messages.events_ui.unlimited')),
+            description: @json(__('messages.events_ui.description')),
+            noDescription: @json(__('messages.events_ui.no_description')),
+            checking: @json(__('messages.events_ui.checking')),
+            checkingRegistration: @json(__('messages.events_ui.checking_registration')),
+            eventFinished: @json(__('messages.events_ui.event_finished')),
+            eventFinishedMessage: @json(__('messages.events_ui.event_finished_message')),
+            alreadyRegistered: @json(__('messages.events_ui.already_registered')),
+            fullCapacity: @json(__('messages.events_ui.full_capacity')),
+            loginToRegister: @json(__('messages.events_ui.login_to_register')),
+            register: @json(__('messages.events_ui.register')),
+            registering: @json(__('messages.events_ui.registering')),
+            retryLaterError: @json(__('messages.events_ui.retry_later_error')),
+            today: @json(__('messages.events_ui.today')),
+            month: @json(__('messages.events_ui.month')),
+            googleCalendar: @json(__('messages.events_ui.google_calendar')),
+            iphoneCalendar: @json(__('messages.events_ui.iphone_calendar'))
+        };
+
+        function buildEventUrl(template, eventId) {
+            return template.replace('__EVENT_ID__', encodeURIComponent(String(eventId)));
+        }
+
         // Helper function to safely escape HTML in JavaScript
         function escapeHtml(text) {
             if (!text) return '';
@@ -60,7 +97,7 @@
 
         function buildEventPlaceholderImage(title, tipus) {
             const safeTitle = String(title || 'Event').trim();
-            const safeTipus = String(tipus || 'Activitat').trim();
+            const safeTipus = String(tipus || i18n.general).trim();
             const initials = safeTitle
                 .split(/\s+/)
                 .slice(0, 2)
@@ -130,7 +167,7 @@
         const userRegisteredEvents = @json($userEvents ?? []);
         // Inicializar calendario (los eventos se cargan dinámicamente por rango)
         initCalendar();
-            const parseJsonResponse = async (response, defaultMessage = 'Error en la resposta del servidor') => {
+            const parseJsonResponse = async (response, defaultMessage = i18n.serverResponseError) => {
                 const payload = await response.json().catch(() => null);
 
                 if (!response.ok) {
@@ -251,10 +288,10 @@
             detailsContainer.insertAdjacentHTML('beforeend', `
                 <div id="calendar-actions-container" class="calendar-actions-container mt-3">
                     <a href="${buildGoogleCalendarUrl(calendarEvent)}" target="_blank" rel="noopener noreferrer" class="btn btn-sm calendar-action-btn calendar-action-btn-google text-nowrap">
-                        <i class="fas fa-calendar-plus me-1"></i>Google Calendar
+                        <i class="fas fa-calendar-plus me-1"></i>${escapeHtml(i18n.googleCalendar)}
                     </a>
                     <button type="button" id="iphone-calendar-btn" class="btn btn-sm calendar-action-btn calendar-action-btn-iphone text-nowrap">
-                        <i class="fas fa-mobile-alt me-1"></i>Calendari iPhone (.ics)
+                        <i class="fas fa-mobile-alt me-1"></i>${escapeHtml(i18n.iphoneCalendar)}
                     </button>
                 </div>
             `);
@@ -285,7 +322,7 @@
                     }
                 });
 
-                const events = await parseJsonResponse(response, 'No s\'han pogut carregar els events.');
+                const events = await parseJsonResponse(response, i18n.loadError);
 
                 window.calendarEvents = events.map(event => {
                     const ext = event.extendedProps || {};
@@ -361,15 +398,15 @@
 
             calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
-                locale: 'ca',
+                locale: calendarLocale,
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
                     right: 'dayGridMonth'
                 },
                 buttonText: {
-                    today: 'Avui',
-                    month: 'Mes'
+                    today: i18n.today,
+                    month: i18n.month
                 },
                 events: function (fetchInfo, successCallback, failureCallback) {
                     loadEvents(fetchInfo.startStr, fetchInfo.endStr)
@@ -438,30 +475,30 @@
                         <ul class="event-details-list">
                             <li><i class="fas fa-calendar-alt"></i> ${startDate}</li>
                             <li><i class="fas fa-clock"></i> ${startTime} ${endTime ? ' - ' + endTime : ''}</li>
-                            <li><i class="fas fa-map-marker-alt"></i> ${event.extendedProps.location || 'No especificat'}</li>
+                            <li><i class="fas fa-map-marker-alt"></i> ${event.extendedProps.location || i18n.notSpecified}</li>
                             <li>
                                 <i class="fas fa-tag"></i> 
                                 <span class="badge" style="background-color: ${event.backgroundColor}">
-                                    ${escapeHtml(event.extendedProps.tipus || 'General')}
+                                    ${escapeHtml(event.extendedProps.tipus || i18n.general)}
                                 </span>
                             </li>
-                            <li><i class="fas fa-users"></i> Capacitat: ${event.extendedProps.capacitat !== null ? event.extendedProps.capacitat : 'Il·limitada'}</li>
+                            <li><i class="fas fa-users"></i> ${i18n.capacity}: ${event.extendedProps.capacitat !== null ? event.extendedProps.capacitat : i18n.unlimited}</li>
                             <li><i class="fas fa-coins"></i> ECODAMS: ${event.extendedProps.punts || 0}</li>
                         </ul>
                     </div>
                 </div>
                 
                 <div class="mt-2">
-                    <h6 class="mb-1">Descripció:</h6>
-                    <p class="small mb-0">${escapeHtml(event.extendedProps.description || 'Sense descripció')}</p>
+                    <h6 class="mb-1">${i18n.description}:</h6>
+                    <p class="small mb-0">${escapeHtml(event.extendedProps.description || i18n.noDescription)}</p>
                 </div>
                 
                 <!-- Añadir un loading mientras verificamos el estado -->
                 <div id="registration-status-loading" class="text-center mt-3">
                     <div class="spinner-border spinner-border-sm text-primary" role="status">
-                        <span class="visually-hidden">Verificant...</span>
+                        <span class="visually-hidden">${i18n.checking}</span>
                     </div>
-                    <span class="ms-2">Verificant l'estat del registre...</span>
+                    <span class="ms-2">${i18n.checkingRegistration}</span>
                 </div>
             `;
 
@@ -485,7 +522,7 @@
 
             // Configurar botón de registro (inicialmente deshabilitado mientras verificamos)
             const registerButton = document.getElementById('register-event-btn');
-            registerButton.textContent = 'Verificant...';
+            registerButton.textContent = i18n.checking;
             registerButton.disabled = true;
 
             const eventStart = event.start ? new Date(event.start) : null;
@@ -494,11 +531,11 @@
 
             if (isPastEvent) {
                 document.getElementById('registration-status-loading').style.display = 'none';
-                registerButton.textContent = 'Event finalitzat';
+                registerButton.textContent = i18n.eventFinished;
                 registerButton.disabled = true;
                 document.getElementById('event-details-content').insertAdjacentHTML('beforeend', `
                     <div class="alert alert-info mt-2 small mb-0">
-                        Aquest event ja ha passat. Pots consultar-ne els detalls, però no registrar-t'hi.
+                        ${i18n.eventFinishedMessage}
                     </div>
                 `);
                 return;
@@ -506,7 +543,7 @@
 
             @auth
                 // Verificar el estado de registro en tiempo real con el servidor
-                fetch(`/events/${event.id}/check-registration`, {
+                fetch(buildEventUrl(eventCheckRegistrationUrlTemplate, event.id), {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -537,21 +574,21 @@
                         event.extendedProps.userRegistered = isRegistered;
 
                         if (isPast) {
-                            registerButton.textContent = 'Event finalitzat';
+                            registerButton.textContent = i18n.eventFinished;
                             registerButton.disabled = true;
 
                             if (data.html) {
                                 document.getElementById('event-details-content').insertAdjacentHTML('beforeend', data.html);
                             }
                         } else if (isRegistered) {
-                            registerButton.textContent = 'Ja estàs registrat';
+                            registerButton.textContent = i18n.alreadyRegistered;
                             registerButton.disabled = true;
 
                             // Añadir mensaje indicando que ya está registrado con más estilo
                             document.getElementById('event-details-content').insertAdjacentHTML('beforeend', data.html);
                             renderCalendarButtons(event.id);
                         } else if (isFull) {
-                            registerButton.textContent = 'Aforament complet';
+                            registerButton.textContent = i18n.fullCapacity;
                             registerButton.disabled = true;
 
                             // Mostrar mensaje de aforo completo
@@ -559,7 +596,7 @@
                                 document.getElementById('event-details-content').insertAdjacentHTML('beforeend', data.html);
                             }
                         } else {
-                            registerButton.textContent = 'Registrar-me';
+                            registerButton.textContent = i18n.register;
                             registerButton.disabled = false;
                             registerButton.onclick = function () {
                                 registerForEvent(event.id);
@@ -569,7 +606,7 @@
                     .catch(error => {
                         console.error('Error al verificar el registro:', error);
                         document.getElementById('registration-status-loading').style.display = 'none';
-                        registerButton.textContent = 'Registrar-me';
+                        registerButton.textContent = i18n.register;
                         registerButton.disabled = false;
                         registerButton.onclick = function () {
                             registerForEvent(event.id);
@@ -580,7 +617,7 @@
                 document.getElementById('registration-status-loading').style.display = 'none';
 
                 // Si no está autenticado, redirigir al login
-                registerButton.textContent = 'Inicia sessió per registrar-te';
+                registerButton.textContent = i18n.loginToRegister;
                 registerButton.onclick = function () {
                     window.location.href = "{{ route('login') }}?redirect=events";
                 };
@@ -592,11 +629,11 @@
             @auth
                 // Mostrar indicador de carga
                 const registerButton = document.getElementById('register-event-btn');
-                registerButton.textContent = 'Registrant...';
+                registerButton.textContent = i18n.registering;
                 registerButton.disabled = true;
 
                 // Usar fetch para hacer la petición AJAX
-                fetch(`/events/${eventId}/register`, {
+                fetch(buildEventUrl(eventRegisterUrlTemplate, eventId), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -616,7 +653,7 @@
                         if (!data) return; // Si hubo redirección
 
                         // Actualizar el botón
-                        registerButton.textContent = data.registered ? 'Ja estàs registrat' : 'Registrar-me';
+                        registerButton.textContent = data.registered ? i18n.alreadyRegistered : i18n.register;
                         registerButton.disabled = data.registered || data.full;
 
                         // Añadir el HTML proporcionado por el backend
@@ -638,7 +675,7 @@
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        registerButton.textContent = 'Registrar-me';
+                        registerButton.textContent = i18n.register;
                         registerButton.disabled = false;
 
                         // Mostrar mensaje de error integrado
@@ -650,7 +687,7 @@
                                             </div>
                                             <div>
                                                 <strong>Error!</strong> 
-                                                <p class="mb-0">Hi ha hagut un error. Torna-ho a provar més tard.</p>
+                                                <p class="mb-0">${i18n.retryLaterError}</p>
                                             </div>
                                         </div>
                                     </div>`;
@@ -665,12 +702,12 @@
         // Funciones de utilidad para formatear fechas
         function formatDate(date) {
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            return date.toLocaleDateString('ca-ES', options);
+            return date.toLocaleDateString(browserLocale, options);
         }
 
         function formatTime(date) {
             const options = { hour: '2-digit', minute: '2-digit' };
-            return date.toLocaleTimeString('ca-ES', options);
+            return date.toLocaleTimeString(browserLocale, options);
         }
         
         // Reemplazar el manejo de cierre del modal
@@ -724,20 +761,6 @@
             // 3. Eliminar estilos inline que Bootstrap puede haber añadido
             document.body.style.overflow = '';
             document.body.style.paddingRight = '';
-
-            // 4. Eliminar TODOS los backdrops
-            const backdrops = document.querySelectorAll('.modal-backdrop');
-            backdrops.forEach(backdrop => {
-                backdrop.classList.remove('show');
-                setTimeout(() => {
-                    backdrop.remove();
-                }, 150);
-            });
-
-            // 5. Si hay múltiples backdrops, eliminarlos todos usando jQuery si está disponible
-            if (typeof $ !== 'undefined') {
-                $('.modal-backdrop').remove();
-            }
 
         }
     });

@@ -46,5 +46,14 @@ return [
         'enabled' => env('GOOGLE_MAPS_ENABLED', false),
     ],
 
+    'mapbox' => [
+        'access_token' => env('MAPBOX_ACCESS_TOKEN'),
+    ],
+
+    'algolia' => [
+        'app_id' => env('ALGOLIA_APP_ID'),
+        'search_key' => env('ALGOLIA_SEARCH_KEY'),
+    ],
+
 
 ];

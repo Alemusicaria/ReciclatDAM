@@ -30,7 +30,7 @@
                                     <i class="fas fa-gift text-white"></i>
                                 </div>
                             @endif
-                            <span>{{ $premi->nom }}</span>
+                            <span>{{ $premi->displayNom() }}</span>
                         </div>
                     </td>
                     <td>
@@ -55,7 +55,7 @@
                             </button>
                             <button class="btn btn-danger btn-sm deleteBtn" 
                                 data-item-id="{{ $premi->id }}" 
-                                data-item-name="{{ $premi->nom }}"
+                                data-item-name="{{ $premi->displayNom() }}"
                                 data-item-type="premi"
                                 title="{{ __('messages.admin.common.delete') }}">
                                 <i class="fas fa-trash"></i>

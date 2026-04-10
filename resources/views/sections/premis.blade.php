@@ -638,8 +638,10 @@
 
 <script>
     $(document).ready(function () {
+        const premisIndex = window.premisIndex;
         const userLoggedIn = @json(Auth::check());
         const userPoints = @json(Auth::check() ? Auth::user()->punts_actuals : 0);
+        const catalogTranslations = window.catalogTranslations || {};
         const awardsI18n = {
             easy: @json(__('messages.awards_ui.difficulty_easy')),
             medium: @json(__('messages.awards_ui.difficulty_medium')),
@@ -703,6 +705,17 @@
             return categoryMap[award.id || award.objectID] || 'accessories';
         }
 
+        function getTranslatedAward(award) {
+            const id = award && (award.id || award.objectID);
+            const entry = id && catalogTranslations.premis ? catalogTranslations.premis[String(id)] : null;
+
+            return {
+                nom: entry?.nom || award.nom,
+                descripcio: entry?.descripcio || award.descripcio,
+                categoria: entry?.categoria || getAwardCategory(award),
+            };
+        }
+
         // Obtener categoría icono
         function getCategoryIcon(category) {
             const icons = {
@@ -726,7 +739,8 @@
         function renderAwardCard(award, isRecommended = false) {
             const awardId = award.id || award.objectID;
             const cost = award.cost || award.punts_requerits || 0;
-            const category = getAwardCategory(award);
+            const translatedAward = getTranslatedAward(award);
+            const category = translatedAward.categoria;
             const difficulty = getDifficulty(cost);
             const canBuy = userPoints >= cost;
             const pointsNeeded = Math.max(0, cost - userPoints);
@@ -760,17 +774,17 @@
                         ${isRecommended ? '<span class="badge-star">⭐</span>' : ''}
                         
                         <div class="award-img-box">
-                            <img src="${escapeHtml(award.imatge)}" alt="${escapeHtml(award.nom)}" class="award-img" onerror="this.src='https://via.placeholder.com/150?text=${encodeURIComponent(award.nom)}'">
+                            <img src="${escapeHtml(award.imatge)}" alt="${escapeHtml(translatedAward.nom)}" class="award-img" onerror="this.src='https://via.placeholder.com/150?text=${encodeURIComponent(translatedAward.nom)}'">
                             <span class="category-tag"><i class="fas ${getCategoryIcon(category)}"></i></span>
                         </div>
 
                         <div class="award-content">
                             <div class="award-header">
-                                <h6 class="award-name">${escapeHtml(award.nom)}</h6>
+                                <h6 class="award-name">${escapeHtml(translatedAward.nom)}</h6>
                                 <span class="points-badge">${cost}</span>
                             </div>
 
-                            <p class="award-desc">${escapeHtml(award.descripcio || '').substring(0, 45)}...</p>
+                            <p class="award-desc">${escapeHtml(translatedAward.descripcio || '').substring(0, 45)}...</p>
 
                             <div class="award-stats">
                                 <div class="stat-item">
@@ -797,6 +811,11 @@
         // Cargar premios desde Algolia
         function loadAllAwards() {
             $('#awards-grid').html(`<div class="col-12 text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">${escapeHtml(awardsI18n.loading)}</span></div></div>`);
+
+            if (!premisIndex || typeof premisIndex.search !== 'function') {
+                $('#awards-grid').html(`<div class="col-12 text-center text-danger py-5">${escapeHtml(awardsI18n.errorLoading)}</div>`);
+                return;
+            }
 
             premisIndex.search('', { hitsPerPage: 100 }).then(({ hits }) => {
                 allAwards = hits.map(h => ({
@@ -868,7 +887,7 @@
 
                 switch(sort) {
                     case 'name':
-                        return (a.nom || '').localeCompare(b.nom || '');
+                        return (getTranslatedAward(a).nom || '').localeCompare(getTranslatedAward(b).nom || '');
                     case 'points-asc':
                         return costA - costB;
                     case 'points-desc':
@@ -966,7 +985,7 @@
                                 <div class="d-flex align-items-center mb-4">
                                     <img src="${escapeHtml(award.imatge)}" alt="" style="width: 70px; height: 70px; object-fit: cover; border-radius: 8px;" class="me-3">
                                     <div>
-                                        <h6 class="mb-1">${escapeHtml(award.nom)}</h6>
+                                        <h6 class="mb-1">${escapeHtml(getTranslatedAward(award).nom)}</h6>
                                         <span class="badge bg-success"><i class="fas fa-coins me-1"></i> ${cost} ${escapeHtml(awardsI18n.points)}</span>
                                     </div>
                                 </div>

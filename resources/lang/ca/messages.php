@@ -133,6 +133,76 @@ return [
         'no_category_opinions' => 'No hi ha opinions en aquesta categoria'
     ],
 
+    'events_ui' => [
+        'calendar_title' => 'Calendari d\'Events',
+        'details_title' => 'Detalls de l\'Event',
+        'close' => 'Tancar',
+        'register' => 'Registrar-me',
+        'today' => 'Avui',
+        'month' => 'Mes',
+        'server_response_error' => 'Error en la resposta del servidor',
+        'load_error' => 'No s\'han pogut carregar els events.',
+        'not_specified' => 'No especificat',
+        'general' => 'General',
+        'capacity' => 'Capacitat',
+        'unlimited' => 'Il·limitada',
+        'description' => 'Descripció',
+        'no_description' => 'Sense descripció',
+        'checking' => 'Verificant...',
+        'checking_registration' => 'Verificant l\'estat del registre...',
+        'event_finished' => 'Event finalitzat',
+        'event_finished_message' => 'Aquest event ja ha passat. Pots consultar-ne els detalls, però no registrar-t\'hi.',
+        'already_registered' => 'Ja estàs registrat',
+        'full_capacity' => 'Aforament complet',
+        'login_to_register' => 'Inicia sessió per registrar-te',
+        'registering' => 'Registrant...',
+        'retry_later_error' => 'Hi ha hagut un error. Torna-ho a provar més tard.',
+        'google_calendar' => 'Google Calendar',
+        'iphone_calendar' => 'Calendari iPhone (.ics)',
+        'registration_closed_past' => 'Aquest event ja ha finalitzat i no admet noves inscripcions.',
+        'registration_success_title' => 'Fantàstic!',
+        'registration_success_existing' => 'Ja formes part d\'aquest event! T\'esperem el dia :date a les :time.',
+        'registration_success_new' => 'T\'has registrat correctament a l\'event! T\'esperem el dia :date a les :time.',
+        'registration_full_title' => 'Ho sentim!',
+        'registration_full_message' => 'Aquest event ja ha arribat a la seva capacitat màxima.',
+        'registration_past_message' => 'Aquest event ja ha passat. El registre està tancat.',
+        'registration_success_flash' => 'T\'has registrat correctament a l\'event!'
+    ],
+
+    'events_db_types' => [
+        'recollida-especial' => 'Recollida Especial',
+        'tallers-educatius' => 'Tallers Educatius',
+        'campanya-informativa' => 'Campanya Informativa',
+    ],
+
+    'events_db_titles' => [
+        'recollida-de-raee-al-barri-gotic' => 'Recollida de RAEE al barri Gòtic',
+        'campanya-informativa-sobre-reciclatge-de-vidre' => 'Campanya informativa sobre reciclatge de vidre',
+        'taller-de-compostatge' => 'Taller de compostatge',
+        'jornada-de-neteja' => 'Jornada de neteja',
+        'campanya-porta-a-porta' => 'Campanya porta a porta',
+        'xerrada-sobre-residus' => 'Xerrada sobre residus',
+        'event-de-prova-28-abril' => 'Event de prova 28 abril',
+    ],
+
+    'events_db_descriptions' => [
+        'porta-els-teus-residus-electronics-i-guanya-punts' => 'Porta els teus residus electrònics i guanya punts!',
+        'descobreix-que-pots-reciclar-i-que-no' => 'Descobreix què pots reciclar i què no!',
+        'apren-a-fer-compost-a-casa' => 'Aprèn a fer compost a casa.',
+        'neteja-collectiva-d-un-espai-natural' => 'Neteja col·lectiva d’un espai natural.',
+        'informacio-sobre-reciclatge-domiciliari' => 'Informació sobre reciclatge domiciliari.',
+        'sessio-oberta-amb-torn-de-preguntes' => 'Sessió oberta amb torn de preguntes.',
+    ],
+
+    'events_db_locations' => [
+        'placa-reial-barcelona' => 'Plaça Reial, Barcelona',
+        'rambla-del-raval' => 'Rambla del Raval',
+        'centre-civic-de-cervera' => 'Centre Cívic de Cervera',
+        'riu-segre' => 'Riu Segre',
+        'barris-de-lleida' => 'Barris de Lleida',
+        'biblioteca-de-tarrega' => 'Biblioteca de Tàrrega',
+    ],
+
     // Recycling section
     'recycling' => [
         'title' => 'Cerca un producte o selecciona una fracció',

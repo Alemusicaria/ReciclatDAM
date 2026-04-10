@@ -75,7 +75,7 @@
                                     <select class="form-select" id="rol_id" name="rol_id" required>
                                         <option value="">{{ __('messages.admin.users.select_role') }}</option>
                                         @foreach(\App\Models\Rol::all() as $rol)
-                                            <option value="{{ $rol->id }}">{{ $rol->nom }}</option>
+                                            <option value="{{ $rol->id }}">{{ $rol->displayNom() }}</option>
                                         @endforeach
                                     </select>
                                 </div>

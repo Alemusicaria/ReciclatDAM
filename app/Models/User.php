@@ -74,4 +74,17 @@ class User extends Authenticatable implements CanResetPassword
         // Si por alguna razón no encuentra nivel, devuelve el nivel 1
         return \App\Models\Nivell::where('punts_requerits', 0)->first();
     }
+
+    public function isAdmin(): bool
+    {
+        $this->loadMissing('rol');
+
+        if (!$this->rol) {
+            return false;
+        }
+
+        $roleName = mb_strtolower(trim((string) $this->rol->getRawOriginal('nom')));
+
+        return in_array($roleName, ['admin', 'administrador'], true);
+    }
 }

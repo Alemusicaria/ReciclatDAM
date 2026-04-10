@@ -43,7 +43,7 @@ class AdminAuthorizationTest extends TestCase
 
     private function createRegularUser(string $prefix = 'Usuari'): User
     {
-        $rol = Rol::find(2) ?? Rol::create(['id' => 2, 'nom' => 'usuari']);
+        $rol = Rol::query()->firstOrCreate(['nom' => 'usuari']);
         $nivell = Nivell::find(1) ?? Nivell::create([
             'id' => 1,
             'nom' => 'Inicial',

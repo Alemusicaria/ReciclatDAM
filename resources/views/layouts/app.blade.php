@@ -147,7 +147,7 @@
                                 <span>{{ Auth::user()->nom }} ({{ Auth::user()->punts_actuals }} ECODAMS)</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                @if(Auth::user()->rol_id == 1)
+                                @if(Auth::user()->isAdmin())
                                     <li>
                                         <a class="dropdown-item" href="{{ url('/admin') }}">
                                             <i class="fas fa-cogs me-1"></i> {{ __('messages.admin.dashboard.title') }}
@@ -192,12 +192,12 @@
     <div class="fixed-bottom-right">
         <div class="dropdown">
             <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="settingsDropdown"
-                aria-expanded="false">
+                aria-expanded="false" aria-label="Settings" title="Settings">
                 <i class="fas fa-cog"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end" id="settingsDropdownMenu" aria-labelledby="settingsDropdown">
                 <li>
-                    <button id="theme-toggle" class="dropdown-item">
+                    <button id="theme-toggle" class="dropdown-item" aria-pressed="false" aria-label="{{ __('Toggle Theme') }}">
                         <i id="theme-icon" class="fas"></i> {{ __('Toggle Theme') }}
                     </button>
                 </li>
@@ -244,15 +244,77 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/algoliasearch@4.17.2/dist/algoliasearch-lite.umd.js"></script>
 
+    @php
+        $catalogTranslations = [
+            'products' => \App\Models\Producte::all()->mapWithKeys(function ($producte) {
+                return [(string) $producte->id => [
+                    'nom' => $producte->displayNom(),
+                    'categoria' => $producte->displayCategoria(),
+                ]];
+            })->all(),
+            'premis' => \App\Models\Premi::all()->mapWithKeys(function ($premi) {
+                return [(string) $premi->id => [
+                    'nom' => $premi->displayNom(),
+                    'descripcio' => $premi->displayDescripcio(),
+                    'categoria' => $premi->displayCategoria(),
+                ]];
+            })->all(),
+            'punts' => \App\Models\PuntDeRecollida::all()->mapWithKeys(function ($punt) {
+                return [(string) $punt->id => [
+                    'nom' => $punt->displayNom(),
+                    'fraccio' => $punt->displayFraccio(),
+                ]];
+            })->all(),
+            'nivells' => \App\Models\Nivell::all()->mapWithKeys(function ($nivell) {
+                return [(string) $nivell->id => [
+                    'nom' => $nivell->displayNom(),
+                    'descripcio' => $nivell->displayDescripcio(),
+                ]];
+            })->all(),
+            'rols' => \App\Models\Rol::all()->mapWithKeys(function ($rol) {
+                return [(string) $rol->id => [
+                    'nom' => $rol->displayNom(),
+                ]];
+            })->all(),
+            'tipus_alertes' => \App\Models\TipusAlerta::all()->mapWithKeys(function ($tipusAlerta) {
+                return [(string) $tipusAlerta->id => [
+                    'nom' => $tipusAlerta->displayNom(),
+                ]];
+            })->all(),
+        ];
+    @endphp
+
     <!-- Scripts específicos para la sección de administración -->
     @if(Request::is('admin*') || Request::is('*/admin*'))
         <script src="{{ asset('js/admin.js') }}"></script>
     @endif
 
     <script>
+        const createFallbackIndex = () => ({
+            search: async () => ({ hits: [] })
+        });
+
+        const ensureFallbackIndexes = () => {
+            window.productIndex = window.productIndex || createFallbackIndex();
+            window.puntsIndex = window.puntsIndex || createFallbackIndex();
+            window.opinionsIndex = window.opinionsIndex || createFallbackIndex();
+            window.premisIndex = window.premisIndex || createFallbackIndex();
+            window.eventsIndex = window.eventsIndex || createFallbackIndex();
+            window.tipusEventsIndex = window.tipusEventsIndex || createFallbackIndex();
+            window.codisIndex = window.codisIndex || createFallbackIndex();
+            window.catalogTranslations = window.catalogTranslations || @json($catalogTranslations);
+        };
+
         // Inicializar cliente Algolia primero
         try {
-            window.algoliaClient = algoliasearch("4JU9PG98CF", "d37ffd358dca40447584fb2ffdc28e03", {
+            const algoliaAppId = @json(config('services.algolia.app_id'));
+            const algoliaSearchKey = @json(config('services.algolia.search_key'));
+
+            if (!algoliaAppId || !algoliaSearchKey) {
+                throw new Error('Missing Algolia client configuration');
+            }
+
+            window.algoliaClient = algoliasearch(algoliaAppId, algoliaSearchKey, {
                 _useRequestCache: true,
                 logLevel: 'error'
             });
@@ -265,6 +327,7 @@
             window.eventsIndex = window.algoliaClient.initIndex('events');
             window.tipusEventsIndex = window.algoliaClient.initIndex('tipus_events');
             window.codisIndex = window.algoliaClient.initIndex('codis');
+            window.catalogTranslations = @json($catalogTranslations);
 
             // Señal de que Algolia está listo
             window.algoliaReady = true;
@@ -273,24 +336,11 @@
             document.dispatchEvent(new Event('algoliaReady'));
         } catch (e) {
             console.error("Error inicializando Algolia:", e);
+            ensureFallbackIndexes();
             window.algoliaReady = false;
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            function cleanupOrphanModalBackdrops() {
-                const hasVisibleModal = document.querySelector('.modal.show') !== null;
-
-                if (!hasVisibleModal) {
-                    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-                    document.body.classList.remove('modal-open');
-                    document.body.style.removeProperty('padding-right');
-                    document.body.style.removeProperty('overflow');
-                }
-            }
-
-            // Clean once on load in case a stale backdrop remained after navigation.
-            cleanupOrphanModalBackdrops();
-
             const settingsDropdownTrigger = document.getElementById('settingsDropdown');
             const settingsDropdownMenu = document.getElementById('settingsDropdownMenu');
 
@@ -354,6 +404,9 @@
                 navElement.classList.add(currentTheme);
             }
             updateThemeIcon(currentTheme);
+            if (themeToggle) {
+                themeToggle.setAttribute('aria-pressed', (currentTheme === 'dark').toString());
+            }
 
             // Actualizar imágenes de tiendas según el tema
             const appleStoreImg = document.getElementById('apple-store');
@@ -375,20 +428,23 @@
             updateImagesBasedOnTheme();
 
             // Cambio de tema
-            themeToggle.addEventListener('click', function () {
-                const isDarkMode = document.body.classList.contains('dark');
-                const newTheme = isDarkMode ? 'light' : 'dark';
-                document.body.classList.remove('light', 'dark');
-                document.body.classList.add(newTheme);
-                if (navElement) {
-                    navElement.classList.remove('light', 'dark');
-                    navElement.classList.add(newTheme);
-                }
-                localStorage.setItem('theme', newTheme);
-                updateImagesBasedOnTheme();
-                updateThemeIcon(newTheme);
-                applyActiveStyles(); // Actualizar estilos activos cuando cambia el tema
-            });
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function () {
+                    const isDarkMode = document.body.classList.contains('dark');
+                    const newTheme = isDarkMode ? 'light' : 'dark';
+                    document.body.classList.remove('light', 'dark');
+                    document.body.classList.add(newTheme);
+                    if (navElement) {
+                        navElement.classList.remove('light', 'dark');
+                        navElement.classList.add(newTheme);
+                    }
+                    localStorage.setItem('theme', newTheme);
+                    updateImagesBasedOnTheme();
+                    updateThemeIcon(newTheme);
+                    themeToggle.setAttribute('aria-pressed', (newTheme === 'dark').toString());
+                    applyActiveStyles(); // Actualizar estilos activos cuando cambia el tema
+                });
+            }
 
             // Manejo de enlace activo en la navegación
             function applyActiveStyles() {
@@ -613,36 +669,7 @@
                     }, 500);
                 }
             }
-            function cleanupModalBackdrops() {
-                // Eliminar todos los backdrops
-                document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
-                    backdrop.remove();
-                });
-
-                // Restaurar el estado del body
-                document.body.classList.remove('modal-open');
-                document.body.style.overflow = '';
-                document.body.style.paddingRight = '';
-
-            }
-
-            // Limpiar backdrops cuando se cierra cualquier modal
-            document.addEventListener('hidden.bs.modal', function (event) {
-                setTimeout(cleanupModalBackdrops, 100);
-            });
-
-            // Añadir función a window para llamarla desde la consola en caso de emergencia
-            window.fixModals = cleanupModalBackdrops;
-
-            // Ejecutar limpieza al cargar la página (por si hay residuos)
-            document.addEventListener('DOMContentLoaded', cleanupModalBackdrops);
-
-            // Añadir manejador de tecla Escape para limpiar modales
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape') {
-                    setTimeout(cleanupModalBackdrops, 100);
-                }
-            });
+            // Bootstrap gestiona los backdrops de los modales de forma nativa.
             // Aplicar estilos iniciales
             applyActiveStyles();
 

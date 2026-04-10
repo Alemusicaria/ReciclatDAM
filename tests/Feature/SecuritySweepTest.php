@@ -105,10 +105,9 @@ class SecuritySweepTest extends TestCase
             'rol_id' => 1,
         ]);
 
-        if ($response->ok()) {
-            $user->refresh();
-            $this->assertNotEquals(1, $user->rol_id, 'Non-admin user should not be able to change role to admin.');
-        }
+        $response->assertStatus(422);
+        $user->refresh();
+        $this->assertFalse($user->isAdmin(), 'Non-admin user should not be able to change role to admin.');
     }
 
     public function test_login_brute_force_is_throttled(): void
@@ -195,7 +194,7 @@ class SecuritySweepTest extends TestCase
 
     private function createAdminUser(): User
     {
-        $rol = Rol::find(1) ?? Rol::create(['id' => 1, 'nom' => 'admin']);
+        $rol = Rol::query()->firstOrCreate(['nom' => 'admin']);
         $nivell = Nivell::find(1) ?? Nivell::create([
             'id' => 1,
             'nom' => 'Inicial',
@@ -220,7 +219,7 @@ class SecuritySweepTest extends TestCase
 
     private function createRegularUser(string $prefix = 'User'): User
     {
-        $rol = Rol::find(2) ?? Rol::create(['id' => 2, 'nom' => 'usuari']);
+        $rol = Rol::query()->firstOrCreate(['nom' => 'usuari']);
         $nivell = Nivell::find(1) ?? Nivell::create([
             'id' => 1,
             'nom' => 'Inicial',

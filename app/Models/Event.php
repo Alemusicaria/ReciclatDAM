@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\AutoTranslator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
@@ -93,5 +94,25 @@ class Event extends Model
     public function producte()
     {
         return $this->belongsTo(Producte::class, 'producte_id');
+    }
+
+    public function displayNom(): string
+    {
+        return AutoTranslator::translate($this->getRawOriginal('nom'), 'events_db_titles') ?? $this->getRawOriginal('nom');
+    }
+
+    public function displayDescripcio(): ?string
+    {
+        return AutoTranslator::translate($this->getRawOriginal('descripcio'), 'events_db_descriptions') ?? $this->getRawOriginal('descripcio');
+    }
+
+    public function displayLloc(): ?string
+    {
+        return AutoTranslator::translate($this->getRawOriginal('lloc'), 'events_db_locations') ?? $this->getRawOriginal('lloc');
+    }
+
+    public function displayTipusNom(): ?string
+    {
+        return $this->tipus ? $this->tipus->displayNom() : null;
     }
 }

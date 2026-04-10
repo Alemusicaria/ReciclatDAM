@@ -6,74 +6,6 @@
     padding-bottom: 110px;
 }
 
-.profile-summary-footer {
-    position: fixed;
-    left: 50%;
-    bottom: 12px;
-    transform: translateX(-50%);
-    width: min(1100px, calc(100% - 24px));
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(6px);
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 14px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    z-index: 1040;
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 8px;
-    padding: 10px 14px;
-}
-
-.profile-summary-footer__item {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-}
-
-.profile-summary-footer__label {
-    font-size: 0.72rem;
-    color: #5f6b7a;
-    white-space: nowrap;
-}
-
-.profile-summary-footer__value {
-    font-size: 0.92rem;
-    font-weight: 700;
-    color: #1f2a37;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.profile-summary-footer__item--meta .profile-summary-footer__value {
-    font-size: 0.82rem;
-}
-
-body.dark .profile-summary-footer {
-    background: rgba(31, 41, 55, 0.94);
-    border-color: rgba(255, 255, 255, 0.12);
-}
-
-body.dark .profile-summary-footer__label {
-    color: #9ca3af;
-}
-
-body.dark .profile-summary-footer__value {
-    color: #f3f4f6;
-}
-
-@media (max-width: 991.98px) {
-    .profile-summary-footer {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        bottom: 8px;
-        padding: 10px;
-    }
-
-    .profile-container {
-        padding-bottom: 170px;
-    }
-}
-
 .stats-card {
     border-radius: 15px;
     overflow: hidden;
@@ -587,6 +519,15 @@ body.dark .progress {
 }
 
 /* Estilos modo oscuro para el perfil de usuario */
+
+#deleteModal.modal {
+    z-index: 1060 !important;
+}
+
+#deleteModal + .modal-backdrop,
+.modal-backdrop.show {
+    z-index: 1055 !important;
+}
 
 /* Fondo y colores base */
 body.dark {

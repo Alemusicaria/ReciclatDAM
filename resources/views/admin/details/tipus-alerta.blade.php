@@ -9,7 +9,7 @@
                         </div>
                     </div>
                     <div>
-                        <h2 class="detail-name mb-1">{{ $tipusAlerta->nom }}</h2>
+                        <h2 class="detail-name mb-1">{{ $tipusAlerta->displayNom() }}</h2>
                         <div class="detail-date">
                             <i class="fas fa-calendar-day text-muted me-2"></i>
                             <span class="text-muted">{{ __('messages.admin.tipus_alertes.created_on') }} {{ $tipusAlerta->created_at->format('d/m/Y H:i') }}</span>

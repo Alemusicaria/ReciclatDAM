@@ -133,6 +133,76 @@ return [
         'no_category_opinions' => 'No hay opiniones en esta categoría'
     ],
 
+    'events_ui' => [
+        'calendar_title' => 'Calendario de Eventos',
+        'details_title' => 'Detalles del Evento',
+        'close' => 'Cerrar',
+        'register' => 'Registrarme',
+        'today' => 'Hoy',
+        'month' => 'Mes',
+        'server_response_error' => 'Error en la respuesta del servidor',
+        'load_error' => 'No se han podido cargar los eventos.',
+        'not_specified' => 'No especificado',
+        'general' => 'General',
+        'capacity' => 'Capacidad',
+        'unlimited' => 'Sin límite',
+        'description' => 'Descripción',
+        'no_description' => 'Sin descripción',
+        'checking' => 'Comprobando...',
+        'checking_registration' => 'Comprobando el estado del registro...',
+        'event_finished' => 'Evento finalizado',
+        'event_finished_message' => 'Este evento ya ha pasado. Puedes consultar los detalles, pero no registrarte.',
+        'already_registered' => 'Ya estás registrado',
+        'full_capacity' => 'Aforo completo',
+        'login_to_register' => 'Inicia sesión para registrarte',
+        'registering' => 'Registrando...',
+        'retry_later_error' => 'Ha ocurrido un error. Inténtalo de nuevo más tarde.',
+        'google_calendar' => 'Google Calendar',
+        'iphone_calendar' => 'Calendario iPhone (.ics)',
+        'registration_closed_past' => 'Este evento ya ha finalizado y no admite nuevas inscripciones.',
+        'registration_success_title' => '¡Fantástico!',
+        'registration_success_existing' => 'Ya formas parte de este evento. Te esperamos el día :date a las :time.',
+        'registration_success_new' => 'Te has registrado correctamente en el evento. Te esperamos el día :date a las :time.',
+        'registration_full_title' => 'Lo sentimos',
+        'registration_full_message' => 'Este evento ya ha alcanzado su capacidad máxima.',
+        'registration_past_message' => 'Este evento ya ha pasado. El registro está cerrado.',
+        'registration_success_flash' => 'Te has registrado correctamente en el evento.'
+    ],
+
+    'events_db_types' => [
+        'recollida-especial' => 'Recogida Especial',
+        'tallers-educatius' => 'Talleres Educativos',
+        'campanya-informativa' => 'Campaña Informativa',
+    ],
+
+    'events_db_titles' => [
+        'recollida-de-raee-al-barri-gotic' => 'Recogida de RAEE en el barrio Gótico',
+        'campanya-informativa-sobre-reciclatge-de-vidre' => 'Campaña informativa sobre reciclaje de vidrio',
+        'taller-de-compostatge' => 'Taller de compostaje',
+        'jornada-de-neteja' => 'Jornada de limpieza',
+        'campanya-porta-a-porta' => 'Campaña puerta a puerta',
+        'xerrada-sobre-residus' => 'Charla sobre residuos',
+        'event-de-prova-28-abril' => 'Evento de prueba 28 abril',
+    ],
+
+    'events_db_descriptions' => [
+        'porta-els-teus-residus-electronics-i-guanya-punts' => 'Trae tus residuos electrónicos y gana puntos.',
+        'descobreix-que-pots-reciclar-i-que-no' => 'Descubre qué puedes reciclar y qué no.',
+        'apren-a-fer-compost-a-casa' => 'Aprende a hacer compost en casa.',
+        'neteja-collectiva-d-un-espai-natural' => 'Limpieza colectiva de un espacio natural.',
+        'informacio-sobre-reciclatge-domiciliari' => 'Información sobre reciclaje domiciliario.',
+        'sessio-oberta-amb-torn-de-preguntes' => 'Sesión abierta con turno de preguntas.',
+    ],
+
+    'events_db_locations' => [
+        'placa-reial-barcelona' => 'Plaza Real, Barcelona',
+        'rambla-del-raval' => 'Rambla del Raval',
+        'centre-civic-de-cervera' => 'Centro Cívico de Cervera',
+        'riu-segre' => 'Río Segre',
+        'barris-de-lleida' => 'Barrios de Lleida',
+        'biblioteca-de-tarrega' => 'Biblioteca de Tàrrega',
+    ],
+
     // Recycling section
     'recycling' => [
         'title' => 'Busca un producto o selecciona una fracción',

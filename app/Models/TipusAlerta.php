@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\AutoTranslator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
@@ -15,6 +16,11 @@ class TipusAlerta extends Model
     protected $fillable = [
         'nom',
     ];
+
+    public function displayNom(): string
+    {
+        return AutoTranslator::translate($this->getRawOriginal('nom'), 'alert_types_db_names') ?? $this->getRawOriginal('nom');
+    }
 
     /**
      * Configura els camps que es sincronitzaran amb Algolia.

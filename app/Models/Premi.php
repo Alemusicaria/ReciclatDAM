@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Support\AutoTranslator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
+use Illuminate\Support\Str;
 
 class Premi extends Model
 {
@@ -23,6 +25,38 @@ class Premi extends Model
         'temps_enviament',
         'rating'
     ];
+
+    public function displayNom(): string
+    {
+        return AutoTranslator::translate($this->getRawOriginal('nom'), 'prizes_db_names') ?? $this->getRawOriginal('nom');
+    }
+
+    public function displayDescripcio(): ?string
+    {
+        return AutoTranslator::translate($this->getRawOriginal('descripcio'), 'prizes_db_descriptions') ?? $this->getRawOriginal('descripcio');
+    }
+
+    public function displayCategoria(): string
+    {
+        $categoria = (string) ($this->getRawOriginal('categoria') ?? '');
+        $key = $this->categoryTranslationKey($categoria);
+
+        return $key ? __('messages.awards_ui.category_' . $key) : $categoria;
+    }
+
+    private function categoryTranslationKey(string $categoria): ?string
+    {
+        $normalized = Str::slug(Str::ascii($categoria));
+
+        return match ($normalized) {
+            'electr-nica', 'electronics', 'electronic' => 'electronics',
+            'transport' => 'transport',
+            'accessoris', 'accessories' => 'accessories',
+            'esports', 'sports' => 'sports',
+            'casa', 'home' => 'home',
+            default => null,
+        };
+    }
 
     /**
      * Configura els camps que es sincronitzaran amb Algolia.

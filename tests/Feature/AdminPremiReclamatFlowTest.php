@@ -140,7 +140,7 @@ class AdminPremiReclamatFlowTest extends TestCase
 
     private function createAdminUser(): User
     {
-        $rol = Rol::query()->firstOrCreate(['id' => 1], ['nom' => 'admin']);
+        $rol = Rol::query()->firstOrCreate(['nom' => 'admin']);
         $nivell = Nivell::query()->firstOrCreate(
             ['id' => 1],
             [
@@ -187,7 +187,7 @@ class AdminPremiReclamatFlowTest extends TestCase
 
     private function createRegularUser(): User
     {
-        $rol = Rol::query()->firstOrCreate(['id' => 2], ['nom' => 'usuari']);
+        $rol = Rol::query()->firstOrCreate(['nom' => 'usuari']);
         $nivell = Nivell::query()->firstOrCreate(
             ['id' => 1],
             [

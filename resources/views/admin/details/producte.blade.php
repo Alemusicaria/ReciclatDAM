@@ -14,16 +14,16 @@
                         @endif
                     </div>
                     <div>
-                        <h2 class="detail-name mb-1">{{ $producte->nom }}</h2>
+                        <h2 class="detail-name mb-1">{{ $producte->displayNom() }}</h2>
                         <div class="producte-category mb-2">
                             <span class="badge bg-primary py-1 px-2">
-                                <i class="fas fa-tag me-1"></i>{{ $producte->categoria }}
+                                <i class="fas fa-tag me-1"></i>{{ $producte->displayCategoria() }}
                             </span>
                         </div>
                         <div class="product-info mt-3">
                             <div class="text-muted">
                                 <i class="fas fa-info-circle me-2"></i>
-                                {{ __('messages.admin.products.category_description', ['category' => $producte->categoria]) }}
+                                {{ __('messages.admin.products.category_description', ['category' => $producte->displayCategoria()]) }}
                             </div>
                         </div>
                     </div>

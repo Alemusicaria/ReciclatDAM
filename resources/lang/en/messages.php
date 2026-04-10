@@ -133,6 +133,76 @@ return [
         'no_category_opinions' => 'No opinions in this category'
     ],
 
+    'events_ui' => [
+        'calendar_title' => 'Events Calendar',
+        'details_title' => 'Event Details',
+        'close' => 'Close',
+        'register' => 'Register',
+        'today' => 'Today',
+        'month' => 'Month',
+        'server_response_error' => 'Error in server response',
+        'load_error' => 'Could not load events.',
+        'not_specified' => 'Not specified',
+        'general' => 'General',
+        'capacity' => 'Capacity',
+        'unlimited' => 'Unlimited',
+        'description' => 'Description',
+        'no_description' => 'No description',
+        'checking' => 'Checking...',
+        'checking_registration' => 'Checking registration status...',
+        'event_finished' => 'Event finished',
+        'event_finished_message' => 'This event has already ended. You can view details, but registration is closed.',
+        'already_registered' => 'You are already registered',
+        'full_capacity' => 'Fully booked',
+        'login_to_register' => 'Sign in to register',
+        'registering' => 'Registering...',
+        'retry_later_error' => 'An error occurred. Please try again later.',
+        'google_calendar' => 'Google Calendar',
+        'iphone_calendar' => 'iPhone Calendar (.ics)',
+        'registration_closed_past' => 'This event has already ended and does not accept new registrations.',
+        'registration_success_title' => 'Great!',
+        'registration_success_existing' => 'You are already part of this event. See you on :date at :time.',
+        'registration_success_new' => 'You have successfully registered for the event. See you on :date at :time.',
+        'registration_full_title' => 'Sorry',
+        'registration_full_message' => 'This event has already reached its maximum capacity.',
+        'registration_past_message' => 'This event has already taken place. Registration is closed.',
+        'registration_success_flash' => 'You have successfully registered for the event.'
+    ],
+
+    'events_db_types' => [
+        'recollida-especial' => 'Special Collection',
+        'tallers-educatius' => 'Educational Workshops',
+        'campanya-informativa' => 'Information Campaign',
+    ],
+
+    'events_db_titles' => [
+        'recollida-de-raee-al-barri-gotic' => 'WEEE collection in the Gothic Quarter',
+        'campanya-informativa-sobre-reciclatge-de-vidre' => 'Information campaign about glass recycling',
+        'taller-de-compostatge' => 'Composting workshop',
+        'jornada-de-neteja' => 'Clean-up day',
+        'campanya-porta-a-porta' => 'Door-to-door campaign',
+        'xerrada-sobre-residus' => 'Talk about waste',
+        'event-de-prova-28-abril' => 'Test event 28 April',
+    ],
+
+    'events_db_descriptions' => [
+        'porta-els-teus-residus-electronics-i-guanya-punts' => 'Bring your electronic waste and earn points!',
+        'descobreix-que-pots-reciclar-i-que-no' => 'Discover what you can recycle and what you cannot.',
+        'apren-a-fer-compost-a-casa' => 'Learn how to make compost at home.',
+        'neteja-collectiva-d-un-espai-natural' => 'Community clean-up of a natural area.',
+        'informacio-sobre-reciclatge-domiciliari' => 'Information about household recycling.',
+        'sessio-oberta-amb-torn-de-preguntes' => 'Open session with Q&A.',
+    ],
+
+    'events_db_locations' => [
+        'placa-reial-barcelona' => 'Placa Reial, Barcelona',
+        'rambla-del-raval' => 'Rambla del Raval',
+        'centre-civic-de-cervera' => 'Cervera Civic Center',
+        'riu-segre' => 'Segre River',
+        'barris-de-lleida' => 'Lleida Neighborhoods',
+        'biblioteca-de-tarrega' => 'Tarrega Library',
+    ],
+
     // Recycling section
     'recycling' => [
         'title' => 'Search for a product or select a fraction',

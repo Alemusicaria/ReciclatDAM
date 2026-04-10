@@ -40,7 +40,7 @@
         <p class="text-muted mb-3">{{ $user->email }}</p>
 
         @if($user->rol)
-            <span class="badge bg-success mb-3">{{ $user->rol->nom ?? 'N/A' }}</span>
+            <span class="badge bg-success mb-3">{{ $user->rol?->displayNom() ?? 'N/A' }}</span>
         @endif
 
         <!-- ECODAMS Points Display -->

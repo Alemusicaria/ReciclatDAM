@@ -17,7 +17,8 @@
         "laravel/socialite": "^5.18",
         "laravel/tinker": "^2.10.1",
         "mcamara/laravel-localization": "^2.3",
-        "silviolleite/laravelpwa": "^2.0"
+        "silviolleite/laravelpwa": "^2.0",
+        "stichoza/google-translate-php": "5.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

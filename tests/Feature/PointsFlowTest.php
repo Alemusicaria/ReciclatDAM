@@ -56,7 +56,7 @@ class PointsFlowTest extends TestCase
 
     private function createUserWithPoints(int $points): User
     {
-        $rol = Rol::query()->firstOrCreate(['id' => 2], ['nom' => 'usuari']);
+        $rol = Rol::query()->firstOrCreate(['nom' => 'usuari']);
         $nivell = Nivell::query()->firstOrCreate(
             ['id' => 1],
             [

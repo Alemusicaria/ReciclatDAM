@@ -16,7 +16,12 @@ class TipusEventController extends Controller
     {
         $query = $request->input('query');
         
-        $results = TipusEvent::search($query)->get();
+        $results = TipusEvent::search($query)->get()->map(function (TipusEvent $tipusEvent) {
+            $tipusEvent->setAttribute('nom', $tipusEvent->displayNom());
+            $tipusEvent->setAttribute('descripcio', $tipusEvent->displayDescripcio());
+
+            return $tipusEvent;
+        });
         
         return response()->json($results);
     }

@@ -9,10 +9,10 @@
                         </div>
                     </div>
                     <div>
-                        <h2 class="detail-name mb-1">{{ $punt->nom }}</h2>
+                        <h2 class="detail-name mb-1">{{ $punt->displayNom() }}</h2>
                         <div class="punt-fraccio mb-2">
                             <span class="badge fraccio-badge punto-{{ strtolower(str_replace(' ', '-', $punt->fraccio)) }}">
-                                <i class="fas fa-tag me-1"></i>{{ $punt->fraccio }}
+                                <i class="fas fa-tag me-1"></i>{{ $punt->displayFraccio() }}
                             </span>
                             
                             @if($punt->disponible)
@@ -30,8 +30,11 @@
             </div>
             <div class="col-md-4 text-md-end mt-3 mt-md-0">
                 <div class="map-thumbnail">
-                    <img src="https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-l+f74e4e({{ $punt->longitud }},{{ $punt->latitud }})/{{ $punt->longitud }},{{ $punt->latitud }},15,0/300x200?access_token=pk.eyJ1IjoibGF1dG9yaW5vIiwiYSI6ImNscDg0cGZmeTBreGsyaW1ubzJxeGpkdmgifQ.S3sLvRUHOE3p4JKdTLnU2A" 
-                         class="img-fluid rounded shadow-sm" alt="{{ __('messages.admin.collection_points.map') }}">
+                    @php($mapboxAccessToken = config('services.mapbox.access_token'))
+                    @if($mapboxAccessToken)
+                        <img src="https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-l+f74e4e({{ $punt->longitud }},{{ $punt->latitud }})/{{ $punt->longitud }},{{ $punt->latitud }},15,0/300x200?access_token={{ urlencode($mapboxAccessToken) }}"
+                             class="img-fluid rounded shadow-sm" alt="{{ __('messages.admin.collection_points.map') }}">
+                    @endif
                 </div>
             </div>
         </div>

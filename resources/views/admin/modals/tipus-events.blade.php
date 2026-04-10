@@ -27,7 +27,7 @@
                                 style="background-color: {{ $tipus->color }}">
                                 <i class="fas fa-calendar-day text-white"></i>
                             </div>
-                            <span>{{ $tipus->nom }}</span>
+                            <span>{{ $tipus->displayNom() }}</span>
                         </div>
                     </td>
                     <td>
@@ -52,7 +52,7 @@
                             </button>
                             <button class="btn btn-danger btn-sm deleteBtn" 
                                 data-item-id="{{ $tipus->id }}" 
-                                data-item-name="{{ $tipus->nom }}"
+                                data-item-name="{{ $tipus->displayNom() }}"
                                 data-item-type="tipus-event"
                                 @if($tipus->events()->count() > 0) disabled @endif
                                 title="@if($tipus->events()->count() > 0) {{ __('messages.admin.tipus_events.cannot_delete') }} @else {{ __('messages.admin.common.delete') }} @endif">

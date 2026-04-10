@@ -1,5 +1,5 @@
 /**
- * Scripts para el panel de administración
+ * Scripts para el panel de administracion
  */
 const parseJsonResponse = async (response) => {
     const payload = await response.json().catch(() => null);
@@ -11,19 +11,51 @@ const parseJsonResponse = async (response) => {
 
     return payload;
 };
+
+const escapeHtml = (unsafe) => {
+    const div = document.createElement('div');
+    div.textContent = String(unsafe ?? '');
+    return div.innerHTML;
+};
+
+const sanitizeHtml = (html) => {
+    const template = document.createElement('template');
+    template.innerHTML = String(html ?? '');
+
+    template.content.querySelectorAll('script, iframe, object, embed').forEach((node) => node.remove());
+
+    template.content.querySelectorAll('*').forEach((el) => {
+        [...el.attributes].forEach((attr) => {
+            const name = attr.name.toLowerCase();
+            const value = (attr.value || '').toLowerCase().trim();
+
+            if (name.startsWith('on') || value.startsWith('javascript:')) {
+                el.removeAttribute(attr.name);
+            }
+        });
+    });
+
+    return template.innerHTML;
+};
+
+const t = (path, fallback) => {
+    const value = path.split('.').reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), window.translations);
+    return value ?? fallback;
+};
+
 const AdminDashboard = {
     /**
-     * Objeto para gestiÃ³n de cÃ³digos
+     * Objeto para gestion de codigos
      */
     Codis: {
         init: function () {
-            // Inicializar el generador de cÃ³digos
+            // Inicializar el generador de codigos
             const generateBtn = document.getElementById('generateCode');
             if (generateBtn) {
                 generateBtn.addEventListener('click', this.generateRandomCode);
             }
 
-            // Control de tipo de cÃ³digo (Ãºnico/mÃºltiple)
+            // Control de tipo de codigo (unico/multiple)
             const tipusUnic = document.getElementById('tipus_unic');
             const tipusMulti = document.getElementById('tipus_multi');
             const multiUsesContainer = document.getElementById('multiUsesContainer');
@@ -63,7 +95,7 @@ const AdminDashboard = {
     },
 
     /**
-     * Objeto para gestiÃ³n de eventos
+     * Objeto para gestian de eventos
      */
     Events: {
         init: function () {
@@ -73,7 +105,7 @@ const AdminDashboard = {
                 form.addEventListener('submit', function (e) {
                     e.preventDefault();
 
-                    // ValidaciÃ³n bÃ¡sica
+                    // Validacian basica
                     let isValid = true;
                     form.querySelectorAll('[required]').forEach(input => {
                         if (!input.value.trim()) {
@@ -121,7 +153,7 @@ const AdminDashboard = {
                                     }
                                 }, 500);
                             } else {
-                                // Restaurar botÃ³n
+                                // Restaurar botan
                                 submitBtn.disabled = false;
                                 submitBtn.innerHTML = 'Guardar Event';
 
@@ -132,7 +164,7 @@ const AdminDashboard = {
                         .catch(error => {
                             console.error('Error:', error);
 
-                            // Restaurar botÃ³n
+                            // Restaurar botan
                             submitBtn.disabled = false;
                             submitBtn.innerHTML = 'Guardar Event';
 
@@ -142,7 +174,7 @@ const AdminDashboard = {
                 });
             }
 
-            // InicializaciÃ³n de fechas
+            // Inicializacian de fechas
             const dataInici = document.getElementById('data_inici');
             const dataFi = document.getElementById('data_fi');
             if (dataInici && dataFi) {
@@ -151,13 +183,13 @@ const AdminDashboard = {
                 const todayStr = today.toISOString().slice(0, 16);
                 dataInici.value = todayStr;
 
-                // Establecer fecha final como maÃ±ana
+                // Establecer fecha final como maaana
                 const tomorrow = new Date();
                 tomorrow.setDate(tomorrow.getDate() + 1);
                 const tomorrowStr = tomorrow.toISOString().slice(0, 16);
                 dataFi.value = tomorrowStr;
 
-                // ValidaciÃ³n de fechas
+                // Validacian de fechas
                 dataInici.addEventListener('change', function () {
                     if (dataFi.value && this.value > dataFi.value) {
                         dataFi.value = this.value;
@@ -174,7 +206,7 @@ const AdminDashboard = {
         }
     },
     /**
- * Objeto para gestiÃ³n de premios
+ * Objeto para gestian de premios
  */
     Premis: {
         init: function () {
@@ -184,7 +216,7 @@ const AdminDashboard = {
                 form.addEventListener('submit', function (e) {
                     e.preventDefault();
 
-                    // ValidaciÃ³n bÃ¡sica
+                    // Validacian basica
                     let isValid = true;
                     form.querySelectorAll('[required]').forEach(input => {
                         if (!input.value.trim()) {
@@ -201,7 +233,7 @@ const AdminDashboard = {
                     const submitBtn = document.getElementById('submitCreatePremiForm');
                     submitBtn.disabled = true;
                     submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ' +
-                        (window.translations?.admin?.premis?.saving || 'Guardant...');
+                        t('admin.premis.saving', 'Guardant...');
 
                     // Enviar formulario via AJAX
                     const formData = new FormData(form);
@@ -234,9 +266,9 @@ const AdminDashboard = {
                                     else window.location.reload();
                                 }, 300);
                             } else {
-                                // Restaurar botÃ³n
+                                // Restaurar botan
                                 submitBtn.disabled = false;
-                                submitBtn.innerHTML = window.translations?.admin?.premis?.save_button || 'Guardar Premi';
+                                submitBtn.innerHTML = t('admin.premis.save_button', 'Guardar Premi');
 
                                 // Mostrar error
                                 alert('Error: ' + (data.message || 'No s\'ha pogut crear el premi'));
@@ -245,9 +277,9 @@ const AdminDashboard = {
                         .catch(error => {
                             console.error('Error:', error);
 
-                            // Restaurar botÃ³n
+                            // Restaurar botan
                             submitBtn.disabled = false;
-                            submitBtn.innerHTML = window.translations?.admin?.premis?.save_button || 'Guardar Premi';
+                            submitBtn.innerHTML = t('admin.premis.save_button', 'Guardar Premi');
 
                             // Mostrar error
                             alert('Error al crear el premi: ' + error.message);
@@ -257,7 +289,7 @@ const AdminDashboard = {
         }
     },
     /**
-     * Objeto para gestiÃ³n de productos
+     * Objeto para gestian de productos
      */
     Productes: {
         init: function () {
@@ -266,7 +298,7 @@ const AdminDashboard = {
                 form.addEventListener('submit', function (e) {
                     e.preventDefault();
 
-                    // ValidaciÃ³n bÃ¡sica
+                    // Validacian basica
                     let isValid = true;
                     form.querySelectorAll('[required]').forEach(input => {
                         if (!input.value.trim()) {
@@ -333,7 +365,7 @@ const AdminDashboard = {
     },
 
     /**
-     * Objeto para gestiÃ³n de puntos de reciclaje
+     * Objeto para gestian de puntos de reciclaje
      */
     PuntsReciclatge: {
         init: function () {
@@ -342,7 +374,7 @@ const AdminDashboard = {
                 form.addEventListener('submit', function (e) {
                     e.preventDefault();
 
-                    // ValidaciÃ³n bÃ¡sica
+                    // Validacian basica
                     let isValid = true;
                     form.querySelectorAll('[required]').forEach(input => {
                         if (!input.value.trim()) {
@@ -409,7 +441,7 @@ const AdminDashboard = {
     },
 
     /**
-     * Objeto para gestiÃ³n de tipos de alertas
+     * Objeto para gestian de tipos de alertas
      */
     TipusAlertes: {
         init: function () {
@@ -418,7 +450,7 @@ const AdminDashboard = {
                 form.addEventListener('submit', function (e) {
                     e.preventDefault();
 
-                    // ValidaciÃ³n bÃ¡sica
+                    // Validacian basica
                     let isValid = true;
                     form.querySelectorAll('[required]').forEach(input => {
                         if (!input.value.trim()) {
@@ -468,7 +500,7 @@ const AdminDashboard = {
                                     else window.location.reload();
                                 }, 300);
                             } else {
-                                // Restaurar botÃ³n
+                                // Restaurar botan
                                 submitBtn.disabled = false;
                                 submitBtn.innerHTML = window.translations?.admin?.tipus_alertes?.save_button || 'Guardar';
 
@@ -488,7 +520,7 @@ const AdminDashboard = {
     },
 
     /**
-     * Objeto para gestiÃ³n de roles
+     * Objeto para gestian de roles
      */
     Rols: {
         init: function () {
@@ -497,7 +529,7 @@ const AdminDashboard = {
                 form.addEventListener('submit', function (e) {
                     e.preventDefault();
 
-                    // ValidaciÃ³n bÃ¡sica
+                    // Validacian basica
                     let isValid = true;
                     form.querySelectorAll('[required]').forEach(input => {
                         if (!input.value.trim()) {
@@ -547,7 +579,7 @@ const AdminDashboard = {
                                     else window.location.reload();
                                 }, 300);
                             } else {
-                                // Restaurar botÃ³n
+                                // Restaurar botan
                                 submitBtn.disabled = false;
                                 submitBtn.innerHTML = window.translations?.admin?.rols?.save_button || 'Guardar Rol';
 
@@ -566,7 +598,7 @@ const AdminDashboard = {
         }
     },
     /**
-     * Objeto para gestiÃ³n de tipos de eventos
+     * Objeto para gestian de tipos de eventos
      */
     TipusEvents: {
         init: function () {
@@ -575,7 +607,7 @@ const AdminDashboard = {
                 form.addEventListener('submit', function (e) {
                     e.preventDefault();
 
-                    // ValidaciÃ³n bÃ¡sica
+                    // Validacian basica
                     let isValid = true;
                     form.querySelectorAll('[required]').forEach(input => {
                         if (!input.value.trim()) {
@@ -641,7 +673,7 @@ const AdminDashboard = {
     },
 
     /**
-     * Objeto para gestiÃ³n de usuarios
+     * Objeto para gestian de usuarios
      */
     Users: {
         init: function () {
@@ -651,7 +683,7 @@ const AdminDashboard = {
                 form.addEventListener('submit', function (e) {
                     e.preventDefault();
 
-                    // ValidaciÃ³n bÃ¡sica
+                    // Validacian basica
                     let isValid = true;
                     form.querySelectorAll('[required]').forEach(input => {
                         if (!input.value.trim()) {
@@ -676,11 +708,11 @@ const AdminDashboard = {
             }
         }
     },    /**
-     * Objeto para gestiÃ³n de premios reclamados
+     * Objeto para gestion de premios reclamados
      */
     PremisReclamats: {
         init: function () {
-            // Configurar botones de aprobaciÃ³n/rechazo
+            // Configurar botones de aprobacion/rechazo
             document.querySelectorAll('.approveBtn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const id = btn.getAttribute('data-id');
@@ -695,7 +727,7 @@ const AdminDashboard = {
                 });
             });
 
-            // BotÃ³n de actualizaciÃ³n de estado
+            // Boton de actualizacion de estado
             document.querySelectorAll('.editStatusBtn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const id = btn.getAttribute('data-id');
@@ -707,7 +739,7 @@ const AdminDashboard = {
         handleAction: function (action, id) {
             const confirmMsg = action === 'approve' ? 'aprovar' : 'rebutjar';
 
-            if (confirm(`${window.translations?.admin?.claimed_prizes?.confirm_action?.replace(':action', confirmMsg) || `EstÃ s segur que vols ${confirmMsg} aquesta solÂ·licitud?`}`)) {
+            if (confirm(`${window.translations?.admin?.claimed_prizes?.confirm_action?.replace(':action', confirmMsg) || `Estas segur que vols ${confirmMsg} aquesta sollicitud?`}`)) {
                 const url = action === 'approve'
                     ? `/admin/premis-reclamats/${id}/approve`
                     : `/admin/premis-reclamats/${id}/reject`;
@@ -723,7 +755,7 @@ const AdminDashboard = {
                     .then(parseJsonResponse)
                     .then(data => {
                         if (data.success) {
-                            alert(`${window.translations?.admin?.claimed_prizes?.request_action_success?.replace(':action', confirmMsg + 'ada') || `SolÂ·licitud ${confirmMsg}ada correctament`}`);
+                            alert(`${window.translations?.admin?.claimed_prizes?.request_action_success?.replace(':action', confirmMsg + 'ada') || `Sollicitud ${confirmMsg}ada correctament`}`);
 
                             if (typeof closeAnyModal === 'function') {
                                 closeAnyModal('detailModal');
@@ -738,13 +770,13 @@ const AdminDashboard = {
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert(`${window.translations?.admin?.claimed_prizes?.request_action_error?.replace(':action', confirmMsg) || `Error al ${confirmMsg} la solÂ·licitud`}`);
+                        alert(`${window.translations?.admin?.claimed_prizes?.request_action_error?.replace(':action', confirmMsg) || `Error al ${confirmMsg} la sollicitud`}`);
                     });
             }
         },
 
         showStatusUpdateModal: function (id) {
-            // Crear el modal dinÃ¡micamente
+            // Crear el modal dinamicamente
             const modalHtml = `
                 <div class="modal fade" id="updateStatusModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog">
@@ -761,7 +793,7 @@ const AdminDashboard = {
                                             <option value="pendent">${window.translations?.admin?.claimed_prizes?.pending || 'Pendent'}</option>
                                             <option value="procesant">${window.translations?.admin?.claimed_prizes?.processing || 'Processant'}</option>
                                             <option value="entregat">${window.translations?.admin?.claimed_prizes?.delivered || 'Entregat'}</option>
-                                            <option value="cancelat">${window.translations?.admin?.claimed_prizes?.canceled || 'CancelÂ·lat'}</option>
+                                            <option value="cancelat">${window.translations?.admin?.claimed_prizes?.canceled || 'Cancelalat'}</option>
                                         </select>
                                     </div>
                                     <div class="mb-3">
@@ -775,7 +807,7 @@ const AdminDashboard = {
                                 </form>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${window.translations?.common?.cancel || 'CancelÂ·lar'}</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${window.translations?.common?.cancel || 'Cancelalar'}</button>
                                 <button type="button" class="btn btn-primary" id="saveStatusBtn">${window.translations?.common?.save || 'Guardar'}</button>
                             </div>
                         </div>
@@ -784,7 +816,7 @@ const AdminDashboard = {
             `;
 
             const modalContainer = document.createElement('div');
-            modalContainer.innerHTML = modalHtml;
+            modalContainer.innerHTML = sanitizeHtml(modalHtml);
             document.body.appendChild(modalContainer);
 
             const modal = new bootstrap.Modal(document.getElementById('updateStatusModal'));
@@ -803,7 +835,7 @@ const AdminDashboard = {
                     (window.translations?.common?.saving || 'Guardant...');
                 this.disabled = true;
 
-                // Realizar peticiÃ³n AJAX
+                // Realizar petician AJAX
                 fetch(`/admin/premis-reclamats/${id}`, {
                     method: 'POST',
                     body: formData,
@@ -813,7 +845,7 @@ const AdminDashboard = {
                 })
                     .then(parseJsonResponse)
                     .then(data => {
-                        // Mostrar mensaje de Ã©xito
+                        // Mostrar mensaje de axito
                         alert(window.translations?.admin?.claimed_prizes?.status_updated || 'Estat actualitzat correctament');
 
                         // Cerrar modal y recargar
@@ -849,7 +881,7 @@ const AdminDashboard = {
         }
     },
     /**
- * Objeto para gestiÃ³n de formularios de ediciÃ³n
+ * Objeto para gestian de formularios de edician
  */
     EditForms: {
         init: function () {
@@ -878,12 +910,12 @@ const AdminDashboard = {
             }
         },
 
-        // Nuevo mÃ©todo base para reducir duplicaciÃ³n de cÃ³digo
+        // Nuevo matodo base para reducir duplicacian de cadigo
         setupBaseEditForm: function (form, submitBtnId, contentType) {
             form.addEventListener('submit', function (e) {
                 e.preventDefault();
 
-                // ValidaciÃ³n bÃ¡sica
+                // Validacian basica
                 let isValid = true;
                 form.querySelectorAll('[required]').forEach(input => {
                     if (!input.value.trim()) {
@@ -932,7 +964,7 @@ const AdminDashboard = {
                                 else window.location.reload();
                             }, 300);
                         } else {
-                            // Restaurar botÃ³n
+                            // Restaurar botan
                             submitBtn.disabled = false;
                             submitBtn.innerHTML = submitBtn.getAttribute('data-original-text') || 'Actualitzar';
                             alert('Error: ' + (data.message || 'No s\'ha pogut actualitzar'));
@@ -946,13 +978,13 @@ const AdminDashboard = {
                     });
             });
 
-            // Guardar texto original del botÃ³n
+            // Guardar texto original del botan
             const submitBtn = document.getElementById(submitBtnId);
             if (submitBtn) {
                 submitBtn.setAttribute('data-original-text', submitBtn.innerHTML);
             }
 
-            // BotÃ³n cancelar
+            // Botan cancelar
             document.getElementById('cancelEditBtn')?.addEventListener('click', function () {
                 if (typeof closeAnyModal === 'function') {
                     closeAnyModal('detailModal');
@@ -960,7 +992,7 @@ const AdminDashboard = {
             });
         },
 
-        // Actualizar los mÃ©todos existentes para usar el mÃ©todo base
+        // Actualizar los matodos existentes para usar el matodo base
         setupAlertaEditForm: function (form) {
             this.setupBaseEditForm(form, 'updateAlertaBtn', 'alertes-punts');
         },
@@ -973,7 +1005,7 @@ const AdminDashboard = {
             this.setupBaseEditForm(form, 'updateEventBtn', 'events');
         },
 
-        // AÃ±adir los nuevos mÃ©todos que faltan
+        // Aaadir los nuevos matodos que faltan
         setupProducteEditForm: function (form) {
             this.setupBaseEditForm(form, 'updateProducteBtn', 'productes');
         },
@@ -1007,11 +1039,11 @@ const AdminDashboard = {
         }
     },
     /**
- * Objeto para gestiÃ³n de tablas administrativas
+ * Objeto para gestian de tablas administrativas
  */
     AdminTables: {
         init: function () {
-            // Verificar si DataTables estÃ¡ disponible
+            // Verificar si DataTables esta disponible
             if (typeof $.fn.DataTable === 'undefined') {
                 return;
             }
@@ -1033,16 +1065,16 @@ const AdminDashboard = {
                 'dynamicTable': { order: [[0, 'desc']], noOrderCols: [4] }
             };
 
-            // Inicializar cada tabla si existe en la pÃ¡gina
+            // Inicializar cada tabla si existe en la pagina
             for (const [tableId, config] of Object.entries(tables)) {
                 const table = document.getElementById(tableId);
                 if (table) {
-                    // Destruir cualquier inicializaciÃ³n existente
+                    // Destruir cualquier inicializacian existente
                     if ($.fn.DataTable.isDataTable('#' + tableId)) {
                         $('#' + tableId).DataTable().destroy();
                     }
 
-                    // ConfiguraciÃ³n comÃºn para todas las tablas
+                    // Configuracian coman para todas las tablas
                     const tableConfig = {
                         language: defaultLanguage,
                         order: config.order || [[0, 'desc']],
@@ -1057,7 +1089,7 @@ const AdminDashboard = {
                     // Inicializar la tabla
                     const dataTable = $('#' + tableId).DataTable(tableConfig);
 
-                    // Configuraciones adicionales especÃ­ficas para ciertas tablas
+                    // Configuraciones adicionales especaficas para ciertas tablas
                     if (tableId === 'premisReclamatsTable') {
                         this.setupPremisReclamatsFilters(dataTable);
                     }
@@ -1096,7 +1128,7 @@ const AdminDashboard = {
 
             // Filtro para cancelados
             $('#filterCanceledBtn').on('click', () => {
-                table.column(4).search('cancelat|CancelÂ·lat').draw();
+                table.column(4).search('cancelat|Cancelalat').draw();
                 this.setActiveFilterButton('filterCanceledBtn');
             });
 
@@ -1114,7 +1146,7 @@ const AdminDashboard = {
         },
 
         setupActivityDetailsButtons: function () {
-            // DelegaciÃ³n de eventos para botones de detalle de actividad
+            // Delegacian de eventos para botones de detalle de actividad
             document.querySelectorAll('.view-activity-details').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -1147,7 +1179,7 @@ const AdminDashboard = {
                         .then(html => {
                             if (modalLoader) modalLoader.classList.add('d-none');
                             if (detailContent) {
-                                detailContent.innerHTML = html;
+                                detailContent.innerHTML = sanitizeHtml(html);
                                 detailContent.classList.remove('d-none');
                             }
                         })
@@ -1158,7 +1190,7 @@ const AdminDashboard = {
                                 detailContent.innerHTML = `
                                     <div class="alert alert-danger">
                                         <i class="fas fa-exclamation-triangle me-2"></i>
-                                        Error al cargar los detalles: ${error.message}
+                                        Error al cargar los detalles: ${escapeHtml(error.message)}
                                     </div>
                                 `;
                                 detailContent.classList.remove('d-none');
@@ -1173,7 +1205,7 @@ const AdminDashboard = {
             document.querySelectorAll('.approveClaimBtn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const id = btn.dataset.id;
-                    if (confirm(window.translations?.admin?.claimed_prizes?.confirm_approve || 'EstÃ s segur que vols aprovar aquesta solÂ·licitud?')) {
+                    if (confirm(window.translations?.admin?.claimed_prizes?.confirm_approve || 'Estas segur que vols aprovar aquesta solalicitud?')) {
                         this.handleClaimAction(id, 'approve');
                     }
                 });
@@ -1182,7 +1214,7 @@ const AdminDashboard = {
             document.querySelectorAll('.rejectClaimBtn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const id = btn.dataset.id;
-                    if (confirm(window.translations?.admin?.claimed_prizes?.confirm_reject || 'EstÃ s segur que vols rebutjar aquesta solÂ·licitud?')) {
+                    if (confirm(window.translations?.admin?.claimed_prizes?.confirm_reject || 'Estas segur que vols rebutjar aquesta solalicitud?')) {
                         this.handleClaimAction(id, 'reject');
                     }
                 });
@@ -1210,7 +1242,7 @@ const AdminDashboard = {
                 '.editProducteBtn': { param: 'producte-id', type: 'producte' }
             };
 
-            // Configurar cada tipo de botÃ³n de ediciÃ³n
+            // Configurar cada tipo de botan de edician
             for (const [selector, config] of Object.entries(editButtonsMap)) {
                 document.querySelectorAll(selector).forEach(btn => {
                     btn.addEventListener('click', () => {
@@ -1227,7 +1259,7 @@ const AdminDashboard = {
             const modalLoader = document.getElementById('detail-modal-loader');
             const detailContent = document.getElementById('detail-content');
 
-            // TraducciÃ³n del tÃ­tulo segÃºn tipo
+            // Traduccian del tatulo segan tipo
             const titleKeys = {
                 'codi': 'messages.admin.codes.edit_title',
                 'alerta-punt': 'messages.admin.alerts.edit_title',
@@ -1269,7 +1301,7 @@ const AdminDashboard = {
                 bsModal.show();
             }
 
-            // Cargar formulario de ediciÃ³n
+            // Cargar formulario de edician
             fetch(`/admin/edit-form/${type}/${id}`)
                 .then(response => {
                     if (!response.ok) throw new Error('Error al cargar el formulario');
@@ -1278,10 +1310,10 @@ const AdminDashboard = {
                 .then(html => {
                     if (modalLoader) modalLoader.classList.add('d-none');
                     if (detailContent) {
-                        detailContent.innerHTML = html;
+                        detailContent.innerHTML = sanitizeHtml(html);
                         detailContent.classList.remove('d-none');
 
-                        // Inicializar formulario de ediciÃ³n
+                        // Inicializar formulario de edician
                         if (AdminDashboard.EditForms && typeof AdminDashboard.EditForms.init === 'function') {
                             AdminDashboard.EditForms.init();
                         }
@@ -1294,7 +1326,7 @@ const AdminDashboard = {
                         detailContent.innerHTML = `
                             <div class="alert alert-danger">
                                 <i class="fas fa-exclamation-triangle me-2"></i>
-                                Error al cargar el formulario: ${error.message}
+                                Error al cargar el formulario: ${escapeHtml(error.message)}
                             </div>
                         `;
                         detailContent.classList.remove('d-none');
@@ -1303,14 +1335,14 @@ const AdminDashboard = {
         },
 
         setupDeleteButtons: function () {
-            // Manejar botones de eliminaciÃ³n
+            // Manejar botones de eliminacian
             document.querySelectorAll('.deleteBtn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const id = btn.dataset.itemId;
                     const name = btn.dataset.itemName;
                     const type = btn.dataset.itemType;
 
-                    if (confirm(`${window.translations?.admin?.common?.confirm_delete || 'EstÃ s segur que vols eliminar'} ${name}?`)) {
+                    if (confirm(`${window.translations?.admin?.common?.confirm_delete || 'Estas segur que vols eliminar'} ${name}?`)) {
                         this.deleteItem(id, type);
                     }
                 });
@@ -1334,8 +1366,8 @@ const AdminDashboard = {
                 .then(data => {
                     if (data.success) {
                         alert(action === 'approve'
-                            ? (window.translations?.admin?.claimed_prizes?.approved_success || 'SolÂ·licitud aprovada correctament')
-                            : (window.translations?.admin?.claimed_prizes?.rejected_success || 'SolÂ·licitud rebutjada correctament'));
+                            ? (window.translations?.admin?.claimed_prizes?.approved_success || 'Solalicitud aprovada correctament')
+                            : (window.translations?.admin?.claimed_prizes?.rejected_success || 'Solalicitud rebutjada correctament'));
 
                         // Recargar la tabla
                         setTimeout(() => {
@@ -1348,8 +1380,8 @@ const AdminDashboard = {
                 .catch(error => {
                     console.error('Error:', error);
                     alert(action === 'approve'
-                        ? (window.translations?.admin?.claimed_prizes?.approve_error || 'Error al aprovar la solÂ·licitud')
-                        : (window.translations?.admin?.claimed_prizes?.reject_error || 'Error al rebutjar la solÂ·licitud'));
+                        ? (window.translations?.admin?.claimed_prizes?.approve_error || 'Error al aprovar la solalicitud')
+                        : (window.translations?.admin?.claimed_prizes?.reject_error || 'Error al rebutjar la solalicitud'));
                 });
         },
 
@@ -1365,7 +1397,7 @@ const AdminDashboard = {
                 .then(parseJsonResponse)
                 .then(data => {
                     if (data.success) {
-                        // Mostrar mensaje de Ã©xito
+                        // Mostrar mensaje de axito
                         alert(window.translations?.admin?.common?.delete_success || 'Element eliminat correctament');
 
                         // Recargar la tabla
@@ -1388,11 +1420,11 @@ const AdminDashboard = {
 
 
     /**
-     * InicializaciÃ³n general del dashboard
+     * Inicializacian general del dashboard
      */
     init: function () {
 
-        // Inicializar mÃ³dulos segÃºn el contenido de la pÃ¡gina
+        // Inicializar madulos segan el contenido de la pagina
         if (document.getElementById('createCodiForm') || document.getElementById('editCodiForm')) {
             this.Codis.init();
         }
@@ -1429,7 +1461,7 @@ const AdminDashboard = {
             this.Users.init();
         }
 
-        // InicializaciÃ³n de tooltips
+        // Inicializacian de tooltips
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         if (tooltipTriggerList.length && typeof bootstrap !== 'undefined') {
             tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -1462,7 +1494,7 @@ const AdminDashboard = {
                 const forms = this.querySelectorAll('form');
                 forms.forEach(form => form.reset());
 
-                // Quitar clases de validaciÃ³n
+                // Quitar clases de validacian
                 this.querySelectorAll('.is-invalid').forEach(el => {
                     el.classList.remove('is-invalid');
                 });
@@ -1471,7 +1503,7 @@ const AdminDashboard = {
     }
 };
 
-// InicializaciÃ³n cuando el DOM estÃ¡ listo
+// Inicializacian cuando el DOM esta listo
 document.addEventListener('DOMContentLoaded', function () {
     AdminDashboard.init();
 });

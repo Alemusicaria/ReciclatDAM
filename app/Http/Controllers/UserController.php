@@ -9,27 +9,37 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Rules\Password;
 use App\Models\Activity;
 use App\Mail\WelcomeMail;
 use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(User::class, 'user');
+    }
+
     private function canManageUser(User $user): bool
     {
         $authUser = Auth::user();
 
-        if (!$authUser) {
+        if (!$authUser instanceof User) {
             return false;
         }
 
-        return (int) $authUser->rol_id === 1 || (int) $authUser->id === (int) $user->id;
+        return $authUser->isAdmin() || (int) $authUser->id === (int) $user->id;
     }
 
     public function index()
     {
         $authUser = Auth::user();
-        $users = ((int) $authUser->rol_id === 1)
+        if (!$authUser instanceof User) {
+            abort(403, 'No tens permisos per consultar els usuaris.');
+        }
+
+        $users = ($authUser->isAdmin())
             ? User::with('rol')->get()
             : User::with('rol')->where('id', $authUser->id)->get();
         if (!view()->exists('users.index')) {
@@ -57,7 +67,7 @@ class UserController extends Controller
                 'telefon' => 'nullable|string|max:15',
                 'ubicacio' => 'nullable|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
-                'password' => 'required|string|min:8',
+                'password' => ['required', 'string', Password::min(8)->letters()->mixedCase()->numbers()],
                 'rol_id' => 'required|exists:rols,id',
                 'punts_actuals' => 'nullable|integer',
                 'foto_perfil' => 'nullable|image|max:2048',
@@ -165,7 +175,8 @@ class UserController extends Controller
         }
 
         try {
-            $isAdmin = (int) Auth::user()->rol_id === 1;
+            $authUser = Auth::user();
+            $isAdmin = $authUser instanceof User && $authUser->isAdmin();
 
             $request->validate([
                 'nom' => 'required|string|max:255',
@@ -177,7 +188,7 @@ class UserController extends Controller
                 'rol_id' => $isAdmin ? 'required|exists:rols,id' : 'prohibited',
                 'punts_actuals' => $isAdmin ? 'nullable|integer|min:0' : 'prohibited',
                 'foto_perfil' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB
-                'password' => 'nullable|string|min:8|confirmed',
+                'password' => ['nullable', 'string', 'confirmed', Password::min(8)->letters()->mixedCase()->numbers()],
             ]);
 
             // Determinar si és una sol·licitud AJAX
@@ -361,7 +372,8 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         try {
-            if ((int) Auth::user()->rol_id !== 1) {
+            $authUser = Auth::user();
+            if (!$authUser instanceof User || !$authUser->isAdmin()) {
                 abort(403, 'No tens permisos per eliminar usuaris.');
             }
 

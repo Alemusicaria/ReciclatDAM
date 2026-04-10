@@ -23,12 +23,13 @@
                             <i class="fas fa-envelope text-muted me-2"></i>{{ $user->email }}
                         </div>
                         <div class="user-status">
-                            <span class="badge {{ $user->rol->nom === 'Administrador' ? 'bg-danger' : ($user->rol->nom === 'Gestor' ? 'bg-warning' : 'bg-success') }} py-1 px-2">
-                                <i class="fas fa-user-shield me-1"></i>{{ $user->rol->nom }}
+                            @php $rawRoleName = $user->rol?->getRawOriginal('nom'); @endphp
+                            <span class="badge {{ $rawRoleName === 'Admin' ? 'bg-danger' : ($rawRoleName === 'Gestor' ? 'bg-warning' : 'bg-success') }} py-1 px-2">
+                                <i class="fas fa-user-shield me-1"></i>{{ $user->rol?->displayNom() ?? 'N/A' }}
                             </span>
                             @if($user->nivell())
                                 <span class="badge bg-info py-1 px-2 ms-2">
-                                    <i class="fas fa-trophy me-1"></i>{{ $user->nivell()->nom }}
+                                    <i class="fas fa-trophy me-1"></i>{{ $user->nivell()->displayNom() }}
                                 </span>
                             @endif
                         </div>
@@ -180,14 +181,14 @@
                                             <div class="d-flex align-items-center">
                                                 @if($reclamat->premi && $reclamat->premi->imatge)
                                                     <img src="{{ asset($reclamat->premi->imatge) }}" 
-                                                         alt="{{ $reclamat->premi->nom }}" 
+                                                         alt="{{ $reclamat->premi->displayNom() }}" 
                                                          class="prize-image me-2 rounded">
                                                 @else
                                                     <span class="prize-placeholder me-2 bg-secondary rounded d-flex align-items-center justify-content-center">
                                                         <i class="fas fa-gift text-white"></i>
                                                     </span>
                                                 @endif
-                                                <span>{{ $reclamat->premi ? $reclamat->premi->nom : __('messages.admin.users.deleted_prize') }}</span>
+                                                <span>{{ $reclamat->premi ? $reclamat->premi->displayNom() : __('messages.admin.users.deleted_prize') }}</span>
                                             </div>
                                         </td>
                                         <td>{{ date('d/m/Y', strtotime($reclamat->data_reclamacio)) }}</td>

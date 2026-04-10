@@ -38,9 +38,26 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const puntsIndex = window.puntsIndex; // Usa la variable global
+        const catalogTranslations = window.catalogTranslations || {};
+
+        function getCatalogEntry(group, record) {
+            const id = record && (record.id || record.objectID);
+            if (!id || !catalogTranslations[group]) {
+                return null;
+            }
+
+            return catalogTranslations[group][String(id)] || null;
+        }
+
+        function getTranslatedPunt(record) {
+            const entry = getCatalogEntry('punts', record);
+
+            return {
+                nom: entry?.nom || record.nom,
+                fraccio: entry?.fraccio || record.fraccio,
+            };
+        }
         const fallbackSearchUrl = `{{ route('punts-recollida.search') }}`;
-        const algoliaAppId = '4JU9PG98CF';
-        const algoliaApiKey = 'd37ffd358dca40447584fb2ffdc28e03';
 
         const searchInput = document.getElementById('search-input');
         const searchResults = document.getElementById('search-results');
@@ -82,6 +99,7 @@
             }
 
             hits.forEach(hit => {
+                const translatedHit = getTranslatedPunt(hit);
                 const listItem = document.createElement('li');
                 listItem.className = 'list-group-item d-flex align-items-center';
 
@@ -98,9 +116,9 @@
 
                 listItem.innerHTML = `
                     <div style="flex: 1; position: relative; z-index: 2; padding: 10px; border-radius: 5px; color: ${document.body.classList.contains('dark') ? '#f3f4f6' : 'black'};">
-                        <strong>${hit.nom}</strong><br>
+                        <strong>${translatedHit.nom}</strong><br>
                         <span>${hit.ciutat}, ${hit.adreca}</span><br>
-                        <small><strong>{{ __("messages.hero.fraction") }}</strong> ${hit.fraccio}</small>
+                        <small><strong>{{ __("messages.hero.fraction") }}</strong> ${translatedHit.fraccio}</small>
                     </div>
                     <div style="margin-left: 10px; z-index: 1;">
                         <img id="map-${mapId}" src="{{ asset('images/offline.svg') }}" alt="{{ __("messages.hero.static_map_alt") }}" style="width: 150px; height: 100px; border-radius: 5px; object-fit: cover;">

@@ -123,36 +123,46 @@
     .opinions-filters {
         display: flex;
         justify-content: center;
-        gap: 1rem;
-        flex-wrap: wrap;
+        gap: 0.4rem;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding-bottom: 0.2rem;
+        scrollbar-width: thin;
     }
 
-    .filter-btn {
+    #opinions .filter-btn {
         background: white;
-        border: 2px solid #e0e0e0;
-        padding: 0.6rem 1rem;
+        border: 1px solid #e0e0e0;
+        padding: 0.24rem 0.4rem !important;
         border-radius: 50px;
         cursor: pointer;
         font-weight: 600;
-        font-size: 0.9rem;
+        font-size: 0.7rem !important;
+        line-height: 1.1;
+        white-space: nowrap;
+        flex: 0 0 auto;
+        width: auto;
+        min-width: 0;
         transition: all 0.3s ease;
         color: #2c3e50;
     }
 
-    .filter-btn:hover {
+    #opinions .filter-btn:hover {
         border-color: #1abc9c;
         color: #1abc9c;
     }
 
-    .filter-btn.active {
+    #opinions .filter-btn.active {
         background: linear-gradient(135deg, #1abc9c, #16a085);
         color: white;
         border-color: #1abc9c;
     }
 
-    .filter-count {
+    #opinions .filter-count {
         opacity: 0.7;
-        font-size: 0.85rem;
+        font-size: 0.62rem !important;
+        margin-left: 0.1rem;
     }
 
     /* GALLERY CONTAINER */
@@ -485,12 +495,15 @@
         }
 
         .opinions-filters {
-            gap: 0.5rem;
+            gap: 0.35rem;
+            justify-content: flex-start;
+            flex-wrap: nowrap;
+            overflow-x: auto;
         }
 
-        .filter-btn {
-            font-size: 0.8rem;
-            padding: 0.5rem 0.75rem;
+        #opinions .filter-btn {
+            font-size: 0.66rem !important;
+            padding: 0.22rem 0.34rem !important;
         }
     }
 
@@ -628,6 +641,11 @@
         // Cargar opiniones
         function loadOpinions() {
             $('#opinions-grid').html(`<div class="col-12 text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">${opinionsI18n.loading}</span></div></div>`);
+
+            if (!opinionsIndex || typeof opinionsIndex.search !== 'function') {
+                $('#opinions-grid').html(`<div class="col-12 text-center text-danger py-5">${opinionsI18n.errorLoading}</div>`);
+                return;
+            }
 
             opinionsIndex.search('', { hitsPerPage: 100 }).then(({ hits }) => {
                 // Filtrar opiniones con rating >= 3 y limitar a máximo 15

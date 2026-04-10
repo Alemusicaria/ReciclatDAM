@@ -67,14 +67,14 @@ class EventsController extends Controller
             ->map(function ($event) {
                 return [
                     'id' => $event->id,
-                    'title' => e($event->nom),
+                    'title' => e($event->displayNom()),
                     'start' => $event->data_inici ? $event->data_inici->format('Y-m-d H:i:s') : null,
                     'end' => $event->data_fi ? $event->data_fi->format('Y-m-d H:i:s') : null,
                     'color' => $event->tipus->color ?? '#3788d8',
-                    'description' => e($event->descripcio),
-                    'location' => e($event->lloc),
+                    'description' => e($event->displayDescripcio()),
+                    'location' => e($event->displayLloc()),
                     'extendedProps' => [
-                        'tipus' => $event->tipus ? e($event->tipus->nom) : null,
+                        'tipus' => $event->displayTipusNom() ? e($event->displayTipusNom()) : null,
                         'capacitat' => $event->capacitat,
                         'punts_disponibles' => $event->punts_disponibles,
                         'participants' => $event->participants_count,
@@ -117,7 +117,17 @@ class EventsController extends Controller
         // Realizar búsqueda
         $results = Event::search($query)->when($filterString, function ($query) use ($filterString) {
             $query->filters($filterString);
-        })->get();
+        })->get()->map(function (Event $event) {
+            $event->setAttribute('nom', $event->displayNom());
+            $event->setAttribute('descripcio', $event->displayDescripcio());
+            $event->setAttribute('lloc', $event->displayLloc());
+
+            if ($event->relationLoaded('tipus') && $event->tipus) {
+                $event->tipus->setAttribute('nom', $event->tipus->displayNom());
+            }
+
+            return $event;
+        });
 
         return response()->json($results);
     }
@@ -143,6 +153,8 @@ class EventsController extends Controller
     {
         $response = DB::transaction(function () use ($id, $request) {
             $event = Event::query()->with('tipus')->whereKey($id)->lockForUpdate()->firstOrFail();
+            $eventDate = $event->data_inici ? $event->data_inici->format('d/m/Y') : '-';
+            $eventTime = $event->data_inici ? $event->data_inici->format('H:i') : '-';
 
             if ($event->data_inici && $event->data_inici->isPast()) {
                 return response()->json([
@@ -150,7 +162,7 @@ class EventsController extends Controller
                     'past' => true,
                     'html' => '
                         <div class="alert alert-info mt-2 small mb-0">
-                            Aquest event ja ha finalitzat i no admet noves inscripcions.
+                            ' . e(__('messages.events_ui.registration_closed_past')) . '
                         </div>'
                 ], 422);
             }
@@ -162,8 +174,8 @@ class EventsController extends Controller
                     'registered' => true,
                     'event' => [
                         'title' => e($event->nom),
-                        'date' => $event->data_inici ? $event->data_inici->format('d/m/Y') : null,
-                        'time' => $event->data_inici ? $event->data_inici->format('H:i') : null
+                        'date' => $eventDate,
+                        'time' => $eventTime
                     ],
                     'html' => '
                         <div class="alert alert-success mt-2 small">
@@ -172,8 +184,8 @@ class EventsController extends Controller
                                     <i class="fas fa-check-circle fa-2x text-success"></i>
                                 </div>
                                 <div>
-                                    <strong>¡Fantàstic!</strong> 
-                                    <p class="mb-0">Ja formes part d\'aquest event! T\'esperem el dia ' . ($event->data_inici ? $event->data_inici->format('d/m/Y') : '') . ' a les ' . ($event->data_inici ? $event->data_inici->format('H:i') : '') . '.</p>
+                                    <strong>' . e(__('messages.events_ui.registration_success_title')) . '</strong>
+                                    <p class="mb-0">' . e(__('messages.events_ui.registration_success_existing', ['date' => $eventDate, 'time' => $eventTime])) . '</p>
                                 </div>
                             </div>
                         </div>'
@@ -192,8 +204,8 @@ class EventsController extends Controller
                                     <i class="fas fa-exclamation-triangle fa-2x text-warning"></i>
                                 </div>
                                 <div>
-                                    <strong>Ho sentim!</strong> 
-                                    <p class="mb-0">Aquest event ja ha arribat a la seva capacitat màxima.</p>
+                                    <strong>' . e(__('messages.events_ui.registration_full_title')) . '</strong>
+                                    <p class="mb-0">' . e(__('messages.events_ui.registration_full_message')) . '</p>
                                 </div>
                             </div>
                         </div>'
@@ -216,8 +228,8 @@ class EventsController extends Controller
                     'registered' => true,
                     'event' => [
                         'title' => e($event->nom),
-                        'date' => $event->data_inici ? $event->data_inici->format('d/m/Y') : null,
-                        'time' => $event->data_inici ? $event->data_inici->format('H:i') : null
+                        'date' => $eventDate,
+                        'time' => $eventTime
                     ],
                     'html' => '
                         <div class="alert alert-success mt-2 small">
@@ -226,15 +238,15 @@ class EventsController extends Controller
                                     <i class="fas fa-check-circle fa-2x text-success"></i>
                                 </div>
                                 <div>
-                                    <strong>¡Fantàstic!</strong> 
-                                    <p class="mb-0">T\'has registrat correctament a l\'event! T\'esperem el dia ' . ($event->data_inici ? $event->data_inici->format('d/m/Y') : '') . ' a les ' . ($event->data_inici ? $event->data_inici->format('H:i') : '') . '.</p>
+                                    <strong>' . e(__('messages.events_ui.registration_success_title')) . '</strong>
+                                    <p class="mb-0">' . e(__('messages.events_ui.registration_success_new', ['date' => $eventDate, 'time' => $eventTime])) . '</p>
                                 </div>
                             </div>
                         </div>'
                 ]);
             }
 
-            return back()->with('success', 'T\'has registrat correctament a l\'event!');
+            return back()->with('success', __('messages.events_ui.registration_success_flash'));
         }, 3);
 
         return $response;
@@ -260,7 +272,7 @@ class EventsController extends Controller
         if ($isPast) {
             $html = '
                 <div class="alert alert-info mt-2 small mb-0">
-                    Aquest event ja ha passat. El registre està tancat.
+                    ' . e(__('messages.events_ui.registration_past_message')) . '
                 </div>';
         } elseif ($isRegistered) {
             $html = '
@@ -270,8 +282,8 @@ class EventsController extends Controller
                             <i class="fas fa-check-circle fa-2x text-success"></i>
                         </div>
                         <div>
-                            <strong>¡Fantàstic!</strong> 
-                            <p class="mb-0">Ja formes part d\'aquest event! T\'esperem el dia ' . ($event->data_inici ? $event->data_inici->format('d/m/Y') : '') . ' a les ' . ($event->data_inici ? $event->data_inici->format('H:i') : '') . '.</p>
+                            <strong>' . e(__('messages.events_ui.registration_success_title')) . '</strong>
+                            <p class="mb-0">' . e(__('messages.events_ui.registration_success_existing', ['date' => $event->data_inici ? $event->data_inici->format('d/m/Y') : '-', 'time' => $event->data_inici ? $event->data_inici->format('H:i') : '-'])) . '</p>
                         </div>
                     </div>
                 </div>';
@@ -283,8 +295,8 @@ class EventsController extends Controller
                             <i class="fas fa-exclamation-triangle fa-2x text-warning"></i>
                         </div>
                         <div>
-                            <strong>Ho sentim!</strong> 
-                            <p class="mb-0">Aquest event ja ha arribat a la seva capacitat màxima.</p>
+                            <strong>' . e(__('messages.events_ui.registration_full_title')) . '</strong>
+                            <p class="mb-0">' . e(__('messages.events_ui.registration_full_message')) . '</p>
                         </div>
                     </div>
                 </div>';

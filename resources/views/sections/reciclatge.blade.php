@@ -221,6 +221,39 @@
 
         const productIndex = window.productIndex; // Usa la variable global
         const puntsIndex = window.puntsIndex; // Usa la variable global
+        const catalogTranslations = window.catalogTranslations || {};
+
+        function getCatalogEntry(group, record) {
+            const id = record && (record.id || record.objectID);
+            if (!id || !catalogTranslations[group]) {
+                return null;
+            }
+
+            return catalogTranslations[group][String(id)] || null;
+        }
+
+        function getTranslatedProduct(record) {
+            const entry = getCatalogEntry('products', record);
+
+            return {
+                nom: entry?.nom || record.nom,
+                categoria: entry?.categoria || record.categoria,
+            };
+        }
+
+        function getTranslatedPunt(record) {
+            const entry = getCatalogEntry('punts', record);
+
+            return {
+                nom: entry?.nom || record.nom,
+                fraccio: entry?.fraccio || record.fraccio,
+            };
+        }
+
+        function getCategoryLabel(category) {
+            const card = document.querySelector(`.category-card[data-category="${category}"] .category-title`);
+            return card ? card.textContent.trim() : category;
+        }
 
         // Get recycling info from PHP
         const recyclingInfo = JSON.parse(document.getElementById('recycling-info-data').textContent);
@@ -268,16 +301,21 @@
                 noResultsControl = null;
             }
 
+            if (!puntsIndex || typeof puntsIndex.search !== 'function') {
+                return;
+            }
+
             puntsIndex.search('', {
                 hitsPerPage: 100
             }).then(({ hits }) => {
+                let filteredHits = hits;
 
                 if (fraccio) {
                     const fraccioNormalitzada = normalizeFraccio(fraccio);
-                    hits = hits.filter(punt => normalizeFraccio(punt.fraccio) === fraccioNormalitzada);
+                    filteredHits = hits.filter(punt => normalizeFraccio(punt.fraccio) === fraccioNormalitzada);
                 }
 
-                if (hits.length === 0) {
+                if (filteredHits.length === 0) {
                     console.warn('No s\'han trobat punts de recollida per a la fracció:', fraccio);
 
                     // Add visual message
@@ -289,13 +327,14 @@
                     };
                     noResultsControl.addTo(map);
                 } else {
-                    hits.forEach(punt => {
+                    filteredHits.forEach(punt => {
+                        const translatedPunt = getTranslatedPunt(punt);
                         const marker = L.marker([punt.latitud, punt.longitud]).addTo(map);
                         marker.bindPopup(`
-                        <strong>${punt.nom}</strong><br>
+                        <strong>${translatedPunt.nom}</strong><br>
                         <strong>{{ __('messages.hero.city') }}:</strong> ${punt.ciutat}<br>
                         <strong>{{ __('messages.hero.address') }}:</strong> ${punt.adreca}<br>
-                        <strong>{{ __('messages.hero.fraction') }}:</strong> ${punt.fraccio}<br>
+                        <strong>{{ __('messages.hero.fraction') }}:</strong> ${translatedPunt.fraccio}<br>
                         <strong>{{ __('messages.recycling.available') }}:</strong> ${punt.disponible ? '{{ __("messages.recycling.yes") }}' : '{{ __("messages.recycling.no") }}'}
                     `);
                         markers.push(marker);
@@ -356,6 +395,13 @@
             clearButton.show();
 
             // Search Algolia
+            if (!productIndex || typeof productIndex.search !== 'function') {
+                productResults.empty();
+                productResults.append(`<li class="list-group-item text-danger">{{ __('messages.products.error_search') }}</li>`);
+                showResults();
+                return;
+            }
+
             productIndex.search(query, {
                 hitsPerPage: 10
             }).then(({ hits }) => {
@@ -368,18 +414,19 @@
                 } else {
                     // Show results
                     hits.forEach(hit => {
+                        const translatedProduct = getTranslatedProduct(hit);
                         productResults.append(`
                             <li class="list-group-item d-flex align-items-center product-result" 
                                 data-product-id="${hit.id}" 
-                                data-product-name="${hit.nom}" 
+                                data-product-name="${translatedProduct.nom}" 
                                 data-product-category="${hit.categoria}" 
                                 data-product-image="${hit.imatge}">
                                 <div class="flex-shrink-0 me-3">
-                                    <img src="${escapeHtml(hit.imatge ? '/' + hit.imatge : '')}" alt="${escapeHtml(hit.nom)}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+                                    <img src="${escapeHtml(hit.imatge ? '/' + hit.imatge : '')}" alt="${escapeHtml(translatedProduct.nom)}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
                                 </div>
                                 <div class="flex-grow-1 ms-3 text-start">
-                                    <strong>${hit.nom}</strong><br>
-                                    <span>${hit.categoria}</span>
+                                    <strong>${translatedProduct.nom}</strong><br>
+                                    <span>${getCategoryLabel(hit.categoria)}</span>
                                 </div>
                             </li>
                         `);
@@ -470,6 +517,14 @@
             const color = $(this).data('color');
             const info = recyclingInfo[categoria];
 
+            if (!productIndex || typeof productIndex.search !== 'function') {
+                $('#product-title').text(`{{ __('messages.recycling.error_search') }} ${getCategoryLabel(categoria)}`);
+                $('#product-list').html(`<p>{{ __('messages.recycling.error_details') }}</p>`);
+                resetProductModalScroll();
+                $('#product-modal').stop(true, true).show();
+                return;
+            }
+
             // Query products for the category
             productIndex.search('', {
                 hitsPerPage: 1000
@@ -482,7 +537,7 @@
                 showProducts(matchingProducts, categoria, color, info);
             }).catch(err => {
                 console.error("Error searching for products:", err);
-                $('#product-title').text(`{{ __('messages.recycling.error_search') }} ${categoria}`);
+                $('#product-title').text(`{{ __('messages.recycling.error_search') }} ${getCategoryLabel(categoria)}`);
                 $('#product-list').html(`<p>{{ __('messages.recycling.error_details') }}: ${err.message}</p>`);
                 resetProductModalScroll();
                 $('#product-modal').stop(true, true).show();
@@ -493,6 +548,7 @@
         function showProducts(products, categoria, color, info) {
             $('#product-title').text(`{{ __('messages.recycling.products_title') }}`);
             const productList = $('#product-list');
+            const categoryLabel = getCategoryLabel(categoria);
             productList.empty();
 
             // Add banner with category information
@@ -501,7 +557,7 @@
                 <svg class="category-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
                     <path d="M17,4V2a2,2,0,0,0-2-2H9A2,2,0,0,0,7,2V4H2V6H4V21a3,3,0,0,0,3,3H17a3,3,0,0,0,3-3V6h2V4ZM11,17H9V11h2Zm4,0H13V11h2ZM15,4H9V2h6Z" />
                 </svg>
-                <h4 class="mb-0">${categoria}</h4>
+                <h4 class="mb-0">${categoryLabel}</h4>
             </div>
             
             <div class="recycling-tips mb-4">
@@ -523,17 +579,18 @@
                 productList.append(row);
 
                 products.forEach(product => {
+                    const translatedProduct = getTranslatedProduct(product);
                     row.append(`
                     <div class="col-6 col-md-3 mb-3 product-row-item">
                         <div class="product-card" 
                             data-product-id="${product.id}" 
-                            data-product-name="${product.nom}" 
+                            data-product-name="${translatedProduct.nom}" 
                             data-product-category="${product.categoria}" 
                             data-product-image="${product.imatge}">
-                            <img src="${escapeHtml(product.imatge ? '/' + product.imatge : '')}" alt="${escapeHtml(product.nom)}" class="card-img-top">
+                            <img src="${escapeHtml(product.imatge ? '/' + product.imatge : '')}" alt="${escapeHtml(translatedProduct.nom)}" class="card-img-top">
                             <div class="product-card-body">
-                                <h6>${product.nom}</h6>
-                                <p class="text-muted">${product.categoria}</p>
+                                <h6>${translatedProduct.nom}</h6>
+                                <p class="text-muted">${getCategoryLabel(product.categoria)}</p>
                             </div>
                         </div>
                     </div>
@@ -556,6 +613,7 @@
 
             // Get recycling text for the fraction
             const info = recyclingInfo[productCategory] || {};
+            const categoryLabel = getCategoryLabel(productCategory);
             const recyclingText = info.instruccions || "{{ __('messages.recycling.no_info') }}";
 
             // Update the modal title with the product name
@@ -569,7 +627,7 @@
                     </div>
                     <div class="product-details">
                         <h4>${productName}</h4>
-                        <p><strong>{{ __('messages.hero.fraction') }}</strong> ${productCategory}</p>
+                        <p><strong>{{ __('messages.hero.fraction') }}</strong> ${categoryLabel}</p>
                         <p><strong>{{ __('messages.recycling.how_to') }}</strong> ${recyclingText}</p>
                     </div>
                 </div>
@@ -633,9 +691,10 @@
                         productNoResultsControl.addTo(productMap);
                     } else {
                         puntsDeRecollida.forEach(punt => {
+                            const translatedPunt = getTranslatedPunt(punt);
                             const marker = L.marker([punt.latitud, punt.longitud]).addTo(productMap);
                             marker.bindPopup(`
-                                        <strong>${punt.nom}</strong><br>
+                                        <strong>${translatedPunt.nom}</strong><br>
                                         ${punt.ciutat}, ${punt.adreca}
                                     `);
                             markersCategory.push(marker);

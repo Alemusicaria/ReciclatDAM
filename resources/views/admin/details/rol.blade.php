@@ -9,7 +9,7 @@
                         </div>
                     </div>
                     <div>
-                        <h2 class="detail-name mb-1">{{ $rol->nom }}</h2>
+                        <h2 class="detail-name mb-1">{{ $rol->displayNom() }}</h2>
                         <div class="mt-2">
                             <span class="badge bg-info">
                                 <i class="fas fa-users me-1"></i> {{ __('messages.admin.roles.users_with_role', ['count' => $rol->users()->count()]) }}
