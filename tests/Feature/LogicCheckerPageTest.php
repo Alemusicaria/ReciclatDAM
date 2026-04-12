@@ -45,7 +45,7 @@ class LogicCheckerPageTest extends TestCase
                 'results',
             ]);
 
-        $results = $response->json('results', []);
+        $results = $response->json('results') ?? [];
 
         $hasLocalizedRoutes = collect($results)->contains(function (array $row): bool {
             return str_starts_with((string) ($row['route'] ?? ''), 'localized.');

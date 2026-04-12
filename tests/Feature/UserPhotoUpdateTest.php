@@ -29,7 +29,7 @@ class UserPhotoUpdateTest extends TestCase
         $user->refresh();
 
         $this->assertNotEmpty($user->foto_perfil);
-        Storage::disk('public')->assertExists($user->foto_perfil);
+        $this->assertTrue(Storage::disk('public')->exists($user->foto_perfil));
     }
 
     private function createUser(): User

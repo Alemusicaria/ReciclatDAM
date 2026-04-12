@@ -124,6 +124,8 @@ function envValue(array $env, string $key, string $default): string
 
 function cleanSql(string $sql): string
 {
+    $sql = preg_replace('/^\xEF\xBB\xBF/', '', $sql) ?? $sql;
+
     // Remove MySQL versioned comments and block comments.
     $sql = preg_replace('/\/\*![\s\S]*?\*\//', '', $sql) ?? $sql;
     $sql = preg_replace('/\/\*[\s\S]*?\*\//', '', $sql) ?? $sql;
@@ -132,7 +134,9 @@ function cleanSql(string $sql): string
     $lines = preg_split('/\R/', $sql) ?: [];
     $filtered = [];
     foreach ($lines as $line) {
-        if (preg_match('/^\s*--/', $line) === 1) {
+        $line = preg_replace('/^\xEF\xBB\xBF/', '', $line) ?? $line;
+
+        if (preg_match('/^\s*(--|#)/', $line) === 1) {
             continue;
         }
         $filtered[] = $line;
