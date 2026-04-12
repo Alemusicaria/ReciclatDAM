@@ -24,9 +24,14 @@ const isUnsafeUrl = (rawUrl) => {
         return false;
     }
 
-    // Allow relative URLs and in-page anchors.
-    if (value.startsWith('/') || value.startsWith('./') || value.startsWith('../') || value.startsWith('#')) {
+    // Allow in-page anchors.
+    if (value.startsWith('#')) {
         return false;
+    }
+
+    // Block protocol-relative URLs explicitly.
+    if (value.startsWith('//')) {
+        return true;
     }
 
     const lower = value.toLowerCase();
@@ -35,12 +40,12 @@ const isUnsafeUrl = (rawUrl) => {
         return true;
     }
 
-    const schemeMatch = lower.match(/^([a-z0-9+.-]+):/);
-    if (!schemeMatch) {
-        return false;
+    try {
+        const parsed = new URL(value, window.location.origin);
+        return !['http:', 'https:', 'mailto:', 'tel:'].includes(parsed.protocol);
+    } catch (_) {
+        return true;
     }
-
-    return !['http', 'https', 'mailto', 'tel'].includes(schemeMatch[1]);
 };
 
 const sanitizeHtml = (html) => {
