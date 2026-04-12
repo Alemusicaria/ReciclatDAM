@@ -53,7 +53,7 @@ class CodiController extends Controller
             return response()->json(['success' => true, 'id' => $codi->id]);
         }
 
-        return redirect()->route('admin.dashboard')->with('success', 'Codi creat correctament.');
+        return redirect()->route('admin.dashboard')->with('success', __('messages.system.code_created_success'));
     }
 
     public function show($id)
@@ -94,7 +94,7 @@ class CodiController extends Controller
             return response()->json(['success' => true]);
         }
 
-        return redirect()->route('admin.dashboard')->with('success', 'Codi actualitzat correctament.');
+        return redirect()->route('admin.dashboard')->with('success', __('messages.system.code_updated_success'));
     }
 
     public function destroy(Request $request, $id)
@@ -106,7 +106,7 @@ class CodiController extends Controller
             return response()->json(['success' => true]);
         }
 
-        return redirect()->route('admin.dashboard')->with('success', 'Codi eliminat correctament.');
+        return redirect()->route('admin.dashboard')->with('success', __('messages.system.code_deleted_success'));
     }
 
     /**
@@ -115,7 +115,12 @@ class CodiController extends Controller
     public function processCode(Request $request)
     {
         try {
-            $code = $request->input('code');
+            $validated = $request->validate([
+                // Accepta codis alfanumèrics i evita caràcters especials innecessaris.
+                'code' => ['required', 'string', 'min:8', 'max:64', 'regex:/^[A-Za-z0-9]+$/'],
+            ]);
+
+            $code = $validated['code'];
             $user = Auth::user();
 
             return DB::transaction(function () use ($code, $user) {
@@ -144,7 +149,7 @@ class CodiController extends Controller
                 $codi->codi = $code;
                 $codi->user_id = $lockedUser->id;
                 $codi->punts = $puntos;
-                $codi->data_escaneig = now();
+                $codi->data_escaneig = Carbon::now();
                 $codi->save();
 
                 // Actualizar puntos del usuario
@@ -168,9 +173,7 @@ class CodiController extends Controller
             
         } catch (\Exception $e) {
             Log::error('Error procesando código', [
-                'code' => $request->input('code'), 
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
             ]);
             
             return response()->json([
@@ -188,7 +191,7 @@ class CodiController extends Controller
     {
         // Ejemplo: asignar puntos basados en la longitud o algún algoritmo
         // En este caso simple, damos entre 10 y 20 puntos
-        return rand(10, 20);
+        return random_int(10, 20);
         
         // Alternativa: usar los últimos dígitos del código como puntos
         // return min(50, max(5, intval(substr($code, -2))));
