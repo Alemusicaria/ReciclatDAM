@@ -53,7 +53,7 @@ class CodiController extends Controller
             return response()->json(['success' => true, 'id' => $codi->id]);
         }
 
-        return redirect()->route('admin.dashboard')->with('success', __('messages.system.code_created_success'));
+        return redirect()->route('admin.dashboard')->with('success', 'Codi creat correctament.');
     }
 
     public function show($id)
@@ -94,7 +94,7 @@ class CodiController extends Controller
             return response()->json(['success' => true]);
         }
 
-        return redirect()->route('admin.dashboard')->with('success', __('messages.system.code_updated_success'));
+        return redirect()->route('admin.dashboard')->with('success', 'Codi actualitzat correctament.');
     }
 
     public function destroy(Request $request, $id)
@@ -106,7 +106,7 @@ class CodiController extends Controller
             return response()->json(['success' => true]);
         }
 
-        return redirect()->route('admin.dashboard')->with('success', __('messages.system.code_deleted_success'));
+        return redirect()->route('admin.dashboard')->with('success', 'Codi eliminat correctament.');
     }
 
     /**

@@ -107,7 +107,7 @@ class MapController extends Controller
                 ->header('Cache-Control', 'public, max-age=300');
 
         } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json(['error' => __('messages.system.map_invalid_parameters')], 422);
+            return response()->json(['error' => 'Invalid parameters'], 422);
         } catch (\Throwable $e) {
             Log::error('MapController error', [
                 'message' => $e->getMessage(),
