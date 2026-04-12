@@ -2,6 +2,14 @@
     <div class="container">
         <div class="text-center mb-5">
             <h2 class="section-title mb-4">{{ __('messages.opinions.title') }}</h2>
+
+            @auth
+                <div class="mb-4">
+                    <a href="{{ route('opinions.create') }}" class="btn btn-success opinion-create-btn">
+                        <i class="fas fa-plus-circle me-1"></i>{{ __('messages.opinions_ui.add_opinion') }}
+                    </a>
+                </div>
+            @endauth
             
             <!-- STATS -->
             <div id="opinions-stats" class="opinions-stats mb-4">
@@ -119,6 +127,12 @@
         color: #f39c12;
     }
 
+    .opinion-create-btn {
+        border-radius: 999px;
+        padding: 0.55rem 1.1rem;
+        font-weight: 600;
+    }
+
     /* FILTRES */
     .opinions-filters {
         display: flex;
@@ -163,6 +177,13 @@
         opacity: 0.7;
         font-size: 0.62rem !important;
         margin-left: 0.1rem;
+    }
+
+    @media (max-width: 576px) {
+        .opinion-create-btn {
+            width: 100%;
+            max-width: 320px;
+        }
     }
 
     /* GALLERY CONTAINER */

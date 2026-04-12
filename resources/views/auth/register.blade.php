@@ -65,7 +65,7 @@
                     enctype="multipart/form-data">
                     @csrf
                     <div class="login100-form-title p-b-20">
-                        <img src="{{ asset('images/logo.png') }}" alt="Logo" style="max-width: 150px;">
+                        <img src="{{ asset('images/logo.png') }}" alt="Logo" class="logo-small" style="max-width: 60px; height: auto;">
                     </div>
 
                     <span class="login100-form-title p-b-53">

@@ -119,6 +119,7 @@ return [
     'opinions_ui' => [
         'avg_rating' => 'Average Rating',
         'total_opinions' => 'Total Opinions',
+        'add_opinion' => 'Add opinion',
         'all' => 'All',
         'just_now' => 'just now',
         'today' => 'Today',
@@ -136,6 +137,8 @@ return [
     'events_ui' => [
         'calendar_title' => 'Events Calendar',
         'details_title' => 'Event Details',
+        'date' => 'Date',
+        'location' => 'Location',
         'close' => 'Close',
         'register' => 'Register',
         'today' => 'Today',
@@ -145,6 +148,8 @@ return [
         'not_specified' => 'Not specified',
         'general' => 'General',
         'capacity' => 'Capacity',
+        'registered_count' => 'Registered',
+        'spots_left' => 'Spots left',
         'unlimited' => 'Unlimited',
         'description' => 'Description',
         'no_description' => 'No description',

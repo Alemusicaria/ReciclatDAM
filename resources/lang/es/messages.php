@@ -119,6 +119,7 @@ return [
     'opinions_ui' => [
         'avg_rating' => 'Puntuación Media',
         'total_opinions' => 'Opiniones Totales',
+        'add_opinion' => 'Añadir opinión',
         'all' => 'Todas',
         'just_now' => 'hace poco',
         'today' => 'Hoy',
@@ -136,6 +137,8 @@ return [
     'events_ui' => [
         'calendar_title' => 'Calendario de Eventos',
         'details_title' => 'Detalles del Evento',
+        'date' => 'Fecha',
+        'location' => 'Ubicación',
         'close' => 'Cerrar',
         'register' => 'Registrarme',
         'today' => 'Hoy',
@@ -145,6 +148,8 @@ return [
         'not_specified' => 'No especificado',
         'general' => 'General',
         'capacity' => 'Capacidad',
+        'registered_count' => 'Apuntados',
+        'spots_left' => 'Libres',
         'unlimited' => 'Sin límite',
         'description' => 'Descripción',
         'no_description' => 'Sin descripción',

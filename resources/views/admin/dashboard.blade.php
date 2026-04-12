@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="admin-dashboard py-4">
-        <div class="container-fluid" style="margin-top: 13vh;">
+        <div class="container-fluid page-offset-admin">
             <!-- Sección 1: Encabezado -->
             <div class="header-card mb-4">
                 <div class="row g-0 align-items-center">
@@ -384,7 +384,7 @@
                             <a href="#" class="btn-sm btn-view-all" id="viewAllActivitiesBtn">{{ __('messages.admin.dashboard.view_all') }}</a>
                         </div>
                         <div class="content-card-body p-0">
-                            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                            <div class="table-responsive table-responsive-container">
                                 <table class="table table-activity">
                                     <thead>
                                         <tr>

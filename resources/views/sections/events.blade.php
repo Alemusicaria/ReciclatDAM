@@ -74,7 +74,9 @@
             today: @json(__('messages.events_ui.today')),
             month: @json(__('messages.events_ui.month')),
             googleCalendar: @json(__('messages.events_ui.google_calendar')),
-            iphoneCalendar: @json(__('messages.events_ui.iphone_calendar'))
+            iphoneCalendar: @json(__('messages.events_ui.iphone_calendar')),
+            registeredCount: @json(__('messages.events_ui.registered_count')),
+            spotsLeft: @json(__('messages.events_ui.spots_left'))
         };
 
         function buildEventUrl(template, eventId) {
@@ -461,6 +463,11 @@
             const startDate = formatDate(event.start);
             const startTime = formatTime(event.start);
             const endTime = event.end ? formatTime(event.end) : '';
+            const capacity = event.extendedProps.capacitat;
+            const participants = Number(event.extendedProps.participants || 0);
+            const spotsLeft = capacity !== null && capacity !== undefined
+                ? Math.max(Number(capacity) - participants, 0)
+                : null;
 
             // Crear contenido HTML para el modal
             const modalContent = `
@@ -482,8 +489,9 @@
                                     ${escapeHtml(event.extendedProps.tipus || i18n.general)}
                                 </span>
                             </li>
-                            <li><i class="fas fa-users"></i> ${i18n.capacity}: ${event.extendedProps.capacitat !== null ? event.extendedProps.capacitat : i18n.unlimited}</li>
-                            <li><i class="fas fa-coins"></i> ECODAMS: ${event.extendedProps.punts || 0}</li>
+                            <li><i class="fas fa-users"></i> ${i18n.capacity}: ${capacity !== null && capacity !== undefined ? capacity : i18n.unlimited}</li>
+                            <li><i class="fas fa-user-check"></i> ${i18n.registeredCount}: ${participants}${spotsLeft !== null ? ` (${i18n.spotsLeft}: ${spotsLeft})` : ''}</li>
+                            <li><i class="fas fa-coins"></i> ECODAMS: ${event.extendedProps.punts_disponibles || 0}</li>
                         </ul>
                     </div>
                 </div>

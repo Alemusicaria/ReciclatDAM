@@ -10,7 +10,7 @@
                         </div>
                     </div>
                     <div>
-                        <h2 class="detail-name mb-1">{{ $tipusEvent->displayNom() }}</h2>
+                        <h2 class="detail-name mb-1">{{ $tipusEvent->displayName() }}</h2>
                         <div class="detail-badge mb-2">
                             <span class="badge py-1 px-2" style="background-color: {{ $tipusEvent->color }}">
                                 {{ $tipusEvent->color }}
@@ -81,7 +81,7 @@
                             <tbody>
                                 @foreach($tipusEvent->events()->take(10)->get() as $event)
                                     <tr>
-                                        <td>{{ $event->displayNom() }}</td>
+                                        <td>{{ $event->displayName() }}</td>
                                         <td>{{ $event->data_inici->format('d/m/Y H:i') }}</td>
                                         <td>{{ $event->data_fi->format('d/m/Y H:i') }}</td>
                                         <td>

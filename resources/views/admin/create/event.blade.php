@@ -22,7 +22,7 @@
                                     <select class="form-select" id="tipus_event_id" name="tipus_event_id" required>
                                         <option value="">{{ __('messages.admin.events.select_type') }}</option>
                                         @foreach(\App\Models\TipusEvent::all() as $tipus)
-                                            <option value="{{ $tipus->id }}">{{ $tipus->displayNom() }}</option>
+                                            <option value="{{ $tipus->id }}">{{ $tipus->displayName() }}</option>
                                         @endforeach
                                     </select>
                                 </div>

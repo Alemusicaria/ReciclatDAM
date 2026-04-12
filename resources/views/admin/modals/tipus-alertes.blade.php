@@ -26,7 +26,7 @@
                             <div class="tipus-alerta-icon rounded-circle me-2 d-flex align-items-center justify-content-center">
                                 <i class="fas fa-bell text-white"></i>
                             </div>
-                            <span>{{ $tipusAlerta->displayNom() }}</span>
+                            <span>{{ $tipusAlerta->displayName() }}</span>
                         </div>
                     </td>
                     <td>{{ $tipusAlerta->created_at->format('d/m/Y H:i') }}</td>
@@ -47,7 +47,7 @@
                             </button>
                             <button class="btn btn-danger btn-sm deleteBtn" 
                                 data-item-id="{{ $tipusAlerta->id }}" 
-                                data-item-name="{{ $tipusAlerta->displayNom() }}"
+                                data-item-name="{{ $tipusAlerta->displayName() }}"
                                 data-item-type="tipus-alerta"
                                 @if($tipusAlerta->alertes()->count() > 0) disabled @endif
                                 title="@if($tipusAlerta->alertes()->count() > 0) {{ __('messages.admin.tipus_alertes.cannot_delete') }} @else {{ __('messages.admin.common.delete') }} @endif">

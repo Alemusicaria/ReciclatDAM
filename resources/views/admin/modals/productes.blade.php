@@ -29,7 +29,7 @@
                                     <i class="fas fa-box text-white"></i>
                                 </div>
                             @endif
-                            <span>{{ $producte->displayNom() }}</span>
+                            <span>{{ $producte->displayName() }}</span>
                         </div>
                     </td>
                     <td>
@@ -48,7 +48,7 @@
                                 <i class="fas fa-edit"></i>
                             </button>
                             <button class="btn btn-danger btn-sm deleteBtn" data-item-id="{{ $producte->id }}"
-                                data-item-name="{{ $producte->displayNom() }}" data-item-type="producte"
+                                data-item-name="{{ $producte->displayName() }}" data-item-type="producte"
                                 title="{{ __('messages.admin.common.delete') }}">
                                 <i class="fas fa-trash"></i>
                             </button>

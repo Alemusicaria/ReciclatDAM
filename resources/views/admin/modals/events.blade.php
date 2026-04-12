@@ -33,14 +33,14 @@
                                     <i class="fas fa-calendar-alt text-white"></i>
                                 </div>
                             @endif
-                            <span>{{ $event->displayNom() }}</span>
+                            <span>{{ $event->displayName() }}</span>
                         </div>
                     </td>
                     <td>{{ $event->data_inici->format('d/m/Y H:i') }}</td>
                     <td>
                         <span class="badge event-type-badge"
                             style="background-color: {{ $event->tipus ? $event->tipus->color : '#3f51b5' }};">
-                            {{ $event->displayTipusNom() ?: __('messages.admin.events.no_type') }}
+                            {{ $event->displayTypeName() ?: __('messages.admin.events.no_type') }}
                         </span>
                     </td>
                     <td>
@@ -61,7 +61,7 @@
                             </button>
                             <button class="btn btn-danger btn-sm deleteBtn" 
                                 data-item-id="{{ $event->id }}" 
-                                data-item-name="{{ $event->displayNom() }}"
+                                data-item-name="{{ $event->displayName() }}"
                                 data-item-type="event"
                                 title="{{ __('messages.admin.common.delete') }}">
                                 <i class="fas fa-trash"></i>
