@@ -40,7 +40,7 @@ class PointsFlowTest extends TestCase
         $user = $this->createUserWithPoints(10);
 
         $response = $this->actingAs($user)->postJson(route('process-code'), [
-            'code' => 'TESTCODE-' . uniqid(),
+            'code' => 'TESTCODE' . uniqid(),
         ]);
 
         $response
