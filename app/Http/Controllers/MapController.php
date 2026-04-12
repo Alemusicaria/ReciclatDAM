@@ -32,27 +32,55 @@ class MapController extends Controller
             $googleMapsEnabled = (bool) config('services.google_maps.enabled', false);
             $googleApiKey = (string) config('services.google_maps.key');
 
-            // If Google is enabled, redirect directly to Google Static Maps.
-            // This avoids local PHP/cURL certificate issues while keeping key server-side.
+            // If Google is enabled, fetch map server-side and stream bytes to avoid exposing API keys.
             if ($googleMapsEnabled && $googleApiKey !== '') {
-                $googleMapUrl = 'https://maps.googleapis.com/maps/api/staticmap?' . http_build_query([
-                    'center' => $lat . ',' . $lng,
-                    'zoom' => $zoom,
-                    'size' => $width . 'x' . $height,
-                    'scale' => $scale,
-                    'markers' => 'color:red|' . $lat . ',' . $lng,
-                    'key' => $googleApiKey,
-                ]);
+                try {
+                    $googleMapUrl = 'https://maps.googleapis.com/maps/api/staticmap?' . http_build_query([
+                        'center' => $lat . ',' . $lng,
+                        'zoom' => $zoom,
+                        'size' => $width . 'x' . $height,
+                        'scale' => $scale,
+                        'markers' => 'color:red|' . $lat . ',' . $lng,
+                        'key' => $googleApiKey,
+                    ]);
 
-                return redirect()->away($googleMapUrl);
+                    $googleClient = Http::timeout(2)
+                        ->connectTimeout(1)
+                        ->retry(0);
+
+                    if (app()->environment(['local', 'development', 'testing'])) {
+                        $googleClient = $googleClient->withoutVerifying();
+                    }
+
+                    $googleResponse = $googleClient->get($googleMapUrl);
+
+                    if ($googleResponse->ok()) {
+                        $contentType = strtolower((string) ($googleResponse->header('Content-Type') ?? ''));
+                        if (str_contains($contentType, 'image/')) {
+                            return response($googleResponse->body(), 200)
+                                ->header('Content-Type', $contentType)
+                                ->header('Cache-Control', 'public, max-age=3600');
+                        }
+                    }
+                } catch (\Throwable $googleError) {
+                    Log::debug('Google Maps fetch failed, trying fallbacks', [
+                        'message' => $googleError->getMessage(),
+                    ]);
+                }
             }
 
             // Try providers server-side so client DNS issues do not break map previews.
             foreach ($this->buildMapUrls($lat, $lng, $width, $height, $zoom, $scale) as $mapUrl) {
                 try {
-                    $mapResponse = Http::timeout(6)
-                        ->retry(1, 150)
-                        ->get($mapUrl);
+                    $mapClient = Http::timeout(4)
+                        ->connectTimeout(2)
+                        ->retry(0);
+
+                    if (app()->environment(['local', 'development', 'testing'])) {
+                        $mapClient = $mapClient->withoutVerifying();
+                    }
+
+                    $mapResponse = $mapClient->get($mapUrl);
 
                     if (!$mapResponse->ok()) {
                         continue;
@@ -67,8 +95,8 @@ class MapController extends Controller
                         ->header('Content-Type', $contentType)
                         ->header('Cache-Control', 'public, max-age=3600');
                 } catch (\Throwable $providerError) {
-                    Log::warning('Map provider fetch failed', [
-                        'url' => $mapUrl,
+                    Log::debug('Map provider fetch failed', [
+                        'provider' => parse_url($mapUrl, PHP_URL_HOST),
                         'message' => $providerError->getMessage(),
                     ]);
                 }
@@ -108,6 +136,7 @@ class MapController extends Controller
             ]);
         }
 
+        // Try multiple OSM static map providers (both HTTPS and HTTP via different hosts)
         $urls[] = 'https://staticmap.openstreetmap.de/staticmap.php?' . http_build_query([
             'center' => $lat . ',' . $lng,
             'zoom' => $zoom,
@@ -116,13 +145,22 @@ class MapController extends Controller
             'markers' => $lat . ',' . $lng . ',red-pushpin',
         ]);
 
-        $urls[] = 'https://staticmap.openstreetmap.fr/?' . http_build_query([
-            'center' => $lat . ',' . $lng,
+        // Tile-based map from OSM (alternative approach)
+        $urls[] = 'https://maps.geoapify.com/v1/staticmap?' . http_build_query([
+            'style' => 'osm-bright',
+            'width' => $width,
+            'height' => $height,
+            'center' => 'lonlat:' . $lng . ',' . $lat,
             'zoom' => $zoom,
-            'size' => $width . 'x' . $height,
-            'maptype' => 'mapnik',
-            'markers' => $lat . ',' . $lng . ',red-pushpin',
+            'marker' => 'lonlat:' . $lng . ',' . $lat . ';color:%23ff0000',
         ]);
+
+        // Fallback: Simple tile-based approach using tile server
+        $tileSize = 256;
+        $tileX = (int) floor(($lng + 180) / 360 * pow(2, $zoom));
+        $tileY = (int) floor((1 - log(tan(deg2rad($lat)) + 1 / cos(deg2rad($lat))) / pi()) / 2 * pow(2, $zoom));
+        
+        $urls[] = 'https://tile.openstreetmap.org/' . $zoom . '/' . $tileX . '/' . $tileY . '.png';
 
         return $urls;
     }
