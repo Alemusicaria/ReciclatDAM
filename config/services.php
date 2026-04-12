@@ -50,6 +50,10 @@ return [
         'access_token' => env('MAPBOX_ACCESS_TOKEN'),
     ],
 
+    'upload_scan' => [
+        'command' => env('UPLOAD_SCAN_COMMAND'),
+    ],
+
     'algolia' => [
         'app_id' => env('ALGOLIA_APP_ID'),
         'search_key' => env('ALGOLIA_SEARCH_KEY'),

@@ -4,9 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\Producte;
 use Illuminate\Http\Request;
+use App\Support\UploadedFileSecurity;
 
 class ProducteController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['auth', 'admin'])->only(['create', 'store', 'edit', 'update', 'destroy']);
+        $this->middleware('auth')->only(['index', 'show']);
+    }
+
     // Llistar tots els productes
     public function index()
     {
@@ -45,8 +52,8 @@ class ProducteController extends Controller
     {
         $validated = $request->validate([
             'nom' => 'required|string|max:255',
-            'categoria' => 'required|string|in:Deixalleria,Envasos,Especial,Medicaments,Organica,Paper,Piles,RAEE,Resta,Vidre', // Valors del camp enum
-            'imatge' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Imatge opcional
+            'categoria' => 'required|string|in:Deixalleria,Envasos,Especial,Medicaments,Organica,Paper,Piles,RAEE,Resta,Vidre',
+            'imatge' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         $producte = new Producte($validated);
@@ -54,23 +61,10 @@ class ProducteController extends Controller
         // Si hi ha una imatge, desa-la al directori corresponent
         if ($request->hasFile('imatge')) {
             $categoria = $validated['categoria'];
-
-            // Defineix el directori on es desarà la imatge
-            $directori = public_path("images/Reciclatge/{$categoria}");
-
-            // Crea el directori si no existeix
-            if (!file_exists($directori)) {
-                mkdir($directori, 0755, true);
-            }
-
-            // Genera el nom de la imatge basat en el nom del producte
-            $nomImatge = str_replace(' ', '_', $validated['nom']) . '.' . $request->file('imatge')->getClientOriginalExtension();
-
-            // Desa la imatge al directori especificat
-            $request->file('imatge')->move($directori, $nomImatge);
-
-            // Desa el path de la imatge a la base de dades
-            $producte->imatge = "images/Reciclatge/{$categoria}/{$nomImatge}";
+            $producte->imatge = UploadedFileSecurity::storeImage(
+                $request->file('imatge'),
+                "images/Reciclatge/{$categoria}"
+            );
         }
 
         $producte->save();
@@ -95,50 +89,21 @@ class ProducteController extends Controller
     {
         $validated = $request->validate([
             'nom' => 'sometimes|string|max:255',
-            'categoria' => 'sometimes|string|in:Deixalleria,Envasos,Especial,Medicaments,Organica,Paper,Piles,RAEE,Resta,Vidre', // Valors del camp enum
-            'imatge' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Imatge opcional
+            'categoria' => 'sometimes|string|in:Deixalleria,Envasos,Especial,Medicaments,Organica,Paper,Piles,RAEE,Resta,Vidre',
+            'imatge' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         $producte = Producte::findOrFail($id);
 
         // Si hi ha una nova imatge, desa-la al directori corresponent
         if ($request->hasFile('imatge')) {
-            // Elimina la imatge antiga si existeix usando Storage facade (más seguro que unlink)
-            if ($producte->imatge) {
-                // Asegurar que solo se eliminen paths dentro de la carpeta pública/images
-                $imagePath = $producte->imatge;
-                if (strpos($imagePath, 'images/') === 0) {
-                    if (file_exists(public_path($imagePath))) {
-                        \Illuminate\Support\Facades\Storage::disk('public')->delete(str_replace('images/', 'public/', $imagePath));
-                    }
-                }
-            }
+            UploadedFileSecurity::deleteStoredFile($producte->imatge);
 
-            // Obté la categoria actual o la nova
             $categoria = isset($validated['categoria']) ? $validated['categoria'] : $producte->categoria;
-
-            // Defineix el directori on es desarà la nova imatge
-            $directori = public_path("images/Reciclatge/{$categoria}");
-
-            // Crea el directori si no existeix
-            if (!file_exists($directori)) {
-                mkdir($directori, 0755, true);
-            }
-
-            // Genera el nom de la imatge basat en el nom del producte - usar timestamp per a evitar collisions
-            $timestamp = time() . '_';
-            $nomImatge = $timestamp . str_replace(' ', '_', $validated['nom'] ?? $producte->nom) . '.' . $request->file('imatge')->getClientOriginalExtension();
-
-            // Valida el nom de la imatge
-            if (!preg_match('/^[a-zA-Z0-9_\-\.]+$/', $nomImatge)) {
-                return back()->with('error', 'Nom de imatge invàlid.');
-            }
-
-            // Desa la nova imatge al directori especificat
-            $request->file('imatge')->move($directori, $nomImatge);
-
-            // Desa el nou path de la imatge a la base de dades
-            $producte->imatge = "images/Reciclatge/{$categoria}/{$nomImatge}";
+            $producte->imatge = UploadedFileSecurity::storeImage(
+                $request->file('imatge'),
+                "images/Reciclatge/{$categoria}"
+            );
         }
 
         // Actualitza els altres camps del producte
@@ -153,9 +118,7 @@ class ProducteController extends Controller
         $producte = Producte::findOrFail($id);
 
         // Elimina la imatge associada si existeix
-        if ($producte->imatge && file_exists(public_path($producte->imatge))) {
-            unlink(public_path($producte->imatge));
-        }
+        UploadedFileSecurity::deleteStoredFile($producte->imatge);
 
         $producte->delete();
 

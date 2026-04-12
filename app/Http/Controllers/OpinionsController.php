@@ -45,7 +45,7 @@ class OpinionsController extends Controller
         ]);
 
         Opinions::create($validated);
-        return redirect()->route('opinions.index')->with('success', 'Opinió creada correctament!');
+        return redirect()->route('opinions.index')->with('success', __('messages.system.opinion_created_success'));
     }
 
     public function edit(Opinions $opinion)
@@ -66,13 +66,13 @@ class OpinionsController extends Controller
         ]);
 
         $opinio->update($validated);
-        return redirect()->route('opinions.index')->with('success', 'Opinió actualitzada correctament!');
+        return redirect()->route('opinions.index')->with('success', __('messages.system.opinion_updated_success'));
     }
 
     public function destroy(Opinions $opinio)
     {
         $opinio->delete();
-        return redirect()->route('opinions.index')->with('success', 'Opinió eliminada correctament!');
+        return redirect()->route('opinions.index')->with('success', __('messages.system.opinion_deleted_success'));
     }
 
     public function search(Request $request)

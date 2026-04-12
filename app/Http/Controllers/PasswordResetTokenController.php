@@ -33,7 +33,7 @@ class PasswordResetTokenController extends Controller
 
         PasswordResetToken::create($validated);
         return redirect()->route('password-reset-tokens.index')
-            ->with('success', 'Password reset token creado correctamente.');
+            ->with('success', __('messages.system.password_reset_token_created'));
     }
 
     public function show(PasswordResetToken $token)

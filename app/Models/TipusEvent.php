@@ -35,12 +35,12 @@ class TipusEvent extends Model
         return $this->hasMany(Event::class, 'tipus_event_id');
     }
 
-    public function displayNom(): string
+    public function displayName(): string
     {
-        return AutoTranslator::translate($this->getRawOriginal('nom'), 'events_db_types') ?? $this->getRawOriginal('nom');
+        return AutoTranslator::translate($this->getRawOriginal('nom'), 'events_types_db_names') ?? $this->getRawOriginal('nom');
     }
 
-    public function displayDescripcio(): ?string
+    public function displayDescription(): ?string
     {
         return AutoTranslator::translate($this->getRawOriginal('descripcio'), 'events_db_descriptions') ?? $this->getRawOriginal('descripcio');
     }

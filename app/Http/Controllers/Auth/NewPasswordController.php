@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Mail\SecurityPasswordChangedMail;
 use App\Http\Controllers\Controller;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password as PasswordRule;
 
 class NewPasswordController extends Controller
 {
@@ -41,7 +44,7 @@ class NewPasswordController extends Controller
         $request->validate([
             'token' => 'required',
             'email' => 'required|email',
-            'password' => 'required|min:8|confirmed',
+            'password' => ['required', 'confirmed', PasswordRule::min(8)->letters()->mixedCase()->numbers()],
         ]);
 
         // Aquí procesamos la solicitud de restablecimiento
@@ -51,6 +54,14 @@ class NewPasswordController extends Controller
                 $user->password = Hash::make($password);
                 $user->setRememberToken(Str::random(60));
                 $user->save();
+
+                if (
+                    !app()->environment('testing')
+                    && is_string($user->email)
+                    && filter_var($user->email, FILTER_VALIDATE_EMAIL)
+                ) {
+                    Mail::to($user->email)->queue(new SecurityPasswordChangedMail($user));
+                }
 
                 event(new PasswordReset($user));
             }

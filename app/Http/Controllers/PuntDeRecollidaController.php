@@ -5,9 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\PuntDeRecollida;
 use Illuminate\Http\Request;
 use App\Models\Activity;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Contracts\Auth\Guard;
 
 class PuntDeRecollidaController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['auth', 'admin'])->only(['create', 'store', 'edit', 'update', 'destroy']);
+        $this->middleware('auth')->only(['index', 'show']);
+    }
+
     public function index()
     {
         $puntsDeRecollida = PuntDeRecollida::all(); // Obtenim tots els punts de recollida
@@ -28,7 +36,7 @@ class PuntDeRecollidaController extends Controller
     public function store(Request $request)
     {
         try {
-            \Log::info('Recibida solicitud para crear punto de recogida');
+            Log::info('Recibida solicitud para crear punto de recogida');
 
             $validatedData = $request->validate([
                 'nom' => 'required|string|max:255',
@@ -52,9 +60,11 @@ class PuntDeRecollidaController extends Controller
             $punt->save();
 
             // Registrar actividad
-            if (auth()->check()) {
+            /** @var Guard $auth */
+            $auth = auth();
+            if ($auth->check()) {
                 Activity::create([
-                    'user_id' => auth()->id(),
+                    'user_id' => $auth->id(),
                     'action' => 'Ha creat un nou punt de recollida: ' . $punt->nom
                 ]);
             }
@@ -71,7 +81,7 @@ class PuntDeRecollidaController extends Controller
             return redirect()->route('admin.dashboard')->with('success', 'Codi creat correctament');
 
         } catch (\Exception $e) {
-            \Log::error('Error al crear punt de recollida: ' . $e->getMessage());
+            Log::error('Error al crear punt de recollida: ' . $e->getMessage());
 
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
@@ -125,9 +135,11 @@ class PuntDeRecollidaController extends Controller
             $punt->save();
 
             // Registrar actividad
-            if (auth()->check()) {
+            /** @var Guard $auth */
+            $auth = auth();
+            if ($auth->check()) {
                 Activity::create([
-                    'user_id' => auth()->id(),
+                    'user_id' => $auth->id(),
                     'action' => 'Ha actualitzat el punt de recollida: ' . $punt->nom
                 ]);
             }
@@ -144,7 +156,7 @@ class PuntDeRecollidaController extends Controller
             // Para peticiones normales
             return redirect()->route('admin.dashboard')->with('success', 'Punt de recollida actualitzat correctament.');
         } catch (\Exception $e) {
-            \Log::error('Error al actualitzar punt de recollida: ' . $e->getMessage());
+            Log::error('Error al actualitzar punt de recollida: ' . $e->getMessage());
 
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([

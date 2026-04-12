@@ -24,22 +24,22 @@ class PuntDeRecollida extends Model
         'disponible',
     ];
 
-    public function displayNom(): string
+    public function displayName(): string
     {
         return AutoTranslator::translate($this->getRawOriginal('nom'), 'collection_points_db_names') ?? $this->getRawOriginal('nom');
     }
 
-    public function displayFraccio(): string
+    public function displayWasteFraction(): string
     {
-        $fraccio = (string) ($this->getRawOriginal('fraccio') ?? '');
-        $key = $this->fractionTranslationKey($fraccio);
+        $fraction = (string) ($this->getRawOriginal('fraccio') ?? '');
+        $key = $this->getFractionTranslationKey($fraction);
 
-        return $key ? __('messages.categories.nom.' . $key) : $fraccio;
+        return $key ? __('messages.categories.nom.' . $key) : $fraction;
     }
 
-    private function fractionTranslationKey(string $fraccio): ?string
+    private function getFractionTranslationKey(string $fraction): ?string
     {
-        $normalized = Str::slug(Str::ascii($fraccio));
+        $normalized = Str::slug(Str::ascii($fraction));
 
         return match ($normalized) {
             'deixalleria', 'punt-verd', 'waste-collection' => 'waste_collection',

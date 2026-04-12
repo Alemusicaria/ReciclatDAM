@@ -1,16 +1,25 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Mail\PrizeClaimedMail;
 use App\Models\Premi;
 use App\Models\PremiReclamat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class PremiController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['auth', 'admin'])->except(['index', 'show', 'search', 'canjear']);
+        $this->middleware('auth')->only(['index', 'show', 'search', 'canjear']);
+    }
+
     public function index()
     {
         return redirect()->to(route('dashboard') . '#premis');
@@ -142,7 +151,7 @@ class PremiController extends Controller
                 $premiReclamat->user_id = $lockedUser->id;
                 $premiReclamat->premi_id = $premi->id;
                 $premiReclamat->punts_gastats = $premi->punts_requerits;
-                $premiReclamat->data_reclamacio = now();
+                $premiReclamat->data_reclamacio = Carbon::now();
                 $premiReclamat->estat = 'pendent';
                 $premiReclamat->save();
 
@@ -150,6 +159,14 @@ class PremiController extends Controller
                 $lockedUser->punts_actuals -= $premi->punts_requerits;
                 $lockedUser->punts_gastats += $premi->punts_requerits;
                 $lockedUser->save();
+
+                if (
+                    !app()->environment('testing')
+                    && is_string($lockedUser->email)
+                    && filter_var($lockedUser->email, FILTER_VALIDATE_EMAIL)
+                ) {
+                    Mail::to($lockedUser->email)->queue(new PrizeClaimedMail($lockedUser, $premi, $premiReclamat));
+                }
 
                 // Devolver respuesta JSON
                 return response()->json([

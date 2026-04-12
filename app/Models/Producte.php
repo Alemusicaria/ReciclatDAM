@@ -13,22 +13,22 @@ class Producte extends Model
 
     protected $fillable = ['nom', 'categoria', 'imatge'];
 
-    public function displayNom(): string
+    public function displayName(): string
     {
         return AutoTranslator::translate($this->getRawOriginal('nom'), 'products_db_names') ?? $this->getRawOriginal('nom');
     }
 
-    public function displayCategoria(): string
+    public function displayCategory(): string
     {
-        $categoria = (string) ($this->getRawOriginal('categoria') ?? '');
-        $key = $this->categoryTranslationKey($categoria);
+        $category = (string) ($this->getRawOriginal('categoria') ?? '');
+        $key = $this->getCategoryTranslationKey($category);
 
-        return $key ? __('messages.categories.nom.' . $key) : $categoria;
+        return $key ? __('messages.categories.nom.' . $key) : $category;
     }
 
-    private function categoryTranslationKey(string $categoria): ?string
+    private function getCategoryTranslationKey(string $category): ?string
     {
-        $normalized = Str::slug(Str::ascii($categoria));
+        $normalized = Str::slug(Str::ascii($category));
 
         return match ($normalized) {
             'deixalleria', 'punt-verd', 'waste-collection' => 'waste_collection',

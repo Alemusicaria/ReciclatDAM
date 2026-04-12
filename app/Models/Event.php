@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Support\AutoTranslator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Auth\Guard;
 use Laravel\Scout\Searchable;
 
 class Event extends Model
@@ -48,18 +49,11 @@ class Event extends Model
         $array['data_inici_formatted'] = $this->data_inici ? $this->data_inici->format('Y-m-d H:i:s') : null;
         $array['data_fi_formatted'] = $this->data_fi ? $this->data_fi->format('Y-m-d H:i:s') : null;
 
-        // Añadir participantes y su información
-        $array['participants_count'] = $this->participants()->count();
-
-        // Si el usuario está autenticado, verificar si está registrado
-        if (auth()->check()) {
-            $array['user_registered'] = $this->participants()->where('user_id', auth()->id())->exists();
-        } else {
-            $array['user_registered'] = false;
-        }
-
-        // Opcional: lista de IDs de participantes
-        $array['participant_ids'] = $this->participants()->pluck('users.id')->toArray();
+        // NOTE: Removed expensive queries (participants count, participant_ids lookups)
+        // These cause severe performance issues during indexing and are rarely used in search results
+        $array['participants_count'] = 0; // Default value
+        $array['participant_ids'] = []; // Default empty array
+        $array['user_registered'] = false; // Default value
 
         return $array;
     }
@@ -96,23 +90,23 @@ class Event extends Model
         return $this->belongsTo(Producte::class, 'producte_id');
     }
 
-    public function displayNom(): string
+    public function displayName(): string
     {
         return AutoTranslator::translate($this->getRawOriginal('nom'), 'events_db_titles') ?? $this->getRawOriginal('nom');
     }
 
-    public function displayDescripcio(): ?string
+    public function displayDescription(): ?string
     {
         return AutoTranslator::translate($this->getRawOriginal('descripcio'), 'events_db_descriptions') ?? $this->getRawOriginal('descripcio');
     }
 
-    public function displayLloc(): ?string
+    public function displayLocation(): ?string
     {
         return AutoTranslator::translate($this->getRawOriginal('lloc'), 'events_db_locations') ?? $this->getRawOriginal('lloc');
     }
 
-    public function displayTipusNom(): ?string
+    public function displayTypeName(): ?string
     {
-        return $this->tipus ? $this->tipus->displayNom() : null;
+        return $this->tipus ? $this->tipus->displayName() : null;
     }
 }

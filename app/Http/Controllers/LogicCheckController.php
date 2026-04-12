@@ -16,6 +16,7 @@ use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class LogicCheckController extends Controller
@@ -25,7 +26,7 @@ class LogicCheckController extends Controller
         $user = Auth::user();
 
         if (!$user instanceof User || !$user->isAdmin()) {
-            abort(403, 'No tens permisos per executar comprovacions de lògica.');
+            abort(403, __('messages.system.logic_check_no_permission'));
         }
 
         return view('admin.logic-checker');
@@ -139,7 +140,7 @@ class LogicCheckController extends Controller
                 ];
             } catch (\Throwable $e) {
                 // Log detailed error for debugging, but don't expose to client
-                \Log::error('LogicCheckController exception', [
+                Log::error('LogicCheckController exception', [
                     'route' => $route->getName() ?: $route->uri(),
                     'method' => $method,
                     'exception' => get_class($e),

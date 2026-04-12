@@ -9,7 +9,6 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Log;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -31,11 +30,15 @@ public function boot()
 
     $locale = Session::get('locale', config('app.locale'));
 
-    // Agregar log para depuración
-    Log::info("AppServiceProvider - Locale obtenido: " . print_r($locale, true));
-
     if (is_string($locale) && in_array($locale, config('app.available_locales'))) {
         App::setLocale($locale);
+    }
+
+    // Disable SSL certificate verification for development environment
+    if (app()->environment(['local', 'development', 'testing'])) {
+        \Illuminate\Support\Facades\Http::macro('unsafe', function () {
+            return \Illuminate\Support\Facades\Http::withoutVerifying();
+        });
     }
 }
 }

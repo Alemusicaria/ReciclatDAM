@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\WelcomeMail;
 use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
@@ -10,16 +11,17 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Config;
 use GuzzleHttp\Client as GuzzleClient;
-use Laravel\Socialite\Two\AbstractProvider;
 use Exception;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rules\Password;
 
 class SocialiteController extends Controller
 {
     public function showSetPasswordForm()
     {
         if (!session()->has('social_user')) {
-            return redirect('login')->withErrors(['msg' => 'No hi ha cap sessió social pendent per establir contrasenya.']);
+            return redirect('login')->withErrors(['msg' => __('messages.system.social_session_missing')]);
         }
 
         return view('auth.set-password');
@@ -28,12 +30,12 @@ class SocialiteController extends Controller
     public function redirectToProvider($provider)
     {
         if (!$this->isProviderSupported($provider)) {
-            return redirect('login')->withErrors(['msg' => 'Proveedor de autenticacion no soportado.']);
+            return redirect('login')->withErrors(['msg' => __('messages.system.auth_provider_unsupported')]);
         }
 
         if (!$this->hasProviderConfig($provider)) {
             Log::error('Social login missing provider configuration', ['provider' => $provider]);
-            return redirect('login')->withErrors(['msg' => 'Falta configurar el inicio de sesion con ' . $provider . '.']);
+            return redirect('login')->withErrors(['msg' => __('messages.system.auth_provider_config_missing', ['provider' => $provider])]);
         }
 
         $response = $this->socialiteDriver($provider)->redirect();
@@ -48,21 +50,22 @@ class SocialiteController extends Controller
     public function handleProviderCallback($provider)
     {
         if (!$this->isProviderSupported($provider)) {
-            return redirect('login')->withErrors(['msg' => 'Proveedor de autenticacion no soportado.']);
+            return redirect('login')->withErrors(['msg' => __('messages.system.auth_provider_unsupported')]);
         }
 
         if (!$this->hasProviderConfig($provider)) {
             Log::error('Social login missing provider configuration on callback', ['provider' => $provider]);
-            return redirect('login')->withErrors(['msg' => 'Falta configurar el inicio de sesion con ' . $provider . '.']);
+            return redirect('login')->withErrors(['msg' => __('messages.system.auth_provider_config_missing', ['provider' => $provider])]);
         }
 
         try {
             $socialUser = $this->socialiteDriver($provider)->user();
             $email = $socialUser->getEmail();
+            $resolvedAvatar = $this->resolveAvatar($socialUser->getAvatar());
 
             if (empty($email)) {
                 Log::warning('Social provider did not return email', ['provider' => $provider]);
-                return redirect('login')->withErrors(['msg' => 'No hem pogut obtenir el teu email de ' . $provider . '. Revisa permisos del compte i torna-ho a provar.']);
+                return redirect('login')->withErrors(['msg' => __('messages.system.social_email_missing', ['provider' => $provider])]);
             }
 
             $findUser = User::where('email', $email)->first();
@@ -73,16 +76,20 @@ class SocialiteController extends Controller
             ]);
     
             if ($findUser) {
+                // Keep avatar populated if account had no valid image previously.
+                $currentAvatar = trim((string) ($findUser->foto_perfil ?? ''));
+                if ($currentAvatar === '' || $currentAvatar === 'null') {
+                    $findUser->foto_perfil = $resolvedAvatar;
+                    $findUser->save();
+                }
+
                 // El usuario ya existe, solo inicia sesión
                 Auth::login($findUser, true); // Añadir "true" para "remember me"
                 Log::info('Existing social user logged in', ['provider' => $provider]);
                 return redirect()->intended('/');
             } else {
                 // Crear nuevo usuario
-                $avatar = $socialUser->getAvatar();
-                if (!str_starts_with($avatar, 'https://')) {
-                    $avatar = 'images/default-profile.png';
-                }
+                $avatar = $resolvedAvatar;
     
                 // Dividir el nombre completo
                 $fullName = $socialUser->getName();
@@ -106,7 +113,7 @@ class SocialiteController extends Controller
                 // Verificar explícitamente que el usuario se creó
                 if (!$newUser->exists) {
                     Log::error('Failed to create user', ['email' => $email]);
-                    return redirect('login')->withErrors(['msg' => 'Error creating user account']);
+                    return redirect('login')->withErrors(['msg' => __('messages.system.social_create_account_error')]);
                 }
     
                 // Forzar recuperación del usuario de la base de datos antes de login
@@ -114,6 +121,10 @@ class SocialiteController extends Controller
 
                 // Login con "remember me" activado
                 Auth::login($newUser, true);
+
+                if (!app()->environment('testing') && !empty($newUser->email)) {
+                    Mail::to($newUser->email)->queue(new WelcomeMail($newUser));
+                }
 
                 Log::info('New social user created and logged in', ['provider' => $provider]);
     
@@ -125,9 +136,8 @@ class SocialiteController extends Controller
             Log::error('Social login error', [
                 'provider' => $provider,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
             ]);
-            return redirect('login')->withErrors(['msg' => 'Error al iniciar sesión con ' . $provider . '. Por favor, inténtalo de nuevo.']);
+            return redirect('login')->withErrors(['msg' => __('messages.system.social_login_error', ['provider' => $provider])]);
         }
     }
 
@@ -147,24 +157,44 @@ class SocialiteController extends Controller
     {
         $driver = Socialite::driver($provider);
 
-        // Windows local setups can fail OAuth token exchange due to missing CA bundle.
-        if (app()->environment('local') && $driver instanceof AbstractProvider) {
-            $driver->setHttpClient(new GuzzleClient(['verify' => false]));
+        // Local dev only: avoid state/certificate issues on Windows local setups.
+        if (app()->environment(['local', 'development', 'testing'])) {
+            if (is_object($driver) && method_exists($driver, 'stateless')) {
+                $driver = call_user_func([$driver, 'stateless']);
+            }
+
+            if (is_object($driver) && method_exists($driver, 'setHttpClient')) {
+                call_user_func([$driver, 'setHttpClient'], new GuzzleClient([
+                    'verify' => false,
+                    'timeout' => 15,
+                ]));
+            }
         }
 
         return $driver;
     }
 
+    private function resolveAvatar(?string $avatar): string
+    {
+        $avatar = trim((string) $avatar);
+
+        if ($avatar !== '' && str_starts_with($avatar, 'http')) {
+            return $avatar;
+        }
+
+        return 'images/default-profile.png';
+    }
+
     public function setPassword(Request $request)
     {
         $request->validate([
-            'password' => 'required|string|min:8|confirmed',
+            'password' => ['required', 'string', 'confirmed', Password::min(8)->letters()->mixedCase()->numbers()],
         ]);
 
         $user = session('social_user');
         if (!$user) {
             Log::error('No user found in session.');
-            return redirect('login')->withErrors(['msg' => 'No user found in session.']);
+            return redirect('login')->withErrors(['msg' => __('messages.system.social_session_user_missing')]);
         }
 
         $user->password = Hash::make($request->password);

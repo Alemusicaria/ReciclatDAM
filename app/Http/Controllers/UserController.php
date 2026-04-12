@@ -187,7 +187,7 @@ class UserController extends Controller
                 'ubicacio' => 'nullable|string|max:255',
                 'rol_id' => $isAdmin ? 'required|exists:rols,id' : 'prohibited',
                 'punts_actuals' => $isAdmin ? 'nullable|integer|min:0' : 'prohibited',
-                'foto_perfil' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB
+                'foto_perfil' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB
                 'password' => ['nullable', 'string', 'confirmed', Password::min(8)->letters()->mixedCase()->numbers()],
             ]);
 
@@ -243,17 +243,16 @@ class UserController extends Controller
                     Log::error('Error al guardar foto de perfil', [
                         'user_id' => $user->id,
                         'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString()
                     ]);
 
                     if ($isAjax) {
                         return response()->json([
                             'success' => false,
-                            'message' => 'No s\'ha pogut actualitzar la foto de perfil.'
+                            'message' => __('messages.system.user_photo_update_error')
                         ], 500);
                     }
                     // Per a sol·licituds no AJAX, continuem amb una advertència
-                    session()->flash('warning', 'S\'ha actualitzat l\'usuari però hi ha hagut un problema amb la foto de perfil.');
+                    session()->flash('warning', __('messages.system.user_updated_with_photo_warning'));
                 }
             }
 
@@ -294,17 +293,16 @@ class UserController extends Controller
             Log::error('Error al actualitzar usuari', [
                 'user_id' => $user->id,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
             ]);
 
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error al actualitzar l\'usuari.'
+                    'message' => __('messages.system.user_update_error')
                 ], 500);
             }
 
-            return back()->withErrors(['error' => 'Error al actualitzar l\'usuari.']);
+            return back()->withErrors(['error' => __('messages.system.user_update_error')]);
         }
     }
 
@@ -315,7 +313,7 @@ class UserController extends Controller
         }
 
         $validated = $request->validate([
-            'foto_perfil' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'foto_perfil' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
         ]);
 
         try {
@@ -361,11 +359,11 @@ class UserController extends Controller
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error al actualitzar la foto.',
+                    'message' => __('messages.system.user_photo_update_short_error'),
                 ], 500);
             }
 
-            return back()->withErrors(['error' => 'Error al actualitzar la foto.']);
+            return back()->withErrors(['error' => __('messages.system.user_photo_update_short_error')]);
         }
     }
 

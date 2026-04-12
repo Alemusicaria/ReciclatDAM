@@ -113,4 +113,21 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Global "To" Address
+    |--------------------------------------------------------------------------
+    |
+    | In local/staging environments you can force all outgoing emails to a
+    | single mailbox to avoid sending messages to real users.
+    |
+    */
+
+    'to' => filled(env('MAIL_TO_ADDRESS'))
+        ? [
+            'address' => env('MAIL_TO_ADDRESS'),
+            'name' => env('MAIL_TO_NAME'),
+        ]
+        : null,
+
 ];

@@ -1,9 +1,11 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Mail\WelcomeMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules\Password;
 use App\Models\User;
 
@@ -69,6 +71,10 @@ class AuthController extends Controller
         }
         $user->password = Hash::make($validated['password']);
         $user->save();
+
+        if (!app()->environment('testing') && !empty($user->email)) {
+            Mail::to($user->email)->queue(new WelcomeMail($user));
+        }
 
         Auth::login($user);
 

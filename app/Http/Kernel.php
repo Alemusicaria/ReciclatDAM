@@ -25,7 +25,6 @@ class Kernel extends HttpKernel
     protected $middlewareGroups = [
         'web' => [
             // otros middlewares
-            \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\CheckSocialLogin::class,
         ],
 
