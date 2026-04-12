@@ -15,7 +15,7 @@
         "laravel-lang/locales": "^2.10",
         "laravel/framework": "^12.0",
         "laravel/socialite": "^5.18",
-        "laravel/tinker": "^2.10.1",
+        "laravel/tinker": "^3.0.0",
         "mcamara/laravel-localization": "^2.3",
         "silviolleite/laravelpwa": "^2.0",
         "stichoza/google-translate-php": "5.0"
