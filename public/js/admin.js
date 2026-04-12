@@ -18,6 +18,31 @@ const escapeHtml = (unsafe) => {
     return div.innerHTML;
 };
 
+const isUnsafeUrl = (rawUrl) => {
+    const value = String(rawUrl ?? '').trim();
+    if (!value) {
+        return false;
+    }
+
+    // Allow relative URLs and in-page anchors.
+    if (value.startsWith('/') || value.startsWith('./') || value.startsWith('../') || value.startsWith('#')) {
+        return false;
+    }
+
+    const lower = value.toLowerCase();
+    const forbidden = ['javascript:', 'data:', 'vbscript:', 'file:'];
+    if (forbidden.some((prefix) => lower.startsWith(prefix))) {
+        return true;
+    }
+
+    const schemeMatch = lower.match(/^([a-z0-9+.-]+):/);
+    if (!schemeMatch) {
+        return false;
+    }
+
+    return !['http', 'https', 'mailto', 'tel'].includes(schemeMatch[1]);
+};
+
 const sanitizeHtml = (html) => {
     const template = document.createElement('template');
     template.innerHTML = String(html ?? '');
@@ -28,8 +53,9 @@ const sanitizeHtml = (html) => {
         [...el.attributes].forEach((attr) => {
             const name = attr.name.toLowerCase();
             const value = (attr.value || '').toLowerCase().trim();
+            const isUrlAttribute = ['href', 'src', 'xlink:href', 'action', 'formaction'].includes(name);
 
-            if (name.startsWith('on') || value.startsWith('javascript:')) {
+            if (name.startsWith('on') || value.startsWith('javascript:') || (isUrlAttribute && isUnsafeUrl(attr.value))) {
                 el.removeAttribute(attr.name);
             }
         });
@@ -966,14 +992,14 @@ const AdminDashboard = {
                         } else {
                             // Restaurar botan
                             submitBtn.disabled = false;
-                            submitBtn.innerHTML = submitBtn.getAttribute('data-original-text') || 'Actualitzar';
+                            submitBtn.textContent = submitBtn.getAttribute('data-original-text') || 'Actualitzar';
                             alert('Error: ' + (data.message || 'No s\'ha pogut actualitzar'));
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
                         submitBtn.disabled = false;
-                        submitBtn.innerHTML = submitBtn.getAttribute('data-original-text') || 'Actualitzar';
+                        submitBtn.textContent = submitBtn.getAttribute('data-original-text') || 'Actualitzar';
                         alert('Error: ' + error.message);
                     });
             });
@@ -981,7 +1007,7 @@ const AdminDashboard = {
             // Guardar texto original del botan
             const submitBtn = document.getElementById(submitBtnId);
             if (submitBtn) {
-                submitBtn.setAttribute('data-original-text', submitBtn.innerHTML);
+                submitBtn.setAttribute('data-original-text', submitBtn.textContent || 'Actualitzar');
             }
 
             // Botan cancelar
