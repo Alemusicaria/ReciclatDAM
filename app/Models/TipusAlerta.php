@@ -17,7 +17,7 @@ class TipusAlerta extends Model
         'nom',
     ];
 
-    public function displayNom(): string
+    public function displayName(): string
     {
         return AutoTranslator::translate($this->getRawOriginal('nom'), 'alert_types_db_names') ?? $this->getRawOriginal('nom');
     }

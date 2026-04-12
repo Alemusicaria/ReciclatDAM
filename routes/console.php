@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Str;
 
 Artisan::command('routes:check {--locale=ca : Locale to use for localized routes} {--only= : Optional comma-separated route name filter} {--json : Output JSON instead of a table}', function () {
@@ -150,3 +151,11 @@ Artisan::command('routes:check {--locale=ca : Locale to use for localized routes
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
+
+Schedule::command('emails:send-event-reminders --hours=24')
+    ->hourly()
+    ->withoutOverlapping();
+
+Schedule::command('emails:send-reactivation --days=30')
+    ->dailyAt('09:00')
+    ->withoutOverlapping();

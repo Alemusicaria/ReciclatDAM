@@ -6,9 +6,15 @@ use App\Models\TipusAlerta;
 use App\Models\Activity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Contracts\Auth\Guard;
 
 class TipusAlertaController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['auth', 'admin']);
+    }
+
     public function index()
     {
         $tipusAlertes = TipusAlerta::all();
@@ -36,9 +42,11 @@ class TipusAlertaController extends Controller
             $tipusAlerta = TipusAlerta::create($validatedData);
 
             // Registrar actividad
-            if (auth()->check()) {
+            /** @var Guard $auth */
+            $auth = auth();
+            if ($auth->check()) {
                 Activity::create([
-                    'user_id' => auth()->id(),
+                    'user_id' => $auth->id(),
                     'action' => 'Ha creat un nou tipus d\'alerta: ' . $tipusAlerta->nom
                 ]);
             }
@@ -92,9 +100,11 @@ class TipusAlertaController extends Controller
             $tipusAlerta->update($validatedData);
 
             // Registrar actividad
-            if (auth()->check()) {
+            /** @var Guard $auth */
+            $auth = auth();
+            if ($auth->check()) {
                 Activity::create([
-                    'user_id' => auth()->id(),
+                    'user_id' => $auth->id(),
                     'action' => 'Ha actualitzat el tipus d\'alerta: ' . $tipusAlerta->nom
                 ]);
             }
@@ -135,9 +145,11 @@ class TipusAlertaController extends Controller
             $tipusAlerta->delete();
 
             // Registrar actividad
-            if (auth()->check()) {
+            /** @var Guard $auth */
+            $auth = auth();
+            if ($auth->check()) {
                 Activity::create([
-                    'user_id' => auth()->id(),
+                    'user_id' => $auth->id(),
                     'action' => 'Ha eliminat el tipus d\'alerta: ' . $tipusAlertaNom
                 ]);
             }

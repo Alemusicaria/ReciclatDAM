@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Mail\EventRegistrationConfirmationMail;
 use App\Models\Event;
 use App\Models\TipusEvent;
 use Carbon\Carbon;
 use App\Models\Activity;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -42,6 +44,13 @@ class EventsController extends Controller
      */
     public function getEvents(Request $request)
     {
+        $request->validate([
+            'upcoming' => 'nullable|boolean',
+            'start' => 'nullable|date',
+            'end' => 'nullable|date',
+            'limit' => 'nullable|integer|min:1|max:200',
+        ]);
+
         $query = Event::with('tipus')->withCount('participants');
 
         if ($request->boolean('upcoming')) {
@@ -58,23 +67,23 @@ class EventsController extends Controller
 
         $query->orderBy('data_inici', 'asc');
 
-        $limit = (int) $request->input('limit', 0);
+        $limit = (int) $request->input('limit', 50);
         if ($limit > 0) {
             $query->limit($limit);
         }
 
         $events = $query->get()
-            ->map(function ($event) {
+            ->map(function (Event $event) {
                 return [
                     'id' => $event->id,
-                    'title' => e($event->displayNom()),
+                    'title' => e($event->displayName()),
                     'start' => $event->data_inici ? $event->data_inici->format('Y-m-d H:i:s') : null,
                     'end' => $event->data_fi ? $event->data_fi->format('Y-m-d H:i:s') : null,
                     'color' => $event->tipus->color ?? '#3788d8',
-                    'description' => e($event->displayDescripcio()),
-                    'location' => e($event->displayLloc()),
+                    'description' => e($event->displayDescription()),
+                    'location' => e($event->displayLocation()),
                     'extendedProps' => [
-                        'tipus' => $event->displayTipusNom() ? e($event->displayTipusNom()) : null,
+                        'tipus' => $event->displayTypeName() ? e($event->displayTypeName()) : null,
                         'capacitat' => $event->capacitat,
                         'punts_disponibles' => $event->punts_disponibles,
                         'participants' => $event->participants_count,
@@ -118,12 +127,12 @@ class EventsController extends Controller
         $results = Event::search($query)->when($filterString, function ($query) use ($filterString) {
             $query->filters($filterString);
         })->get()->map(function (Event $event) {
-            $event->setAttribute('nom', $event->displayNom());
-            $event->setAttribute('descripcio', $event->displayDescripcio());
-            $event->setAttribute('lloc', $event->displayLloc());
+            $event->setAttribute('nom', $event->displayName());
+            $event->setAttribute('descripcio', $event->displayDescription());
+            $event->setAttribute('lloc', $event->displayLocation());
 
             if ($event->relationLoaded('tipus') && $event->tipus) {
-                $event->tipus->setAttribute('nom', $event->tipus->displayNom());
+                $event->tipus->setAttribute('nom', $event->tipus->displayName());
             }
 
             return $event;
@@ -218,6 +227,17 @@ class EventsController extends Controller
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
+
+            $authUser = Auth::user();
+            if (
+                !app()->environment('testing')
+                &&
+                $authUser
+                && is_string($authUser->email)
+                && filter_var($authUser->email, FILTER_VALIDATE_EMAIL)
+            ) {
+                Mail::to($authUser->email)->queue(new EventRegistrationConfirmationMail($authUser, $event));
+            }
 
             // Volver a indexar el evento en Algolia para actualizar la información de participantes
             $event->searchable();
@@ -339,7 +359,7 @@ class EventsController extends Controller
                 'capacitat' => 'nullable|integer|min:0',
                 'punts_disponibles' => 'nullable|integer|min:0',
                 'actiu' => 'nullable|boolean',
-                'imatge' => 'nullable|image|max:2048',
+                'imatge' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             ]);
 
             $event = new Event();
@@ -376,7 +396,7 @@ class EventsController extends Controller
                 ]);
             }
 
-            return redirect()->route('admin.dashboard')->with('success', 'Event creat correctament');
+            return redirect()->route('admin.dashboard')->with('success', __('messages.system.event_created_success'));
         } catch (\Exception $e) {
             Log::error('Error al crear l\'event: ' . $e->getMessage());
 
@@ -387,7 +407,7 @@ class EventsController extends Controller
                 ], 422);
             }
 
-            return back()->withErrors(['error' => 'No s\'ha pogut crear l\'event.']);
+            return back()->withErrors(['error' => __('messages.system.event_create_error')]);
         }
     }
 
@@ -416,7 +436,7 @@ class EventsController extends Controller
                 'capacitat' => 'nullable|integer|min:0',
                 'punts_disponibles' => 'nullable|integer|min:0',
                 'actiu' => 'nullable|boolean',
-                'imatge' => 'nullable|image|max:2048',
+                'imatge' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             ]);
 
             $event->nom = $validated['nom'];
@@ -457,7 +477,7 @@ class EventsController extends Controller
                 ]);
             }
 
-            return redirect()->route('admin.events.show', $event->id)->with('success', 'Event actualitzat correctament');
+            return redirect()->route('admin.events.show', $event->id)->with('success', __('messages.system.event_updated_success'));
         } catch (\Exception $e) {
             Log::error('Error al actualitzar l\'event: ' . $e->getMessage());
 
@@ -468,7 +488,7 @@ class EventsController extends Controller
                 ], 500);
             }
 
-            return back()->withErrors(['error' => 'No s\'ha pogut actualitzar l\'event.']);
+            return back()->withErrors(['error' => __('messages.system.event_update_error')]);
         }
     }
 
@@ -502,7 +522,7 @@ class EventsController extends Controller
                 ]);
             }
 
-            return redirect()->route('admin.dashboard')->with('success', 'Event eliminat correctament');
+            return redirect()->route('admin.dashboard')->with('success', __('messages.system.event_deleted_success'));
         } catch (\Exception $e) {
             Log::error('Error al eliminar l\'event: ' . $e->getMessage());
 
@@ -513,7 +533,7 @@ class EventsController extends Controller
                 ], 500);
             }
 
-            return back()->withErrors(['error' => 'No s\'ha pogut eliminar l\'event.']);
+            return back()->withErrors(['error' => __('messages.system.event_delete_error')]);
         }
     }
 }

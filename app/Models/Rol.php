@@ -15,7 +15,7 @@ class Rol extends Model
 
     protected $fillable = ['nom'];
 
-    public function displayNom(): string
+    public function displayName(): string
     {
         return AutoTranslator::translate($this->getRawOriginal('nom'), 'roles_db_names') ?? $this->getRawOriginal('nom');
     }

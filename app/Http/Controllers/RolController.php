@@ -7,9 +7,15 @@ use App\Models\User;
 use App\Models\Activity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Contracts\Auth\Guard;
 
 class RolController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['auth', 'admin']);
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -40,9 +46,11 @@ class RolController extends Controller
             $rol = Rol::create($validatedData);
 
             // Registrar actividad
-            if (auth()->check()) {
+            /** @var Guard $auth */
+            $auth = auth();
+            if ($auth->check()) {
                 Activity::create([
-                    'user_id' => auth()->id(),
+                    'user_id' => $auth->id(),
                     'action' => 'Ha creat un nou rol: ' . $rol->nom
                 ]);
             }
@@ -101,9 +109,11 @@ class RolController extends Controller
             $rol->update($validatedData);
 
             // Registrar actividad
-            if (auth()->check()) {
+            /** @var Guard $auth */
+            $auth = auth();
+            if ($auth->check()) {
                 Activity::create([
-                    'user_id' => auth()->id(),
+                    'user_id' => $auth->id(),
                     'action' => 'Ha actualitzat el rol: ' . $rol->nom
                 ]);
             }
@@ -147,9 +157,11 @@ class RolController extends Controller
             $rol->delete();
 
             // Registrar actividad
-            if (auth()->check()) {
+            /** @var Guard $auth */
+            $auth = auth();
+            if ($auth->check()) {
                 Activity::create([
-                    'user_id' => auth()->id(),
+                    'user_id' => $auth->id(),
                     'action' => 'Ha eliminat el rol: ' . $rolName
                 ]);
             }

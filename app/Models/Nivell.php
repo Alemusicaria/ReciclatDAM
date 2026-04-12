@@ -20,12 +20,12 @@ class Nivell extends Model
         'color'
     ];
 
-    public function displayNom(): string
+    public function displayName(): string
     {
         return AutoTranslator::translate($this->getRawOriginal('nom'), 'levels_db_names') ?? $this->getRawOriginal('nom');
     }
 
-    public function displayDescripcio(): ?string
+    public function displayDescription(): ?string
     {
         return AutoTranslator::translate($this->getRawOriginal('descripcio'), 'levels_db_descriptions') ?? $this->getRawOriginal('descripcio');
     }

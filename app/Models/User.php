@@ -5,6 +5,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\CanResetPassword;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable implements CanResetPassword
 {
@@ -61,6 +63,12 @@ class User extends Authenticatable implements CanResetPassword
     {
         return $this->hasMany(PremiReclamat::class);
     }
+
+    public function activities()
+    {
+        return $this->hasMany(Activity::class);
+    }
+
     public function nivell()
     {
         $nivells = \App\Models\Nivell::orderBy('punts_requerits', 'desc')->get();
@@ -86,5 +94,26 @@ class User extends Authenticatable implements CanResetPassword
         $roleName = mb_strtolower(trim((string) $this->rol->getRawOriginal('nom')));
 
         return in_array($roleName, ['admin', 'administrador'], true);
+    }
+
+    public function profilePhotoUrl(): string
+    {
+        $photo = trim((string) ($this->foto_perfil ?? ''));
+
+        if ($photo !== '') {
+            if (Str::startsWith($photo, ['http://', 'https://'])) {
+                return $photo;
+            }
+
+            if (Storage::disk('public')->exists($photo)) {
+                return Storage::url($photo);
+            }
+
+            if (file_exists(public_path($photo))) {
+                return asset($photo);
+            }
+        }
+
+        return asset('images/default-profile.png');
     }
 }

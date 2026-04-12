@@ -46,6 +46,19 @@ class AdminController extends Controller
         'opinions',
     ];
 
+    private const ALLOWED_MUTATION_TYPES = [
+        'user',
+        'event',
+        'premi',
+        'codi',
+        'punt-reciclatge',
+        'rol',
+        'alerta-punt',
+        'tipus-alerta',
+        'tipus-event',
+        'producte',
+    ];
+
     public function index(AdminDashboardMetricsService $metricsService)
     {
         $cachedStats = $metricsService->getDashboardStats();
@@ -246,7 +259,7 @@ class AdminController extends Controller
                     return view('admin.create.codi', compact('users'));
 
                 default:
-                    throw new \Exception('Formulario de creación no soportado');
+                    throw new \Exception(__('messages.system.unsupported_form_creation'));
             }
         } catch (\Exception $e) {
             Log::error('Error en getCreateForm: ' . $e->getMessage());
@@ -337,7 +350,7 @@ class AdminController extends Controller
                     $activitat = Activity::with('user.rol')->findOrFail($id);
                     return view('admin.details.activitat', compact('activitat'));
                 default:
-                    throw new \Exception('Tipus de detall no suportat');
+                    throw new \Exception(__('messages.system.unsupported_detail_type'));
             }
         } catch (\Exception $e) {
             Log::error('Error en getDetails: ' . $e->getMessage());
@@ -401,7 +414,7 @@ class AdminController extends Controller
                     $activitat = Activity::findOrFail($id);
                     return view('admin.edit.activitat', compact('activitat'));
                 default:
-                    throw new \Exception('Formulario de edición no soportado');
+                    throw new \Exception(__('messages.system.unsupported_form_edit'));
             }
         } catch (\Exception $e) {
             Log::error('Error en getEditForm: ' . $e->getMessage());
@@ -415,6 +428,13 @@ class AdminController extends Controller
     public function updateDetails(Request $request, $type, $id)
     {
         try {
+            if (!in_array($type, self::ALLOWED_MUTATION_TYPES, true)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tipus de registre no permés.',
+                ], 400);
+            }
+
             switch ($type) {
                 case 'user':
                     $item = User::findOrFail($id);
@@ -510,7 +530,7 @@ class AdminController extends Controller
                     break;
 
                 default:
-                    throw new \Exception('Tipo de detalle no soportado');
+                    throw new \Exception(__('messages.system.unsupported_detail_edit'));
             }
 
             $item->update($validatedData);
@@ -531,6 +551,13 @@ class AdminController extends Controller
     public function destroyDetails($type, $id)
     {
         try {
+            if (!in_array($type, self::ALLOWED_MUTATION_TYPES, true)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tipus de registre no permés.',
+                ], 400);
+            }
+
             switch ($type) {
                 case 'user':
                     $item = User::findOrFail($id);
@@ -590,7 +617,7 @@ class AdminController extends Controller
 
                     // Verificar si hay eventos que usan este tipo
                     if ($item->events()->count() > 0) {
-                        throw new \Exception('No es pot eliminar aquest tipus d\'event perquè hi ha events que l\'utilitzen.');
+                        throw new \Exception(__('messages.system.cannot_delete_event_type_in_use'));
                     }
                     break;
 
@@ -604,7 +631,7 @@ class AdminController extends Controller
                     }
                     break;
                 default:
-                    throw new \Exception('Tipus d\'element no suportat');
+                    throw new \Exception(__('messages.system.unsupported_detail_type'));
             }
 
             // Eliminar el elemento

@@ -81,14 +81,14 @@ return [
 
     'locale' => 'ca',
 
-    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
+    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'ca'),
 
-    'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
+    'faker_locale' => env('APP_FAKER_LOCALE', 'ca_ES'),
 
     'available_locales' => [
-        'en',
-        'es',
         'ca',
+        'es',
+        'en',
     ],
 
     /*

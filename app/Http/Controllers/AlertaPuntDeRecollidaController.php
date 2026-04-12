@@ -8,9 +8,17 @@ use App\Models\TipusAlerta;
 use App\Models\Activity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Contracts\Auth\Guard;
+use App\Support\UploadedFileSecurity;
 
 class AlertaPuntDeRecollidaController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('admin')->only(['index', 'edit', 'update', 'destroy']);
+    }
+
     public function index()
     {
         $alertes = AlertaPuntDeRecollida::with('puntDeRecollida', 'tipus')->get();
@@ -34,7 +42,7 @@ class AlertaPuntDeRecollidaController extends Controller
                 'punt_de_recollida_id' => 'required|exists:punts_de_recollida,id',
                 'tipus_alerta_id' => 'required|exists:tipus_alertes,id',
                 'descripció' => 'required|string',
-                'imatge' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'imatge' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             ]);
 
             $alerta = new AlertaPuntDeRecollida();
@@ -43,24 +51,28 @@ class AlertaPuntDeRecollidaController extends Controller
             $alerta->descripció = $validatedData['descripció'];
 
             // Asignar el usuario actual si está autenticado
-            if (auth()->check()) {
-                $alerta->user_id = auth()->id();
+            /** @var Guard $auth */
+            $auth = auth();
+            if ($auth->check()) {
+                $alerta->user_id = $auth->id();
             }
 
             // Procesar y guardar la imagen si existe
             if ($request->hasFile('imatge')) {
-                $file = $request->file('imatge');
-                $filename = 'alerta_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('images/alertes'), $filename);
-                $alerta->imatge = 'images/alertes/' . $filename;
+                $alerta->imatge = UploadedFileSecurity::storeImage(
+                    $request->file('imatge'),
+                    'images/alertes'
+                );
             }
 
             $alerta->save();
 
             // Registrar actividad
-            if (auth()->check()) {
+            /** @var Guard $auth */
+            $auth = auth();
+            if ($auth->check()) {
                 Activity::create([
-                    'user_id' => auth()->id(),
+                    'user_id' => $auth->id(),
                     'action' => 'Ha creat una nova alerta per al punt de recollida ID: ' . $alerta->punt_de_recollida_id
                 ]);
             }
@@ -73,7 +85,7 @@ class AlertaPuntDeRecollidaController extends Controller
                 ]);
             }
 
-            return redirect()->route('scanner')->with('success', 'Problema reportat correctament. Gràcies per la teva col·laboració!');
+            return redirect()->route('scanner')->with('success', __('messages.system.alert_created_success'));
         } catch (\Exception $e) {
             Log::error('Error al crear alerta: ' . $e->getMessage());
 
@@ -84,7 +96,7 @@ class AlertaPuntDeRecollidaController extends Controller
                 ], 422);
             }
 
-            return back()->withErrors(['error' => 'No s\'ha pogut crear l\'alerta.']);
+            return back()->withErrors(['error' => __('messages.system.alert_create_error')]);
         }
     }
 
@@ -112,7 +124,7 @@ class AlertaPuntDeRecollidaController extends Controller
                 'punt_de_recollida_id' => 'required|exists:punts_de_recollida,id',
                 'tipus_alerta_id' => 'required|exists:tipus_alertes,id',
                 'descripció' => 'required|string',
-                'imatge' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'imatge' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
                 'eliminar_imatge' => 'nullable',
             ]);
 
@@ -122,32 +134,27 @@ class AlertaPuntDeRecollidaController extends Controller
 
             // Gestionar la imagen
             if ($request->hasFile('imatge')) {
-                // Si hay una imagen previa, eliminarla
-                if ($alertaPuntDeRecollida->imatge && file_exists(public_path($alertaPuntDeRecollida->imatge))) {
-                    unlink(public_path($alertaPuntDeRecollida->imatge));
-                }
-
-                // Guardar la nueva imagen
-                $file = $request->file('imatge');
-                $filename = 'alerta_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('images/alertes'), $filename);
-                $alertaPuntDeRecollida->imatge = 'images/alertes/' . $filename;
+                UploadedFileSecurity::deleteStoredFile($alertaPuntDeRecollida->imatge);
+                $alertaPuntDeRecollida->imatge = UploadedFileSecurity::storeImage(
+                    $request->file('imatge'),
+                    'images/alertes'
+                );
             }
             // Si se marca eliminar imagen pero no hay nueva imagen
             elseif ($request->has('eliminar_imatge') && $request->eliminar_imatge == 1) {
                 // Eliminar la imagen actual si existe
-                if ($alertaPuntDeRecollida->imatge && file_exists(public_path($alertaPuntDeRecollida->imatge))) {
-                    unlink(public_path($alertaPuntDeRecollida->imatge));
-                }
+                UploadedFileSecurity::deleteStoredFile($alertaPuntDeRecollida->imatge);
                 $alertaPuntDeRecollida->imatge = null;
             }
 
             $alertaPuntDeRecollida->save();
 
             // Registrar actividad
-            if (auth()->check()) {
+            /** @var Guard $auth */
+            $auth = auth();
+            if ($auth->check()) {
                 Activity::create([
-                    'user_id' => auth()->id(),
+                    'user_id' => $auth->id(),
                     'action' => 'Ha actualitzat l\'alerta ID: ' . $alertaPuntDeRecollida->id
                 ]);
             }
@@ -160,7 +167,7 @@ class AlertaPuntDeRecollidaController extends Controller
                 ]);
             }
 
-            return redirect()->route('admin.dashboard')->with('success', 'Alerta actualitzada correctament.');
+            return redirect()->route('admin.dashboard')->with('success', __('messages.system.alert_updated_success'));
         } catch (\Exception $e) {
             Log::error('Error al actualitzar alerta: ' . $e->getMessage());
 
@@ -171,7 +178,7 @@ class AlertaPuntDeRecollidaController extends Controller
                 ], 422);
             }
 
-            return back()->withErrors(['error' => 'No s\'ha pogut actualitzar l\'alerta.']);
+            return back()->withErrors(['error' => __('messages.system.alert_update_error')]);
         }
     }
 
@@ -179,16 +186,16 @@ class AlertaPuntDeRecollidaController extends Controller
     {
         try {
             // Eliminar la imagen si existe
-            if ($alertaPuntDeRecollida->imatge && file_exists(public_path($alertaPuntDeRecollida->imatge))) {
-                unlink(public_path($alertaPuntDeRecollida->imatge));
-            }
+            UploadedFileSecurity::deleteStoredFile($alertaPuntDeRecollida->imatge);
 
             $alertaPuntDeRecollida->delete();
 
             // Registrar actividad
-            if (auth()->check()) {
+            /** @var Guard $auth */
+            $auth = auth();
+            if ($auth->check()) {
                 Activity::create([
-                    'user_id' => auth()->id(),
+                    'user_id' => $auth->id(),
                     'action' => 'Ha eliminat l\'alerta ID: ' . $alertaPuntDeRecollida->id
                 ]);
             }
@@ -200,7 +207,7 @@ class AlertaPuntDeRecollidaController extends Controller
                 ]);
             }
 
-            return redirect()->route('admin.dashboard')->with('success', 'Alerta eliminada correctament.');
+            return redirect()->route('admin.dashboard')->with('success', __('messages.system.alert_deleted_success'));
         } catch (\Exception $e) {
             Log::error('Error al eliminar alerta: ' . $e->getMessage());
 
@@ -211,7 +218,7 @@ class AlertaPuntDeRecollidaController extends Controller
                 ], 500);
             }
 
-            return back()->withErrors(['error' => 'No s\'ha pogut eliminar l\'alerta.']);
+            return back()->withErrors(['error' => __('messages.system.alert_delete_error')]);
         }
     }
 }

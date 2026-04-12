@@ -6,9 +6,16 @@ use Illuminate\Http\Request;
 use App\Models\TipusEvent;
 use App\Models\Activity;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Contracts\Auth\Guard;
 
 class TipusEventController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['auth', 'admin'])->only(['create', 'store', 'edit', 'update', 'destroy']);
+        $this->middleware('auth')->only(['index', 'show']);
+    }
+
     /**
      * Buscar tipos de eventos con Algolia
      */
@@ -17,8 +24,8 @@ class TipusEventController extends Controller
         $query = $request->input('query');
         
         $results = TipusEvent::search($query)->get()->map(function (TipusEvent $tipusEvent) {
-            $tipusEvent->setAttribute('nom', $tipusEvent->displayNom());
-            $tipusEvent->setAttribute('descripcio', $tipusEvent->displayDescripcio());
+            $tipusEvent->setAttribute('nom', $tipusEvent->displayName());
+            $tipusEvent->setAttribute('descripcio', $tipusEvent->displayDescription());
 
             return $tipusEvent;
         });
@@ -58,9 +65,11 @@ class TipusEventController extends Controller
             $tipusEvent = TipusEvent::create($validatedData);
             
             // Registrar actividad
-            if (auth()->check()) {
+            /** @var Guard $auth */
+            $auth = auth();
+            if ($auth->check()) {
                 Activity::create([
-                    'user_id' => auth()->id(),
+                    'user_id' => $auth->id(),
                     'action' => 'Ha creat un nou tipus d\'event: ' . $tipusEvent->nom
                 ]);
             }
@@ -120,9 +129,11 @@ class TipusEventController extends Controller
             $tipusEvent->update($validatedData);
             
             // Registrar actividad
-            if (auth()->check()) {
+            /** @var Guard $auth */
+            $auth = auth();
+            if ($auth->check()) {
                 Activity::create([
-                    'user_id' => auth()->id(),
+                    'user_id' => $auth->id(),
                     'action' => 'Ha actualitzat el tipus d\'event: ' . $tipusEvent->nom
                 ]);
             }
@@ -166,9 +177,11 @@ class TipusEventController extends Controller
             $tipusEvent->delete();
             
             // Registrar actividad
-            if (auth()->check()) {
+            /** @var Guard $auth */
+            $auth = auth();
+            if ($auth->check()) {
                 Activity::create([
-                    'user_id' => auth()->id(),
+                    'user_id' => $auth->id(),
                     'action' => 'Ha eliminat el tipus d\'event: ' . $tipusEventNom
                 ]);
             }

@@ -9,6 +9,8 @@ use App\Http\Controllers\LogicCheckController;
 use App\Http\Controllers\CacheController;
 use App\Http\Controllers\CacheLockController;
 use App\Http\Controllers\CodiController;
+use App\Http\Controllers\EmailPreviewController;
+use App\Http\Controllers\EmailLinkController;
 use App\Http\Controllers\EventsController;
 use App\Http\Controllers\MapController;
 use App\Http\Controllers\MigrationController;
@@ -58,6 +60,8 @@ Route::localizedGroup(function () {
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
 
+    Route::get('/email/secure-redirect', [EmailLinkController::class, 'redirect'])->name('email.secure-redirect');
+
     Route::resource('caches', CacheController::class)->middleware(['auth', 'admin']);
     Route::resource('cache-locks', CacheLockController::class)->middleware(['auth', 'admin']);
     Route::resource('codis', CodiController::class)->middleware(['auth', 'admin']);
@@ -67,17 +71,17 @@ Route::localizedGroup(function () {
     Route::resource('premis', PremiController::class)->middleware('auth');
     Route::resource('sessions', SessionController::class)->middleware(['auth', 'admin']);
     Route::resource('users', UserController::class)->middleware('auth');
-    Route::resource('productes', ProducteController::class)->middleware('auth');
+    Route::resource('productes', ProducteController::class)->middleware(['auth', 'admin']);
     Route::get('opinions/search', [OpinionsController::class, 'search'])->name('opinions.search');
     Route::resource('opinions', OpinionsController::class)->middleware('auth');
 
-    Route::resource('punts_de_recollida', PuntDeRecollidaController::class)->middleware('auth');
-    Route::resource('tipus_alertes', TipusAlertaController::class)->middleware('auth');
+    Route::resource('punts_de_recollida', PuntDeRecollidaController::class)->middleware(['auth', 'admin']);
+    Route::resource('tipus_alertes', TipusAlertaController::class)->middleware(['auth', 'admin']);
     Route::resource('alertes_punts_de_recollida', AlertaPuntDeRecollidaController::class)->middleware('auth');
 
     // Rutas para eventos con calendario
     Route::get('/events', [EventsController::class, 'index'])->name('events');
-    Route::get('/events/data', [EventsController::class, 'getEvents'])->name('events.getEvents');
+    Route::get('/events/data', [EventsController::class, 'getEvents'])->name('events.getEvents')->middleware('throttle:120,1');
     Route::get('/events/search', [EventsController::class, 'search'])->name('events.search');
     Route::get('/events/{id}', [EventsController::class, 'show'])->name('events.show');
     Route::post('/events/{id}/register', [EventsController::class, 'register'])->name('events.register')->middleware('auth');
@@ -98,7 +102,7 @@ Route::localizedGroup(function () {
     Route::middleware(['auth'])->group(function () {
         Route::get('/scanner', [PageAndApiController::class, 'scanner'])->name('scanner');
 
-        Route::post('/process-code', [CodiController::class, 'processCode'])->name('process-code');
+        Route::post('/process-code', [CodiController::class, 'processCode'])->name('process-code')->middleware('throttle:20,1');
     });
 
     Route::get('/punts-recollida/nearby', [PageAndApiController::class, 'nearbyCollectionPoints'])->name('punts-recollida.nearby')->middleware('throttle:60,1');
@@ -210,5 +214,10 @@ Route::localizedGroup(function () {
             Route::post('/premis-reclamats/approve-all', 'approveAllPending')->name('admin.premis-reclamats.approve-all');
             Route::put('/premis-reclamats/{id}', 'update')->name('admin.premis-reclamats.update');
         });
+    });
+
+    Route::prefix('dev')->middleware(['auth', 'admin'])->group(function () {
+        Route::get('/emails', [EmailPreviewController::class, 'index'])->name('dev.emails.index');
+        Route::get('/emails/{template}', [EmailPreviewController::class, 'show'])->name('dev.emails.show');
     });
 });

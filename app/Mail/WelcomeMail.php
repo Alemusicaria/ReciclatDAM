@@ -32,7 +32,6 @@ class WelcomeMail extends Mailable
     public function build()
     {
         return $this->subject('Benvingut/da a ' . config('app.name'))
-            ->markdown('emails.welcome')
-            ->embed(public_path('images/logo.png'), 'logo');
+            ->markdown('emails.welcome');
     }
 }

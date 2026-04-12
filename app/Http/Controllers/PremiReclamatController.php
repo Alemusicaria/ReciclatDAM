@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\PrizeStatusUpdatedMail;
 use App\Models\PremiReclamat;
 use App\Models\Premi;
 use App\Models\User;
@@ -10,9 +11,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\Activity;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class PremiReclamatController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('admin')->except(['userClaims']);
+    }
+
     public function index()
     {
         $premisReclamats = PremiReclamat::with(['user', 'premi'])->latest()->paginate(10);
@@ -49,7 +57,7 @@ class PremiReclamatController extends Controller
             $premi = Premi::findOrFail($validated['premi_id']);
 
             if ($user->punts_actuals < $validated['punts_gastats']) {
-                return back()->with('error', 'L\'usuari no té suficients punts per reclamar aquest premi.');
+                return back()->with('error', __('messages.system.prize_claim_insufficient_points'));
             }
 
             // Descontar puntos al usuario
@@ -61,7 +69,7 @@ class PremiReclamatController extends Controller
             PremiReclamat::create($validated);
 
             return redirect()->route('premis_reclamats.index')
-                ->with('success', 'Premi reclamat amb èxit.');
+                ->with('success', __('messages.system.prize_claimed_success'));
         });
     }
 
@@ -89,6 +97,7 @@ class PremiReclamatController extends Controller
             ]);
 
             $premiReclamat = PremiReclamat::findOrFail($id);
+            $previousStatus = (string) $premiReclamat->estat;
 
             // Generar código de seguimiento si está vacío y estado es procesant
             if ($request->estat == 'procesant' && empty($request->codi_seguiment)) {
@@ -101,6 +110,8 @@ class PremiReclamatController extends Controller
             $premiReclamat->estat = $request->estat;
             $premiReclamat->comentaris = $request->comentaris;
             $premiReclamat->save();
+
+            $this->sendStatusEmailIfNeeded($premiReclamat, $previousStatus);
 
             // Registrar actividad
             if (Auth::check()) {
@@ -118,7 +129,7 @@ class PremiReclamatController extends Controller
             }
 
             return redirect()->route('admin.dashboard')
-                ->with('success', 'Estat del premi reclamat actualitzat correctament.');
+                ->with('success', __('messages.system.prize_status_updated_success'));
         } catch (\Exception $e) {
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
@@ -194,7 +205,7 @@ class PremiReclamatController extends Controller
         $userId = (int) $userId;
 
         // Check authorization: must be admin or the user themselves
-        $isAdmin = $authUser->rol && $authUser->rol->nom === 'Administrador';
+        $isAdmin = $authUser instanceof User && $authUser->isAdmin();
         $isOwner = (int) $authUser->id === $userId;
 
         if (!$isAdmin && !$isOwner) {
@@ -211,12 +222,15 @@ class PremiReclamatController extends Controller
         try {
             DB::transaction(function () use ($id) {
                 $premiReclamat = PremiReclamat::query()->with('user')->whereKey($id)->lockForUpdate()->firstOrFail();
+                $previousStatus = (string) $premiReclamat->estat;
                 $premiReclamat->estat = 'procesant';
 
                 // Generar código de seguimiento único
                 $premiReclamat->codi_seguiment = $this->generarCodiSeguimentUnic();
 
                 $premiReclamat->save();
+
+                $this->sendStatusEmailIfNeeded($premiReclamat, $previousStatus);
 
                 // Registrar actividad
                 if (Auth::check()) {
@@ -301,6 +315,7 @@ class PremiReclamatController extends Controller
         try {
             $response = DB::transaction(function () use ($id) {
                 $premiReclamat = PremiReclamat::query()->with('user')->whereKey($id)->lockForUpdate()->firstOrFail();
+                $previousStatus = (string) $premiReclamat->estat;
 
                 if ($premiReclamat->estat !== 'procesant') {
                     return response()->json([
@@ -311,6 +326,8 @@ class PremiReclamatController extends Controller
 
                 $premiReclamat->estat = 'entregat';
                 $premiReclamat->save();
+
+                $this->sendStatusEmailIfNeeded($premiReclamat, $previousStatus);
 
                 if (Auth::check()) {
                     Activity::create([
@@ -367,6 +384,7 @@ class PremiReclamatController extends Controller
     {
         DB::transaction(function () use ($id) {
             $premiReclamat = PremiReclamat::query()->with('user')->whereKey($id)->lockForUpdate()->firstOrFail();
+            $previousStatus = (string) $premiReclamat->estat;
 
             // Si se rechaza, devolver puntos al usuario
             if ($premiReclamat->user) {
@@ -381,6 +399,8 @@ class PremiReclamatController extends Controller
                 'Sol·licitud rebutjada el ' . now()->format('d/m/Y H:i') . ' per ' . Auth::user()->nom;
             $premiReclamat->save();
 
+            $this->sendStatusEmailIfNeeded($premiReclamat, $previousStatus);
+
             // Registrar actividad
             if (Auth::check()) {
                 Activity::create([
@@ -391,5 +411,23 @@ class PremiReclamatController extends Controller
         });
 
         return response()->json(['success' => true]);
+    }
+
+    private function sendStatusEmailIfNeeded(PremiReclamat $claim, string $previousStatus): void
+    {
+        $claim->loadMissing(['user', 'premi']);
+
+        if (
+            !app()->environment('testing')
+            &&
+            $claim->user
+            && is_string($claim->user->email)
+            && filter_var($claim->user->email, FILTER_VALIDATE_EMAIL)
+            && $previousStatus !== (string) $claim->estat
+        ) {
+            Mail::to($claim->user->email)->queue(
+                new PrizeStatusUpdatedMail($claim->user, $claim, $previousStatus, (string) $claim->estat)
+            );
+        }
     }
 }
