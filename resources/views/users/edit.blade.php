@@ -36,7 +36,7 @@
                     @method('PUT')
 
                     <div class="photo-upload-container">
-                        <div class="photo-preview" style="width: 96px; height: 96px;">
+                        <div class="photo-preview profile-avatar-edit">
                             <img src="{{ $profilePhoto }}" alt="{{ __('messages.admin.users.current_photo') }}">
                         </div>
                         <label for="foto_perfil" class="photo-upload-btn">

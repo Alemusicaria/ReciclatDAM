@@ -42,7 +42,7 @@
                 <form action="{{ route('password.email') }}" method="POST" class="login100-form validate-form flex-sb flex-w">
                     @csrf
                     <div class="login100-form-title p-b-20">
-                        <img src="{{ asset('images/logo.png') }}" alt="Logo" style="max-width: 150px;">
+                        <img src="{{ asset('images/logo.png') }}" alt="Logo" class="logo-small">
                     </div>
 
                     <span class="login100-form-title p-b-53">

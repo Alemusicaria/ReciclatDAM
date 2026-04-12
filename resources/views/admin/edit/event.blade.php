@@ -24,7 +24,7 @@
                                         <option value="">{{ __('messages.admin.events.select_type') }}</option>
                                         @foreach(\App\Models\TipusEvent::all() as $tipus)
                                             <option value="{{ $tipus->id }}" {{ $event->tipus_event_id == $tipus->id ? 'selected' : '' }}>
-                                                {{ $tipus->displayNom() }}
+                                                {{ $tipus->displayName() }}
                                             </option>
                                         @endforeach
                                     </select>

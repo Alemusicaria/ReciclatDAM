@@ -14,7 +14,7 @@
                         @endif
                     </div>
                     <div>
-                        <h2 class="detail-name mb-1">{{ $premi->displayNom() }}</h2>
+                        <h2 class="detail-name mb-1">{{ $premi->displayName() }}</h2>
                         <div class="detail-badge mb-2">
                             <span class="badge bg-primary py-1 px-2">
                                 <i class="fas fa-coins me-1"></i>{{ $premi->punts_requerits }} {{ __('messages.admin.premis.points') }}
@@ -47,7 +47,7 @@
                     <i class="fas fa-align-left text-success me-2"></i>{{ __('messages.admin.premis.description') }}
                 </h4>
                 <div class="premi-description">
-                    <p class="mb-0">{{ $premi->displayDescripcio() ?: __('messages.admin.premis.no_description') }}</p>
+                    <p class="mb-0">{{ $premi->displayDescription() ?: __('messages.admin.premis.no_description') }}</p>
                 </div>
             </div>
         </div>

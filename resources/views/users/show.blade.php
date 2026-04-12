@@ -6,7 +6,7 @@
         $summaryLevel = $user->nivell();
         $summaryUpdatedAt = \App\Support\LocalizedDate::format($user->updated_at, $locale, 'd M Y H:i', '-');
     ?>
-    <div class="container profile-container" style="margin-top: 8rem !important;">
+    <div class="container profile-container page-offset-profile">
         <div class="row">
             <div class="col-lg-4">
                 <!-- Tarjeta de perfil principal -->
@@ -14,30 +14,13 @@
                     <div class="card-body text-center">
                         <div class="position-relative mb-4">
                             <!-- Imagen de perfil -->
-                            @if($user->foto_perfil)
-                                @if(str_starts_with($user->foto_perfil, 'https://'))
-                                    <img src="{{ e($user->foto_perfil) }}" alt="{{ __('messages.profile_page.profile_photo_alt') }}"
-                                        class="rounded-circle img-thumbnail shadow js-user-avatar" id="profile-image-main"
-                                        style="width: 150px; height: 150px; object-fit: cover;">
-                                @elseif(\Illuminate\Support\Facades\Storage::disk('public')->exists($user->foto_perfil))
-                                    <img src="{{ \Illuminate\Support\Facades\Storage::url($user->foto_perfil) }}" alt="{{ __('messages.profile_page.profile_photo_alt') }}"
-                                        class="rounded-circle img-thumbnail shadow js-user-avatar" id="profile-image-main"
-                                        style="width: 150px; height: 150px; object-fit: cover;">
-                                @else
-                                    <img src="{{ asset('images/default-profile.png') }}" alt="{{ __('messages.profile_page.profile_photo_alt') }}"
-                                        class="rounded-circle img-thumbnail shadow js-user-avatar" id="profile-image-main"
-                                        style="width: 150px; height: 150px; object-fit: cover;">
-                                @endif
-                            @else
-                                <img src="{{ asset('images/default-profile.png') }}" alt="{{ __('messages.profile_page.profile_photo_alt') }}"
-                                    class="rounded-circle img-thumbnail shadow js-user-avatar" id="profile-image-main"
-                                    style="width: 150px; height: 150px; object-fit: cover;">
-                            @endif
+                            <img src="{{ $user->profilePhotoUrl() }}" alt="{{ __('messages.profile_page.profile_photo_alt') }}"
+                                class="rounded-circle img-thumbnail shadow js-user-avatar profile-avatar-lg" id="profile-image-main"
+                                onerror="this.onerror=null;this.src='{{ asset('images/default-profile.png') }}';">
 
                             <!-- Icono para editar foto -->
                             <div class="position-relative bottom-0 start-0">
-                                <label for="photo-upload" class="btn btn-sm btn-success rounded-circle change-photo-btn"
-                                    style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; margin: auto; margin-top: 1vh;"
+                                <label for="photo-upload" class="btn btn-sm btn-success rounded-circle change-photo-btn profile-edit-button"
                                     title="{{ __('messages.profile_page.change_photo') }}">
                                     <i class="fas fa-camera"></i>
                                 </label>
@@ -99,12 +82,12 @@
 
                         @if($currentLevel)
                             <div class="d-flex align-items-center mb-3">
-                                <div class="me-3 p-3 rounded-circle" style="background-color: {{ $currentLevel->color }}; width: 70px; height: 70px; display: flex; justify-content: center; align-items: center; margin-right: 20px;">
+                                <div class="me-3 p-3 rounded-circle level-badge" style="background-color: {{ $currentLevel->color }};">
                                     <i class="{{ $currentLevel->icona }} fa-2x text-white"></i>
                                 </div>
                                 <div>
-                                    <h5 class="mb-1">{{ $currentLevel->displayNom() }}</h5>
-                                    <p class="mb-0 text-muted">{{ $currentLevel->displayDescripcio() }}</p>
+                                    <h5 class="mb-1">{{ $currentLevel->displayName() }}</h5>
+                                    <p class="mb-0 text-muted">{{ $currentLevel->displayDescription() }}</p>
                                 </div>
                             </div>
                         @endif
@@ -112,10 +95,10 @@
                         @if($currentLevel && $nextLevel)
                             <div class="mt-4">
                                 <div class="d-flex justify-content-between mb-2">
-                                    <span>{{ __('messages.profile_page.level_progress', ['current' => $currentLevel->id, 'current_name' => $currentLevel->displayNom()]) }}</span>
-                                    <span>{{ __('messages.profile_page.next_level', ['next' => $nextLevel->id, 'next_name' => $nextLevel->displayNom()]) }}</span>
+                                    <span>{{ __('messages.profile_page.level_progress', ['current' => $currentLevel->id, 'current_name' => $currentLevel->displayName()]) }}</span>
+                                    <span>{{ __('messages.profile_page.next_level', ['next' => $nextLevel->id, 'next_name' => $nextLevel->displayName()]) }}</span>
                                 </div>
-                                <div class="progress" style="height: 10px;">
+                                <div class="progress progress-bar-height">
                                     <div class="progress-bar" role="progressbar" 
                                         style="width: {{ $progress }}%; background-color: {{ $currentLevel->color }};" 
                                         aria-valuenow="{{ $progress }}" aria-valuemin="0" aria-valuemax="100"></div>
@@ -140,7 +123,7 @@
                 </div>
 
                 <!-- Tarjeta de estadísticas visuales -->
-                <div class="card mb-4 stats-card" style="height: 45vh;">
+                <div class="card mb-4 stats-card stats-card-responsive">
                     <div class="card-body">
                         <h5 class="card-title mb-4">
                             <i class="fas fa-chart-pie me-2" style="margin-right: 5px;"></i>{{ __('messages.profile_page.points_distribution') }}
@@ -157,7 +140,7 @@
                         </h5>
 
                         @if($user->premisReclamats->count() > 0)
-                            <div class="table-responsive" style="max-height: none; overflow-y: visible;">
+                            <div class="table-responsive stats-card-responsive-table">
                                 <table class="table table-hover table-sm">
                                     <thead>
                                         <tr>
@@ -191,7 +174,7 @@
                                                     <div class="d-flex align-items-center">
                                                         @if($premi->premi->imatge)
                                                             <img src="{{ asset($premi->premi->imatge) }}"
-                                                                alt="{{ $premi->premi->displayNom() }}"
+                                                                alt="{{ $premi->premi->displayName() }}"
                                                                 class="me-2" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 10px;">
                                                         @else
                                                             <div class="me-2 bg-light d-flex align-items-center justify-content-center"
@@ -200,7 +183,7 @@
                                                             </div>
                                                         @endif
                                                         <div class="text-truncate" style="max-width: 150px;">
-                                                            <div class="fw-bold text-truncate">{{ $premi->premi->displayNom() }}</div>
+                                                            <div class="fw-bold text-truncate">{{ $premi->premi->displayName() }}</div>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -304,7 +287,7 @@
                 </div>
 
                 <!-- Gráfico de actividad -->
-                <div class="card mb-4 stats-card" style="height: 45vh;">
+                <div class="card mb-4 stats-card stats-card-responsive">
                     <div class="card-body">
                         <h5 class="card-title mb-3">
                             <i class="fas fa-chart-line me-2" style="margin-right: 5px;"></i>{{ __('messages.profile_page.recent_activity') }}
@@ -399,7 +382,7 @@
                                                             <div class="day">{{ \App\Support\LocalizedDate::format($event->data_inici, $locale, 'd') }}</div>
                                                         </div>
                                                         <div class="event-details">
-                                                            <h6 class="mb-1">{{ $event->displayNom() }}</h6>
+                                                            <h6 class="mb-1">{{ $event->displayName() }}</h6>
                                                             <p class="text-muted mb-1 small">
                                                                 <i class="fas fa-map-marker-alt me-1"></i> {{ $event->lloc }}
                                                             </p>
@@ -414,7 +397,7 @@
                                                                 <br>
                                                                 @if($event->tipus)
                                                                     <span class="badge" style="background-color: {{ $event->tipus->color }}; margin-top: 5px;">
-                                                                        {{ $event->displayTipusNom() }}
+                                                                        {{ $event->displayTypeName() }}
                                                                     </span>
                                                                 @endif
                                                             </div>
@@ -446,7 +429,7 @@
                                                             <div class="day">{{ \App\Support\LocalizedDate::format($event->data_inici, $locale, 'd') }}</div>
                                                         </div>
                                                         <div class="event-details">
-                                                            <h6 class="mb-1">{{ $event->displayNom() }}</h6>
+                                                            <h6 class="mb-1">{{ $event->displayName() }}</h6>
                                                             <p class="text-muted mb-1 small">
                                                                 <i class="fas fa-map-marker-alt me-1"></i> {{ $event->lloc }}
                                                             </p>
@@ -476,7 +459,7 @@
                                                                 <br>
                                                                 @if($event->tipus)
                                                                     <span class="badge" style="background-color: {{ $event->tipus->color }}; margin-top: 5px;">
-                                                                        {{ $event->displayTipusNom() }}
+                                                                        {{ $event->displayTypeName() }}
                                                                     </span>
                                                                 @endif
                                                             </div>
@@ -1088,3 +1071,4 @@
         })
     });
 </script>
+

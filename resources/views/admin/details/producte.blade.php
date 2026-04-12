@@ -23,7 +23,7 @@
                         <div class="product-info mt-3">
                             <div class="text-muted">
                                 <i class="fas fa-info-circle me-2"></i>
-                                {{ __('messages.admin.products.category_description', ['category' => $producte->displayCategoria()]) }}
+                                {{ __('messages.admin.products.category_description', ['category' => $producte->displayCategory()]) }}
                             </div>
                         </div>
                     </div>

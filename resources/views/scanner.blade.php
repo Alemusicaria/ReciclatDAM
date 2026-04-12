@@ -16,9 +16,8 @@
                             No s'ha pogut accedir a la càmera. Comprova els permisos.
                         </div>
 
-                        <div id="scanner-container" style="position: relative;">
-                            <div id="interactive" class="viewport"
-                                style="width: 100%; max-height: 70vh; min-height: 300px; position: relative; background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                        <div id="scanner-container" class="scanner-container">
+                            <div id="interactive" class="viewport scanner-viewport">
                                 <div class="camera-placeholder text-center py-5">
                                     <i class="fas fa-camera fa-3x text-muted mb-3"></i>
                                     <p>Fes clic a "Activar càmera" per començar a escanejar</p>

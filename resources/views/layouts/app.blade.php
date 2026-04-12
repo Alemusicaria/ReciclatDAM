@@ -126,24 +126,10 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown"
                                 role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                @if(Auth::user()->foto_perfil)
-                                    @if(str_starts_with(Auth::user()->foto_perfil, 'https://'))
-                                        <img src="{{ Auth::user()->foto_perfil }}" alt="Foto de perfil" class="rounded-circle js-user-avatar"
-                                            id="navbar-profile-image" style="width: 30px; height: 30px; margin-right: 5px; ">
-                                    @elseif(\Illuminate\Support\Facades\Storage::disk('public')->exists(Auth::user()->foto_perfil))
-                                        <img src="{{ \Illuminate\Support\Facades\Storage::url(Auth::user()->foto_perfil) }}" alt="Foto de perfil"
-                                            class="rounded-circle js-user-avatar" id="navbar-profile-image"
-                                            style="width: 30px; height: 30px; object-fit: cover; margin-right: 5px; ">
-                                    @else
-                                        <img src="{{ asset('images/default-profile.png') }}" alt="Foto de perfil"
-                                            class="rounded-circle js-user-avatar" id="navbar-profile-image"
-                                            style="width: 30px; height: 30px; object-fit: cover; margin-right: 5px; ">
-                                    @endif
-                                @else
-                                    <img src="{{ asset('images/default-profile.png') }}" alt="Foto de perfil"
-                                        class="rounded-circle js-user-avatar" id="navbar-profile-image"
-                                        style="width: 30px; height: 30px; object-fit: cover; margin-right: 5px; ">
-                                @endif
+                                <img src="{{ Auth::user()->profilePhotoUrl() }}" alt="Foto de perfil"
+                                    class="rounded-circle js-user-avatar" id="navbar-profile-image"
+                                    onerror="this.onerror=null;this.src='{{ asset('images/default-profile.png') }}';"
+                                    style="width: 30px; height: 30px; object-fit: cover; margin-right: 5px; ">
                                 <span>{{ Auth::user()->nom }} ({{ Auth::user()->punts_actuals }} ECODAMS)</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
@@ -248,37 +234,37 @@
         $catalogTranslations = [
             'products' => \App\Models\Producte::all()->mapWithKeys(function ($producte) {
                 return [(string) $producte->id => [
-                    'nom' => $producte->displayNom(),
-                    'categoria' => $producte->displayCategoria(),
+                    'nom' => $producte->displayName(),
+                    'categoria' => $producte->displayCategory(),
                 ]];
             })->all(),
             'premis' => \App\Models\Premi::all()->mapWithKeys(function ($premi) {
                 return [(string) $premi->id => [
-                    'nom' => $premi->displayNom(),
-                    'descripcio' => $premi->displayDescripcio(),
-                    'categoria' => $premi->displayCategoria(),
+                    'nom' => $premi->displayName(),
+                    'descripcio' => $premi->displayDescription(),
+                    'categoria' => $premi->displayCategory(),
                 ]];
             })->all(),
             'punts' => \App\Models\PuntDeRecollida::all()->mapWithKeys(function ($punt) {
                 return [(string) $punt->id => [
-                    'nom' => $punt->displayNom(),
-                    'fraccio' => $punt->displayFraccio(),
+                    'nom' => $punt->displayName(),
+                    'fraccio' => $punt->displayWasteFraction(),
                 ]];
             })->all(),
             'nivells' => \App\Models\Nivell::all()->mapWithKeys(function ($nivell) {
                 return [(string) $nivell->id => [
-                    'nom' => $nivell->displayNom(),
-                    'descripcio' => $nivell->displayDescripcio(),
+                    'nom' => $nivell->displayName(),
+                    'descripcio' => $nivell->displayDescription(),
                 ]];
             })->all(),
             'rols' => \App\Models\Rol::all()->mapWithKeys(function ($rol) {
                 return [(string) $rol->id => [
-                    'nom' => $rol->displayNom(),
+                    'nom' => $rol->displayName(),
                 ]];
             })->all(),
             'tipus_alertes' => \App\Models\TipusAlerta::all()->mapWithKeys(function ($tipusAlerta) {
                 return [(string) $tipusAlerta->id => [
-                    'nom' => $tipusAlerta->displayNom(),
+                    'nom' => $tipusAlerta->displayName(),
                 ]];
             })->all(),
         ];
@@ -729,6 +715,142 @@
                 });
             }
         });
+    </script>
+
+    <script>
+        (function () {
+            const baseTitle = @json(__('messages.brand')) || 'Reciclat DAM';
+            let rafId = null;
+
+            function normalize(text) {
+                return String(text || '').replace(/\s+/g, ' ').trim();
+            }
+
+            function composeTitle(part) {
+                const cleanPart = normalize(part);
+                return cleanPart ? cleanPart + ' | ' + baseTitle : baseTitle;
+            }
+
+            function getModalTitle() {
+                const openModals = Array.from(document.querySelectorAll('.modal.show'));
+                if (openModals.length === 0) {
+                    return '';
+                }
+
+                const latest = openModals[openModals.length - 1];
+                const modalTitle = latest.querySelector('.modal-title, [data-modal-title], h1, h2, h3');
+                return normalize(modalTitle ? modalTitle.textContent : '');
+            }
+
+            function getActiveTabTitle() {
+                const activeTab = document.querySelector('.nav-tabs .nav-link.active, .nav-pills .nav-link.active, [role="tab"].active');
+                return normalize(activeTab ? activeTab.textContent : '');
+            }
+
+            function getHashTitle() {
+                const hash = normalize(window.location.hash.replace('#', ''));
+                if (!hash) {
+                    return '';
+                }
+
+                const navByData = document.querySelector('.navbar-nav .nav-link[data-section="' + CSS.escape(hash) + '"]');
+                if (navByData) {
+                    return normalize(navByData.textContent);
+                }
+
+                const sectionEl = document.getElementById(hash);
+                if (!sectionEl) {
+                    return '';
+                }
+
+                const heading = sectionEl.querySelector('h1, h2, h3, [data-section-title]');
+                return normalize(heading ? heading.textContent : '');
+            }
+
+            function getPageTitle() {
+                const explicit = document.querySelector('[data-page-title]');
+                if (explicit) {
+                    const explicitTitle = normalize(explicit.getAttribute('data-page-title') || explicit.textContent);
+                    if (explicitTitle) {
+                        return explicitTitle;
+                    }
+                }
+
+                const firstHeading = document.querySelector('main h1, .container h1, .container-fluid h1, h1');
+                if (firstHeading) {
+                    const headingText = normalize(firstHeading.textContent);
+                    if (headingText) {
+                        return headingText;
+                    }
+                }
+
+                const activeNav = document.querySelector('.navbar-nav .nav-link.active');
+                if (activeNav) {
+                    const navText = normalize(activeNav.textContent);
+                    if (navText) {
+                        return navText;
+                    }
+                }
+
+                const path = normalize(window.location.pathname.toLowerCase());
+                if (!path || path === '/' || path === '/ca' || path === '/es' || path === '/en') {
+                    return '';
+                }
+
+                const fallbackMap = {
+                    '/login': 'Login',
+                    '/register': 'Register',
+                    '/scanner': 'Scanner',
+                    '/admin': 'Admin',
+                    '/events': 'Events',
+                    '/users': 'Profile'
+                };
+
+                const matched = Object.keys(fallbackMap).find(function (prefix) {
+                    return path.endsWith(prefix) || path.indexOf('/ca' + prefix) !== -1 || path.indexOf('/es' + prefix) !== -1 || path.indexOf('/en' + prefix) !== -1;
+                });
+
+                return matched ? fallbackMap[matched] : '';
+            }
+
+            function updateDocumentTitleNow() {
+                const modalTitle = getModalTitle();
+                const tabTitle = getActiveTabTitle();
+                const hashTitle = getHashTitle();
+                const pageTitle = getPageTitle();
+                const titlePart = modalTitle || tabTitle || hashTitle || pageTitle;
+                document.title = composeTitle(titlePart);
+            }
+
+            function scheduleTitleUpdate() {
+                if (rafId !== null) {
+                    cancelAnimationFrame(rafId);
+                }
+
+                rafId = requestAnimationFrame(function () {
+                    updateDocumentTitleNow();
+                    rafId = null;
+                });
+            }
+
+            window.addEventListener('DOMContentLoaded', scheduleTitleUpdate);
+            window.addEventListener('load', scheduleTitleUpdate);
+            window.addEventListener('hashchange', scheduleTitleUpdate);
+            window.addEventListener('popstate', scheduleTitleUpdate);
+
+            document.addEventListener('shown.bs.modal', scheduleTitleUpdate);
+            document.addEventListener('hidden.bs.modal', scheduleTitleUpdate);
+            document.addEventListener('shown.bs.tab', scheduleTitleUpdate);
+            document.addEventListener('shown.bs.pill', scheduleTitleUpdate);
+
+            const observer = new MutationObserver(scheduleTitleUpdate);
+            observer.observe(document.body, {
+                subtree: true,
+                childList: true,
+                attributes: true,
+                attributeFilter: ['class', 'aria-selected']
+            });
+        })();
     </script>
 
 </body>

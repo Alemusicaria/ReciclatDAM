@@ -1,7 +1,7 @@
 @component('mail::message')
 # Benvingut/da a {{ config('app.name') }}!
 
-Hola **{{ $user->name }}**,
+Hola **{{ $user->nom ?? $user->name ?? 'usuari' }}**,
 
 Gràcies per unir-te a la comunitat de reciclatge de ReciclatDAM! Estem encantats de tenir-te amb nosaltres.
 
@@ -26,7 +26,7 @@ Atentament,<br>
 L'equip de {{ config('app.name') }}
 
 <div style="text-align: center; margin-top: 30px;">
-    <img src="https://reciclatdam.com/images/logo.png"  alt="{{ config('app.name') }}" style="max-height: 80px;">
+    <img src="https://reciclatdam.com/images/logo.png"  alt="{{ config('app.name') }}" class="logo-email">
     <p style="margin-top: 15px; color: #88a; font-size: 14px;">
         Junts per un futur més verd! 🌍
     </p>

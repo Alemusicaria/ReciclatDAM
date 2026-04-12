@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container" style="margin-top: 9rem; max-width: 520px;">
+    <div class="container page-offset-profile" style="max-width: 520px;">
         <div class="card shadow-sm border-0">
             <div class="card-body p-4">
                 <h1 class="h4 mb-3">Establir contrasenya</h1>

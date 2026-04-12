@@ -25,11 +25,11 @@
                         <div class="user-status">
                             @php $rawRoleName = $user->rol?->getRawOriginal('nom'); @endphp
                             <span class="badge {{ $rawRoleName === 'Admin' ? 'bg-danger' : ($rawRoleName === 'Gestor' ? 'bg-warning' : 'bg-success') }} py-1 px-2">
-                                <i class="fas fa-user-shield me-1"></i>{{ $user->rol?->displayNom() ?? 'N/A' }}
+                                <i class="fas fa-user-shield me-1"></i>{{ $user->rol?->displayName() ?? 'N/A' }}
                             </span>
                             @if($user->nivell())
                                 <span class="badge bg-info py-1 px-2 ms-2">
-                                    <i class="fas fa-trophy me-1"></i>{{ $user->nivell()->displayNom() }}
+                                    <i class="fas fa-trophy me-1"></i>{{ $user->nivell()->displayName() }}
                                 </span>
                             @endif
                         </div>

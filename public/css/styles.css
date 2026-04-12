@@ -4370,6 +4370,167 @@ button#next-selected-award:focus {
     transition: all .3s ease
 }
 
+/* First-pass responsive utilities for high-traffic screens */
+.page-offset-admin {
+    margin-top: clamp(5.5rem, 11vh, 13vh);
+}
+
+.page-offset-profile {
+    margin-top: clamp(5.5rem, 10vh, 8rem) !important;
+}
+
+.profile-avatar-lg {
+    width: clamp(112px, 20vw, 150px);
+    height: clamp(112px, 20vw, 150px);
+    object-fit: cover;
+}
+
+.profile-avatar-sm {
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+    margin-right: 5px;
+}
+
+.profile-avatar-md {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.profile-avatar-edit {
+    width: 96px;
+    height: 96px;
+}
+
+.profile-edit-button {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+    margin-top: 1vh;
+}
+
+.level-badge {
+    width: 70px;
+    height: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 20px;
+    border-radius: 50%;
+}
+
+.stats-card-responsive {
+    height: 45vh;
+    min-height: 280px;
+}
+
+.stats-card-responsive-table {
+    max-height: none;
+    overflow-y: visible;
+}
+
+.scanner-container {
+    position: relative;
+}
+
+.scanner-viewport {
+    width: 100%;
+    max-height: 70vh;
+    min-height: 300px;
+    position: relative;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+}
+
+.progress-bar-height {
+    height: 10px;
+}
+
+.event-list-image {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.logo-medium {
+    max-width: 180px;
+}
+
+.logo-small {
+    max-width: 80px;
+    height: auto;
+}
+
+.logo-large {
+    max-width: 350px;
+    height: auto;
+}
+
+.logo-email {
+    max-height: 80px;
+}
+
+.icon-sm {
+    margin-right: 5px;
+}
+
+.icon-flag {
+    width: 20px;
+    margin-right: 10px;
+}
+
+.table-responsive-container {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.text-truncate-150 {
+    max-width: 150px;
+}
+
+.product-item-thumb {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+@media (max-width: 768px) {
+    .stats-card-responsive {
+        height: auto;
+        min-height: 240px;
+    }
+
+    .scanner-viewport {
+        max-height: 62vh;
+        min-height: 240px;
+    }
+
+    .level-badge {
+        width: 60px;
+        height: 60px;
+        margin-right: 15px;
+    }
+
+    .table-responsive-container {
+        max-height: 300px;
+    }
+
+    .profile-avatar-lg {
+        width: clamp(100px, 18vw, 130px);
+        height: clamp(100px, 18vw, 130px);
+    }
+}
+
 .category-card .overlay {
     align-items: center;
     background-color: var(--hover-color);
