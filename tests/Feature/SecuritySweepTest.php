@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Nivell;
 use App\Models\Rol;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
@@ -108,6 +109,46 @@ class SecuritySweepTest extends TestCase
         $response->assertStatus(422);
         $user->refresh();
         $this->assertFalse($user->isAdmin(), 'Non-admin user should not be able to change role to admin.');
+    }
+
+    public function test_non_admin_cannot_access_sensitive_crud_routes(): void
+    {
+        $user = $this->createRegularUser();
+
+        $routes = [
+            route('productes.index'),
+            route('punts_de_recollida.index'),
+            route('tipus_alertes.index'),
+            route('premis_reclamats.index'),
+        ];
+
+        foreach ($routes as $route) {
+            $response = $this->actingAs($user)->get($route);
+            $response->assertRedirect(route('dashboard'));
+        }
+    }
+
+    public function test_security_headers_are_present_on_web_responses(): void
+    {
+        $response = $this->get(route('login'));
+
+        $response->assertHeader('X-Content-Type-Options', 'nosniff');
+        $response->assertHeader('X-Frame-Options', 'DENY');
+        $response->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+        $response->assertHeader('Content-Security-Policy');
+    }
+
+    public function test_svg_product_upload_is_rejected(): void
+    {
+        $admin = $this->createAdminUser();
+
+        $response = $this->actingAs($admin)->post(route('admin.productes.store'), [
+            'nom' => 'Test product',
+            'categoria' => 'Resta',
+            'imatge' => UploadedFile::fake()->create('evil.svg', 10, 'image/svg+xml'),
+        ]);
+
+        $response->assertSessionHasErrors('imatge');
     }
 
     public function test_login_brute_force_is_throttled(): void
